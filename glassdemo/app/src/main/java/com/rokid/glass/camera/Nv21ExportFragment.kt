@@ -8,12 +8,18 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.LinearLayout
+import android.graphics.Rect
 import android.widget.SeekBar
 import android.widget.Spinner
 import android.widget.Switch
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import com.rokid.glass.base.GlassKeyEvent
 import com.rokid.glass.view.glsurface.view.BackgroundGLSurfaceView
 import com.rokid.glesse.R
@@ -105,7 +111,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     private lateinit var nv21SurfaceView: BackgroundGLSurfaceView
     private lateinit var tvInfo: TextView
-    private lateinit var configPanel: LinearLayout
+    private lateinit var configPanel: View
     private lateinit var btnShowConfig: Button
     private lateinit var btnApply: Button
     private lateinit var btnToggleConfig: Button
@@ -118,6 +124,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     private var selectedConfigIndex = 0
     
     private val nv21Helper = CameraShareHelper()
+    private var configSwitchJob: Job? = null
+    @Volatile private var callbackGeneration = 0
+    private val previewPreferences get() = requireContext().getSharedPreferences("nv21_preview", 0)
     private var frameCount = 0L
     private var lastFpsTime = 0L
     private var currentWidth = 0
@@ -153,13 +162,19 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         // 动态获取 Camera 支持的分辨率列表（已过滤高于 2268x3024 的分辨率）
         resolutionOptions = getSupportedResolutions()
         
-        // 查找 1920x1080 的索引作为默认选项
-        currentResolutionIndex = resolutionOptions.indexOfFirst { 
-            it.second.first == 1920 && it.second.second == 1080 
-        }.takeIf { it >= 0 } ?: 0 // 如果找不到 1920x1080，使用第一个（最高分辨率）
-        
-        Log.d(TAG, "Default resolution index: $currentResolutionIndex, resolution: ${resolutionOptions[currentResolutionIndex].first}")
-        
+        val preferences = previewPreferences
+        val savedWidth = preferences.getInt("width", 1920)
+        val savedHeight = preferences.getInt("height", 1080)
+        currentResolutionIndex = resolutionOptions.indexOfFirst {
+            it.second.first == savedWidth && it.second.second == savedHeight
+        }.takeIf { it >= 0 } ?: resolutionOptions.indexOfFirst {
+            it.second.first == 1920 && it.second.second == 1080
+        }.coerceAtLeast(0)
+        currentFpsIndex = FPS_OPTIONS.indexOf(preferences.getInt("fps", 15)).coerceAtLeast(0)
+        currentZoom = preferences.getInt("zoom", 1).coerceIn(1, 8)
+        currentEis = preferences.getBoolean("eis", false)
+        Log.d(TAG, "Restored requested resolution: ${resolutionOptions[currentResolutionIndex].first}")
+
         nv21SurfaceView = view.findViewById(R.id.nv21_surface_view)
         tvInfo = view.findViewById(R.id.tv_info)
         configPanel = view.findViewById(R.id.config_panel)
@@ -210,6 +225,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     }
 
     private fun releaseNv21Resources(reason: String) {
+        callbackGeneration++
+        configSwitchJob?.cancel()
+        configSwitchJob = null
         if (!nv21Helper.isNv21Active()) return
         Log.d(TAG, "$reason: releasing NV21 export")
         try {
@@ -294,6 +312,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
      * 应用用户配置
      */
     private fun applyConfig() {
+        if (configSwitchJob?.isActive == true) return
         val resolutionOption = resolutionOptions[currentResolutionIndex].second
         val width = resolutionOption.first
         val height = resolutionOption.second
@@ -311,15 +330,55 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         )
 
         Log.d(TAG, "applyConfig: ${width}x${height}@${fps}fps, zoom=$currentZoom")
-        nv21Helper.restartNv21ExportWithConfig(
-            enableMix = false,
-            config = newConfig,
-            callback = createNv21Callback(isPortrait),
-        )
+        // Avoid immediate stop/start reusing the old producer on current firmware.
+        // Only release our consumer; never force-close other camera consumers.
+        callbackGeneration++
+        val firstFrame = CompletableDeferred<Unit>()
+        configSwitchJob = viewLifecycleOwner.lifecycleScope.launch {
+            btnApply.isEnabled = false
+            try {
+                nv21Helper.releaseNv21Export()
+                nv21SurfaceView.releasePreview()
+                nv21SurfaceView.requestRender()
+                currentWidth = 0
+                currentHeight = 0
+                frameCount = 0
+                lastFpsTime = 0
+                lastFrameTimestamp = 0
+                frameIntervalSum = 0
+                frameIntervalCount = 0
+                Log.d(TAG, "Config switch: released own consumer; waiting for idle cleanup")
+                delay(1500)
+                nv21Helper.initNv21ExportWithConfig(
+                    enableMix = false,
+                    config = newConfig,
+                    callback = createNv21Callback(isPortrait, newConfig, firstFrame),
+                )
+                withTimeout(10_000) { firstFrame.await() }
+                previewPreferences.edit()
+                    .putInt("width", width).putInt("height", height).putInt("fps", fps)
+                    .putInt("zoom", newConfig.zoomLevel).putBoolean("eis", newConfig.enableVideoStabilization)
+                    .apply()
+                currentConfigText = "请求: ${width}x${height}@${fps}fps，EIS=${if (newConfig.enableVideoStabilization) "ON" else "OFF"}，zoom=${newConfig.zoomLevel}；已收到匹配尺寸帧"
+                updateDisplay()
+                Log.d(TAG, "Config switch confirmed by frame: ${width}x${height}")
+            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                currentConfigText = "切换未确认：10秒内未收到 ${width}x${height} 帧；实际 ${currentWidth}x${currentHeight}"
+                updateDisplay()
+                Log.w(TAG, currentConfigText)
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e(TAG, "Config switch failed", e)
+                tvInfo.text = "配置切换失败：${e.message}"
+            } finally {
+                btnApply.isEnabled = true
+            }
+        }
         
         // 更新显示
         val orientationText = if (isPortrait) "竖屏" else "横屏"
-        currentConfigText = "配置: ${width}x${height}@${fps}fps ($orientationText), EIS=${if (currentEis) "ON" else "OFF"}, zoom=$currentZoom"
+        currentConfigText = "切换中: ${width}x${height}@${fps}fps ($orientationText)，等待实际帧"
         updateDisplay()
 
         // 隐藏配置面板
@@ -330,6 +389,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     private fun setConfigPanelVisible(visible: Boolean) {
         configPanel.visibility = if (visible) View.VISIBLE else View.GONE
         btnShowConfig.visibility = if (visible) View.GONE else View.VISIBLE
+        tvInfo.visibility = if (visible) View.GONE else View.VISIBLE
         if (visible) {
             selectedConfigIndex = 0
             focusSelectedConfig()
@@ -363,6 +423,12 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     private fun focusSelectedConfig() {
         updateConfigHighlight()
+        val selected = configControls[selectedConfigIndex]
+        selected.post {
+            if (configPanel.visibility == View.VISIBLE) {
+                selected.requestRectangleOnScreen(Rect(0, 0, selected.width, selected.height), true)
+            }
+        }
     }
 
     private fun updateConfigHighlight() {
@@ -394,9 +460,15 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
      * 创建 NV21 Callback
      * @param isPortrait 是否为竖屏模式
      */
-    private fun createNv21Callback(isPortrait: Boolean = false): CameraShareHelper.Nv21Callback {
+    private fun createNv21Callback(
+        isPortrait: Boolean = false,
+        expected: CameraShareConfig? = null,
+        firstFrame: CompletableDeferred<Unit>? = null,
+    ): CameraShareHelper.Nv21Callback {
+        val generation = callbackGeneration
         return object : CameraShareHelper.Nv21Callback {
             override fun onCameraOpened(width: Int, height: Int) {
+                if (generation != callbackGeneration) return
                 Log.d(TAG, "NV21 camera opened: ${width}x${height}, isPortrait=$isPortrait")
                 currentWidth = width
                 currentHeight = height
@@ -410,6 +482,12 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             }
 
             override fun onNv21Frame(nv21: ByteArray, width: Int, height: Int, timestamp: Long) {
+                if (generation != callbackGeneration) return
+                currentWidth = width
+                currentHeight = height
+                if (expected != null && width == expected.previewWidth && height == expected.previewHeight) {
+                    firstFrame?.complete(Unit)
+                }
                 // 记录帧间隔，便于观察采集帧率。
                 val now = System.currentTimeMillis()
                 if (lastFrameTimestamp > 0) {
@@ -435,6 +513,8 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             }
 
             override fun onError(code: Int, msg: String) {
+                if (generation != callbackGeneration) return
+                firstFrame?.completeExceptionally(IllegalStateException("$code: $msg"))
                 Log.e(TAG, "NV21 error: code=$code, msg=$msg")
                 activity?.runOnUiThread {
                     tvInfo.text = "错误: $code, $msg"
@@ -442,6 +522,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             }
 
             override fun onNv21ExportResolutionChanged(width: Int, height: Int, appliedPreviewFps: Int) {
+                if (generation != callbackGeneration) return
                 Log.d(TAG, "onNv21ExportResolutionChanged: ${width}x${height}, fps=$appliedPreviewFps")
                 currentWidth = width
                 currentHeight = height

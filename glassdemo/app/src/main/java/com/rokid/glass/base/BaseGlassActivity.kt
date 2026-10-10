@@ -79,7 +79,11 @@ open class BaseGlassActivity : AppCompatActivity() {
         false
     }
 
+    /** Pages with clickable controls can opt out of also interpreting touches as ring gestures. */
+    protected open val translateTouchToGlassGesture: Boolean = true
+
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+        if (!translateTouchToGlassGesture) return super.dispatchTouchEvent(event)
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
                 startX = event.x

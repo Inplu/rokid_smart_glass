@@ -15,6 +15,10 @@ import com.rokid.glass.camera.SurfaceShareFragment
  */
 class CameraShareDemoActivity : BaseGlassActivity() {
 
+    // Buttons, sliders and scrolling handle pointer input themselves. Translating the same
+    // tap into a delayed CLICK would reopen a panel just hidden by its button.
+    override val translateTouchToGlassGesture: Boolean = false
+
     companion object {
         private const val CAMERA_SHARE_FRAGMENT_TAG = "camera_share_fragment"
         private const val EXTRA_MODE = "mode"
