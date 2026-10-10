@@ -101,26 +101,35 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
     }
 
     // 预览数据进行渲染
-    public synchronized void setPreviewData(byte[] data, int width, int height) {
+    public void setPreviewData(byte[] data, int width, int height) {
         if (mRenderer != null && data != null && data.length > 0) {
             mRenderer.setPreviewData(data, width, height);
             this.requestRender();
         }
     }
 
-    public synchronized void releasePreview(){
+    public void releasePreview(){
         if (mRenderer != null){
             mRenderer.releaseBuf();
-//            mRenderer = null;
         }
     }
 
-    class PreviewRenderer implements Renderer {
-        private volatile ByteBuffer yFloatBuffer;
-        private volatile ByteBuffer uvFloatBuffer;
+    public long getReceivedFrameCount() {
+        return mRenderer == null ? 0L : mRenderer.getReceivedFrameCount();
+    }
 
-        private int width;
-        private int height;
+    public long getRenderedFrameCount() {
+        return mRenderer == null ? 0L : mRenderer.getRenderedFrameCount();
+    }
+
+    public long getDroppedFrameCount() {
+        return mRenderer == null ? 0L : mRenderer.getDroppedFrameCount();
+    }
+
+    class PreviewRenderer implements Renderer {
+        private final Nv21FrameMailbox frameMailbox = new Nv21FrameMailbox();
+        private int textureWidth = -1;
+        private int textureHeight = -1;
 
         @Override
         public void onDrawFrame(GL10 gl) {
@@ -131,11 +140,20 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
 
             GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
-            if (yFloatBuffer == null || uvFloatBuffer == null) {
+            Nv21FrameMailbox.Frame frame = frameMailbox.acquireLatest();
+            if (frame == null) {
                 return;
             }
+            int width = frame.getWidth();
+            int height = frame.getHeight();
+            ByteBuffer yBuffer = frame.getY();
+            ByteBuffer uvBuffer = frame.getUv();
+            if (mFrameWidth != width || mFrameHeight != height) {
+                mFrameWidth = width;
+                mFrameHeight = height;
+                mAspectRatioDirty = true;
+            }
 
-            //Logger.d( "BackgroundGLSurfaceView: onDrawFrame() mProgram="+mProgram+", width="+width+", height="+height+", mTextureID[0]="+mTextureID[0]+", mTextureID[1]="+mTextureID[1]);
             GLES20.glUseProgram(mProgram);
 
             if (mAspectRatioDirty) {
@@ -156,12 +174,29 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             // 绑定Y和UV纹理
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[0]);
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, width, height, 0, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, yFloatBuffer);
+            yBuffer.position(0);
+            if (textureWidth != width || textureHeight != height) {
+                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, width, height,
+                        0, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, yBuffer);
+            } else {
+                GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, width, height,
+                        GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, yBuffer);
+            }
             GLES20.glUniform1i(myTextureLoc, 0);
 
             GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[1]);
-            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE_ALPHA, width / 2, height / 2, 0, GLES20.GL_LUMINANCE_ALPHA, GLES20.GL_UNSIGNED_BYTE, uvFloatBuffer);
+            uvBuffer.position(0);
+            if (textureWidth != width || textureHeight != height) {
+                GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE_ALPHA,
+                        width / 2, height / 2, 0, GLES20.GL_LUMINANCE_ALPHA,
+                        GLES20.GL_UNSIGNED_BYTE, uvBuffer);
+                textureWidth = width;
+                textureHeight = height;
+            } else {
+                GLES20.glTexSubImage2D(GLES20.GL_TEXTURE_2D, 0, 0, 0, width / 2, height / 2,
+                        GLES20.GL_LUMINANCE_ALPHA, GLES20.GL_UNSIGNED_BYTE, uvBuffer);
+            }
             GLES20.glUniform1i(muvTextureLoc, 1);
 
             // 绘制 GLES20.GL_TRIANGLE_STRIP:复用坐标
@@ -188,6 +223,10 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             // 该方法在渲染开始前调用，OpenGL ES的绘制上下文被重建时也会调用。
             //当Activity暂停时，绘制上下文会丢失，当Activity恢复时，绘制上下文会重建。
 //            Logger.d( "BackgroundGLSurfaceView: onSurfaceCreated()");
+            mTextureID[0] = 0;
+            mTextureID[1] = 0;
+            textureWidth = -1;
+            textureHeight = -1;
             initGLEnv();
         }
 
@@ -197,42 +236,24 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
          * @param width
          * @param height
          */
-        public synchronized void setPreviewData(byte[] data, int width, int height) {
-            int ySize = width * height;
-            int uvSize = ySize / 2;
-            if (yFloatBuffer == null || yFloatBuffer.capacity() < ySize ||
-                    uvFloatBuffer == null || uvFloatBuffer.capacity() < uvSize) {
-                yFloatBuffer = ByteBuffer.allocate(width * height);
-                uvFloatBuffer = ByteBuffer.allocate(width * height / 2);
-            }
-            if (mFrameWidth != width || mFrameHeight != height) {
-                mFrameWidth = width;
-                mFrameHeight = height;
-                mAspectRatioDirty = true;
-            }
-            this.width = width;
-            this.height = height;
-            //Logger.d( "BackgroundGLSurfaceView: data.length="+data.length+", width="+width+", height="+height);
-            yFloatBuffer.position(0);
-            yFloatBuffer.put(data, 0, width * height);
-            yFloatBuffer.position(0);
-
-            uvFloatBuffer.position(0);
-            uvFloatBuffer.put(data, width * height, width * height / 2);
-            uvFloatBuffer.position(0);
+        public void setPreviewData(byte[] data, int width, int height) {
+            frameMailbox.submit(data, width, height);
         }
 
+        public void releaseBuf(){
+            frameMailbox.clear();
+        }
 
-        public synchronized void releaseBuf(){
-            if (yFloatBuffer != null){
-                yFloatBuffer.clear();
-                yFloatBuffer = null;
-            }
+        public long getReceivedFrameCount() {
+            return frameMailbox.getReceivedFrameCount();
+        }
 
-            if (uvFloatBuffer != null){
-                uvFloatBuffer.clear();
-                uvFloatBuffer = null;
-            }
+        public long getRenderedFrameCount() {
+            return frameMailbox.getRenderedFrameCount();
+        }
+
+        public long getDroppedFrameCount() {
+            return frameMailbox.getDroppedFrameCount();
         }
     }
 

@@ -129,6 +129,8 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     private val previewPreferences get() = requireContext().getSharedPreferences("nv21_preview", 0)
     private var frameCount = 0L
     private var lastFpsTime = 0L
+    private var lastRenderedFrameCount = 0L
+    private var lastDroppedFrameCount = 0L
     private var currentWidth = 0
     private var currentHeight = 0
     private var currentFps = 0 // 实际应用的 FPS
@@ -344,6 +346,8 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 currentHeight = 0
                 frameCount = 0
                 lastFpsTime = 0
+                lastRenderedFrameCount = 0
+                lastDroppedFrameCount = 0
                 lastFrameTimestamp = 0
                 frameIntervalSum = 0
                 frameIntervalCount = 0
@@ -503,9 +507,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 }
                 lastFrameTimestamp = now
 
-                // Camera 本身已支持竖屏分辨率，直接使用原始数据
-                nv21SurfaceView.setPreviewData(nv21, width, height)
+                // 回调帧率与预览渲染解耦；预览较慢时只保留最新帧，不阻塞后续回调。
                 updateFps(width, height)
+                nv21SurfaceView.setPreviewData(nv21, width, height)
             }
 
             override fun onCameraClosed() {
@@ -582,18 +586,34 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         if (lastFpsTime == 0L) lastFpsTime = now
         val elapsed = now - lastFpsTime
         if (elapsed >= 1000) {
-            val fps = frameCount * 1000f / elapsed
+            val callbackFps = frameCount * 1000f / elapsed
+            val renderedTotal = nv21SurfaceView.renderedFrameCount
+            val droppedTotal = nv21SurfaceView.droppedFrameCount
+            val renderedFps = (renderedTotal - lastRenderedFrameCount) * 1000f / elapsed
+            val droppedFrames = droppedTotal - lastDroppedFrameCount
             activity?.runOnUiThread {
-                updateDisplay(fps)
+                updateDisplay(callbackFps, renderedFps, droppedFrames)
             }
             frameCount = 0
             lastFpsTime = now
+            lastRenderedFrameCount = renderedTotal
+            lastDroppedFrameCount = droppedTotal
         }
     }
 
-    private fun updateDisplay(fps: Float? = null) {
+    private fun updateDisplay(
+        callbackFps: Float? = null,
+        renderedFps: Float? = null,
+        droppedFrames: Long = 0,
+    ) {
         val resolutionText = "已连接: ${currentWidth}x${currentHeight}"
-        val fpsText = fps?.let { "实时帧率: %.1f fps".format(it) } ?: ""
+        val fpsText = callbackFps?.let {
+            "SDK回调: %.1f fps，预览渲染: %.1f fps，丢弃旧预览帧: %d".format(
+                it,
+                renderedFps ?: 0f,
+                droppedFrames,
+            )
+        } ?: ""
         activity?.runOnUiThread {
             tvInfo.text = if (fpsText.isNotEmpty()) {
                 "$resolutionText\n$currentConfigText\n$fpsText"
