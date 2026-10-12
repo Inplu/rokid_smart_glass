@@ -1,0 +1,37 @@
+# Glass3 SDK Demo
+
+[中文](README.zh-CN.md) | [English](README.en.md)
+
+An example project for Rokid Glass3, covering the glasses SDK, phone and glasses coordination, industry applications, and audio/video streaming.
+
+## Glass Demo · glassdemo
+
+Demonstrates photo and video capture, camera sharing and NV21 frame export, messaging, voice interaction, and device status queries for glasses application development.
+
+[View the Glass Demo documentation](glassdemo/README.en.md)
+
+[SDK 2.2.2 integration notes and version differences](SDK_2_2_2_APIS.md): new capabilities are integrated into the existing message sending, camera sharing, and SDK photo/video pages; the tool task example is in the last panel of the message sending page.
+
+[SDK 2.2.2 method and callback reference](SDK_2_2_2_API_REFERENCE.md): signatures, data models, I420 frame consumption, TTS/tool callbacks, and new phone-side methods are documented according to `c2b9677`.
+
+## Phone Demo · glass3sdkphonedemo
+
+Demonstrates connecting an Android phone to the glasses, two-way messaging and file transfer, real-time audio/video reception, notifications, and device management.
+
+[View the Phone Demo documentation](glass3sdkphonedemo/README.en.md)
+
+## Industry Application · Hazard Recognition
+
+Runs on the glasses and uses Wi-Fi to call a vision model for fire-safety hazard recognition, showing the live preview and recognition results without a phone app. DeepSeek is provided only as an integration example; developers can configure or integrate another vision model.
+
+[View the Hazard Recognition Demo documentation](industry/hazard-recognition/README.md)
+
+## Audio/Video Capture and Browser Streaming · glass3-media-streaming
+
+Demonstrates capturing NV21 video frames and PCM audio from the glasses and sending them to a PC browser through WebRTC. The raw media capture implementation can also be used independently as a reference.
+
+[View the audio/video capture and streaming documentation](glass3-media-streaming/README.md)
+
+## Example Usage Notice
+
+Each project provides code references and usage examples only; developers are not required to follow the same approach. Adapt the implementation to your needs and refer to the README in each project for details.
