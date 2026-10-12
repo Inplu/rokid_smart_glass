@@ -2,7 +2,7 @@
 
 [中文](README.zh-CN.md) | [English](README.en.md)
 
-[Back to project overview](../README.en.md)
+[Back to project overview](../README.md)
 
 Focused on individual SDK capabilities, this demo helps developers learn the glasses interfaces, verify hardware capabilities, and build custom glasses applications.
 

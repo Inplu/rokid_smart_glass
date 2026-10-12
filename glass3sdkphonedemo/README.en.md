@@ -2,7 +2,7 @@
 
 [中文](README.zh-CN.md) | [English](README.en.md)
 
-[Back to project overview](../README.en.md)
+[Back to project overview](../README.md)
 
 This demo focuses on phone–glasses collaboration. It is suitable for companion apps that support the glasses and for apps that receive live views and manage devices on the phone.
 

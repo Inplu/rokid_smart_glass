@@ -1,6 +1,6 @@
 # Glass3 SDK Demo
 
-[中文](README.zh-CN.md) | [English](README.en.md)
+[English README](README.md)
 
 面向 Rokid Glass3 的示例工程，涵盖眼镜 SDK、手机与眼镜协同、行业应用和音视频传输。
 
