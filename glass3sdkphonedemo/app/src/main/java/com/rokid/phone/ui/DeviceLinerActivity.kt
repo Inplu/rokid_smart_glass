@@ -1,5 +1,7 @@
 package com.rokid.phone.ui
 
+import com.rokid.phone.utils.demoString
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Bundle
@@ -26,12 +28,12 @@ import kotlinx.coroutines.launch
 
 /**
  * 指环连接界面
+ * Ring connection screen.
  */
 class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemClickListener {
 
     private lateinit var availableDevicesAdapter: DeviceLinkerAdapter
 
-    //    private lateinit var pairedDevicesAdapter: DeviceLinkerAdapter
     private var isConnectionEnabled = true
     private val TAG = "DeviceLinerActivity"
     private val availableDevices = mutableListOf<BluetoothDevice>()
@@ -45,6 +47,7 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
 
     private fun setupViews() {
         // 设置Switch监听
+        // Set the Switch listener.
         binding.layoutTitle.ivBack.setOnClickListener {
             finish()
         }
@@ -54,6 +57,7 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
         }
 
         // 设置外设连接区域点击事件
+        // Set the accessory connection area click listener.
         binding.clDeviceLinker.setOnClickListener {
             binding.switchConnection.toggle()
         }
@@ -70,11 +74,11 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
             }
             if (SystemGlobalConstant.glassRingConnected) {
                 binding.flConnectDevice.visibility = View.VISIBLE
-                binding.tvLinkDevice.text = SystemGlobalConstant.glassRingBluetoothDeviceName + " 已连接"
+                binding.tvLinkDevice.text = SystemGlobalConstant.glassRingBluetoothDeviceName + demoString(R.string.demo_connected_2)
                 binding.tvLinkDevice.setTextColor(ContextCompat.getColor(Utils.getApp(), R.color.green))
             } else {
                 binding.flConnectDevice.visibility = View.VISIBLE
-                binding.tvLinkDevice.text = SystemGlobalConstant.glassRingBluetoothDeviceName + " 已中断"
+                binding.tvLinkDevice.text = SystemGlobalConstant.glassRingBluetoothDeviceName + demoString(R.string.demo_disconnected_2)
                 binding.tvLinkDevice.setTextColor(ContextCompat.getColor(Utils.getApp(), R.color.red))
             }
         }
@@ -87,9 +91,10 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
             if (!availableDevices.contains(device)) {
                 availableDevices.add(device)
                 // 在主线程更新UI
+                // Update the UI on the main thread.
                 runOnUiThread {
                     availableDevicesAdapter.setNewData(availableDevices.map {
-                        ListItem.DeviceItem(it.name ?: "Unknown Device", false)
+                        ListItem.DeviceItem(it.name ?: demoString(R.string.demo_unknown_device_status_34), false)
                     })
                 }
             }
@@ -116,13 +121,13 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
         }
         if (success) {
             availableDevicesAdapter.updateItemStatus(selectPosition, isConnected = true, isConnecting = false)
-            Toast.makeText(this@DeviceLinerActivity, "连接成功", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@DeviceLinerActivity, demoString(R.string.demo_connected_successfully), Toast.LENGTH_SHORT).show()
         } else {
             availableDevicesAdapter.updateItemStatus(selectPosition, isConnected = false, isConnecting = false)
             if (SystemGlobalConstant.glassRingConnected) {
-                Toast.makeText(this@DeviceLinerActivity, "连接中断", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DeviceLinerActivity, demoString(R.string.demo_connection_interrupted), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this@DeviceLinerActivity, "连接失败", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@DeviceLinerActivity, demoString(R.string.demo_connection_failed), Toast.LENGTH_SHORT).show()
             }
         }
         SystemGlobalConstant.glassRingConnected = success
@@ -133,26 +138,14 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
         availableDevicesAdapter = DeviceLinkerAdapter().apply {
             onItemClickListener = this@DeviceLinerActivity
         }
-//        pairedDevicesAdapter = DeviceLinkerAdapter()
 
         binding.rvAvailableDevices.apply {
             layoutManager = LinearLayoutManager(this@DeviceLinerActivity)
             adapter = availableDevicesAdapter
         }
 
-//        binding.rvPairedDevices.apply {
-//            layoutManager = LinearLayoutManager(this@DeviceLinerActivity)
-//            adapter = pairedDevicesAdapter
-//        }
-
-        // 模拟已配对设备数据
-//        val pairedDevices = listOf(
-//            ListItem.DeviceItem("Rk Meta 2020 蓝牙耳机&音频设备", true)
-//        )
-
         PSecuritySDK.getBluetoothRingService()?.addClientListener(btRingListener)
 
-//        pairedDevicesAdapter.setNewData(listOf(ListItem.GroupHeader("已配对设备")) + pairedDevices)
         availableDevicesAdapter.setNewData(emptyList())
         val dividerItemDecoration = DividerItemDecoration(
             binding.rvAvailableDevices.context,
@@ -190,7 +183,7 @@ class DeviceLinerActivity : BaseActivity<ActivityDeviceLinkerBinding>(), OnItemC
     override fun onConnectClick(deviceItem: ListItem.DeviceItem, position: Int) {
         val deviceToConnect = availableDevices.find { it.name == deviceItem.name }
         if (deviceToConnect == null) {
-            Toast.makeText(this, "设备未找到", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, demoString(R.string.demo_device_not_found), Toast.LENGTH_SHORT).show()
             return
         }
 

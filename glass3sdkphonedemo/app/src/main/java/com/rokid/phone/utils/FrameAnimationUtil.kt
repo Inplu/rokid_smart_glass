@@ -83,6 +83,7 @@ class FrameAnimationUtil internal constructor(
         if (!isRunning) {
             imageView.post {
                 // 关键修复：确保动画Drawable仍被ImageView引用
+                // Key fix: ensure ImageView still references the animation Drawable.
                 if (imageView.drawable !== animationDrawable) {
                     imageView.setImageDrawable(animationDrawable)
                 }
@@ -95,9 +96,12 @@ class FrameAnimationUtil internal constructor(
         if (isRunning) {
             animationDrawable?.stop()
             // 关键修复：保留动画Drawable，仅重置到第一帧
+            // Key fix: retain the animation Drawable and reset it to the first frame only.
             animationDrawable?.let {
                 if (it.numberOfFrames > 0) {
-                    it.selectDrawable(0) // 内部重置帧位置，不替换Drawable
+                    // 内部重置帧位置，不替换Drawable
+                    // Reset the frame position internally without replacing the Drawable.
+                    it.selectDrawable(0)
                 }
             }
         }
@@ -107,9 +111,6 @@ class FrameAnimationUtil internal constructor(
         stop()
         imageView.setImageDrawable(null)
         animationDrawable?.callback = null
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-//            animationDrawable?.unscheduleSelf(null)
-//        }
         animationDrawable = null
         loadJob?.cancel()
         drawableCache.clear()

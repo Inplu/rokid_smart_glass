@@ -1,5 +1,8 @@
 package com.rokid.phone
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioManager
@@ -62,28 +65,45 @@ class VideoReceiveActivity : ComponentActivity() {
     }
 
     private val audioTrack = AudioTrack(
-        AudioManager.STREAM_MUSIC,                // 音频流类型
-        16000,                                    // 采样率（必须一致）
-        AudioFormat.CHANNEL_OUT_MONO,             // 声道配置（与录音一致）
-        AudioFormat.ENCODING_PCM_16BIT,           // 编码格式（必须一致）
-        AudioTrack.getMinBufferSize(              // 合理的缓冲区大小
+        // 音频流类型
+        // Audio stream type.
+        AudioManager.STREAM_MUSIC,
+        // 采样率（必须一致）
+        // Sample rate; it must match the source.
+        16000,
+        // 声道配置（与录音一致）
+        // Channel configuration; it must match the recording.
+        AudioFormat.CHANNEL_OUT_MONO,
+        // 编码格式（必须一致）
+        // Encoding format; it must match the source.
+        AudioFormat.ENCODING_PCM_16BIT,
+        // 合理的缓冲区大小
+        // Use an appropriate buffer size.
+        AudioTrack.getMinBufferSize(
             16000,
             AudioFormat.CHANNEL_OUT_MONO,
             AudioFormat.ENCODING_PCM_16BIT
         ),
-        AudioTrack.MODE_STREAM                    // 流式模式（适合实时播放）
+        // 流式模式（适合实时播放）
+        // Streaming mode is suitable for real-time playback.
+        AudioTrack.MODE_STREAM
     )
 
     private enum class PageState { CONFIG, PREVIEW }
 
     /**
      * 两种模式在网络中传输的都是眼镜端编码后的 H.264 压缩码流，区别在手机端：
+     * Both modes transmit an H.264 compressed stream encoded by the glasses; they differ on the phone:
      *
      * NV21：手机 SDK 内部解码 H.264 并转换成 NV21，再由 Demo 的 GLSurfaceView 渲染。
+     * NV21: the phone SDK decodes H.264 and converts it to NV21, which the Demo renders using GLSurfaceView.
      * 适合需要逐帧算法、截图或像素处理的场景，但解码、格式转换和内存复制开销较高。
+     * Suitable for per-frame algorithms, screenshots, or pixel processing, but decoding, format conversion, and memory copies add overhead.
      *
      * H264：Demo 将收到的 H.264 码流交给 MediaCodec 硬解并直接输出到 SurfaceView。
+     * H264: the Demo passes the received H.264 stream to MediaCodec for hardware decoding directly to SurfaceView.
      * 适合仅做实时预览的场景，延迟和资源占用更低，但不向业务层提供 NV21 像素帧。
+     * Suitable for live preview with lower latency and resource use, but does not expose NV21 pixel frames to application code.
      */
     private enum class PreviewMode(private val label: String) {
         NV21("NV21"),
@@ -163,7 +183,9 @@ class VideoReceiveActivity : ComponentActivity() {
         const val RECOVERY_STABLE_TIME_MS = 10_000L
         val DEFAULT_RESOLUTION = ResolutionOption(2400, 1800)
         // Glass3 传感器方向为 270°，眼镜端自定义流会交换输出宽高后请求 Camera2。
+        // The Glass3 sensor orientation is 270 degrees; the glasses swap the requested output width and height before calling Camera2 for a custom stream.
         // 这里只展示已实测可用、且交换后的 Camera2 纹理尺寸也由 HAL 支持的横屏尺寸。
+        // Only show tested landscape sizes whose swapped Camera2 texture dimensions are also supported by the HAL.
         val SUPPORTED_RESOLUTIONS = listOf(
             ResolutionOption(2400, 1800),
             ResolutionOption(1920, 1080),
@@ -254,6 +276,7 @@ class VideoReceiveActivity : ComponentActivity() {
     }
 
     /* ================= 页面切换 ================= */
+    // ================= Page switching =================
 
     private fun switchPage(state: PageState) {
         currentState = state
@@ -276,6 +299,7 @@ class VideoReceiveActivity : ComponentActivity() {
     }
 
     /* ================= 参数校验 ================= */
+    // ================= Parameter validation =================
     private fun validateAndStartPreview() {
         clearErrors()
 
@@ -290,8 +314,11 @@ class VideoReceiveActivity : ComponentActivity() {
 
     /**
      * 视频控制命令走蓝牙，而视频帧走 Wi-Fi P2P。请求前使用 SDK 的 isConnect
+     * Video control commands use Bluetooth, while video frames use Wi-Fi P2P. Before requesting a stream, use the SDK's isConnect
      * 检查实际 P2P 数据通道，避免系统 P2P 组仍存在、但 SDK 数据连接已失效时
+     * to check the actual P2P data channel, so that an existing system P2P group with a stale SDK data connection does not
      * 进入黑屏页面并等待多轮首帧超时。
+     * lead to a black preview and repeated first-frame timeouts.
      */
     private fun checkP2pAndStartPreview(
         fps: Int,
@@ -301,7 +328,7 @@ class VideoReceiveActivity : ComponentActivity() {
         previewMode: PreviewMode
     ) {
         if (!GlobalData.btConnectState.value) {
-            toast("蓝牙未连接，无法拉取音视频流")
+            toast(demoString(R.string.demo_bluetooth_disconnected_cannot_receive_audio_video))
             return
         }
         if (isCheckingP2p) {
@@ -311,7 +338,7 @@ class VideoReceiveActivity : ComponentActivity() {
         val p2pService = PSecuritySDK.getWifiP2PClientService()
         if (p2pService == null) {
             GlobalData.setP2pConnectState(false)
-            toast("请重新连接 Wi-Fi P2P")
+            toast(demoString(R.string.demo_reconnect_wi_fi_p2p))
             return
         }
 
@@ -332,7 +359,7 @@ class VideoReceiveActivity : ComponentActivity() {
                         stopPreview()
                         switchPage(PageState.CONFIG)
                     }
-                    toast("请重新连接 Wi-Fi P2P")
+                    toast(demoString(R.string.demo_reconnect_wi_fi_p2p))
                     return@runOnUiThread
                 }
 
@@ -344,8 +371,8 @@ class VideoReceiveActivity : ComponentActivity() {
     private fun parseFps(): Int? {
         val fps = binding.etFrameRate.text.toString().toIntOrNull() ?: defaultFps
         return if (fps in 5..30) fps else {
-            binding.etFrameRate.error = "帧率范围 5~30"
-            toast("帧率不合法")
+            binding.etFrameRate.error = demoString(R.string.demo_frame_rate_must_be_between_5_and_30)
+            toast(demoString(R.string.demo_invalid_frame_rate))
             null
         }
     }
@@ -353,8 +380,8 @@ class VideoReceiveActivity : ComponentActivity() {
     private fun parseBitrate(): Int? {
         val bitrate = binding.etBitrate.text.toString().toIntOrNull() ?: defaultBitrate
         return if (bitrate in 500_000..30_000_000) bitrate else {
-            binding.etBitrate.error = "码率范围 500k~30M"
-            toast("码率不合法")
+            binding.etBitrate.error = demoString(R.string.demo_bitrate_must_be_between_500k_and_30m)
+            toast(demoString(R.string.demo_invalid_bitrate))
             null
         }
     }
@@ -363,13 +390,13 @@ class VideoReceiveActivity : ComponentActivity() {
         val width = binding.etResolutionWidth.text.toString().toIntOrNull()
         val height = binding.etResolutionHeight.text.toString().toIntOrNull()
         if (width == null || width !in 16..4096 || width % 2 != 0) {
-            binding.etResolutionWidth.error = "请输入 16~4096 的偶数"
-            toast("分辨率宽度不合法")
+            binding.etResolutionWidth.error = demoString(R.string.demo_enter_an_even_number_from_16_to_4096)
+            toast(demoString(R.string.demo_invalid_resolution_width))
             return null
         }
         if (height == null || height !in 16..4096 || height % 2 != 0) {
-            binding.etResolutionHeight.error = "请输入 16~4096 的偶数"
-            toast("分辨率高度不合法")
+            binding.etResolutionHeight.error = demoString(R.string.demo_enter_an_even_number_from_16_to_4096)
+            toast(demoString(R.string.demo_invalid_resolution_height))
             return null
         }
         return ResolutionOption(width, height)
@@ -387,6 +414,7 @@ class VideoReceiveActivity : ComponentActivity() {
     }
 
     /* ================= 预览控制 ================= */
+    // ================= Preview controls =================
     @SuppressLint("SetTextI18n")
     private fun startPreview(
         fps: Int,
@@ -396,7 +424,7 @@ class VideoReceiveActivity : ComponentActivity() {
         previewMode: PreviewMode
     ) {
         if (!GlobalData.btConnectState.value) {
-            toast("蓝牙未连接，无法拉取音视频流")
+            toast(demoString(R.string.demo_bluetooth_disconnected_cannot_receive_audio_video))
             return
         }
         if (currentState == PageState.PREVIEW && isPreviewStarted && startPreviewJob?.isActive == true) {
@@ -410,7 +438,7 @@ class VideoReceiveActivity : ComponentActivity() {
         currentConfig = PreviewConfig(fps, bitrate, resolution, isARMixEnabled, previewMode)
         PSecuritySDK.getWifiP2PClientService()?.setAutoDecodeH264ToNv21(previewMode == PreviewMode.NV21)
         resetFps()
-        updateStreamState("等待首帧")
+        updateStreamState(demoString(R.string.demo_waiting_for_first_frame))
         switchPage(PageState.PREVIEW)
         Log.d(TAG, "---------startPreview()---${currentState}")
         startTime = System.currentTimeMillis()
@@ -453,7 +481,7 @@ class VideoReceiveActivity : ComponentActivity() {
         tryCount = 0
         lastAudioTime = System.currentTimeMillis()
         Log.d(TAG, "startStreamRequest: reason=$reason, version=$requestVersion, config=$config")
-        binding.tvDuration.text = "正在请求音视频流..."
+        binding.tvDuration.text = demoString(R.string.demo_requesting_audio_video_stream)
 
         awaitPreviousStreamStopAndDrain()
         delay(STREAM_RETRY_DELAY_MS)
@@ -474,7 +502,7 @@ class VideoReceiveActivity : ComponentActivity() {
                 val now = System.currentTimeMillis()
                 if (now - lastCallTime > VIDEO_STALL_TIMEOUT_MS && isGetVideo) {
                     tryCount++
-                    binding.tvDuration.text = "视频流中断:${TimeUtils.formatDuration(duration)}"
+                    binding.tvDuration.text = demoString(R.string.demo_video_stream_interrupted, TimeUtils.formatDuration(duration))
                     if (tryCount >= 3) {
                         tryCount = 0
                         isGetVideo = false
@@ -485,10 +513,10 @@ class VideoReceiveActivity : ComponentActivity() {
                     hasVideoFrame &&
                     now - lastRenderedFrameTime > VIDEO_STALL_TIMEOUT_MS
                 ) {
-                    binding.tvDuration.text = "视频解码无画面:${TimeUtils.formatDuration(duration)}"
+                    binding.tvDuration.text = demoString(R.string.demo_no_decoded_video, TimeUtils.formatDuration(duration))
                     handleVideoNoFrames("h264 packets received but decoder not rendering")
                 } else {
-                    binding.tvDuration.text = "时长:${TimeUtils.formatDuration(duration)}"
+                    binding.tvDuration.text = demoString(R.string.demo_duration, TimeUtils.formatDuration(duration))
                 }
             }
         }
@@ -497,7 +525,7 @@ class VideoReceiveActivity : ComponentActivity() {
     private fun requestVideoStream(requestVersion: Int, config: PreviewConfig, reason: String) {
         val deviceInfoService = PSecuritySDK.getAbsDeviceInfoService()
         if (deviceInfoService == null) {
-            handleStreamFailed(requestVersion, "设备信息服务未初始化，无法请求视频流")
+            handleStreamFailed(requestVersion, demoString(R.string.demo_device_information_service_is_not_initialized_cannot_request))
             return
         }
         videoRequestCount++
@@ -521,7 +549,7 @@ class VideoReceiveActivity : ComponentActivity() {
     private fun requestAudioStream(requestVersion: Int, reason: String) {
         val deviceInfoService = PSecuritySDK.getAbsDeviceInfoService()
         if (deviceInfoService == null) {
-            handleStreamFailed(requestVersion, "设备信息服务未初始化，无法请求音频流")
+            handleStreamFailed(requestVersion, demoString(R.string.demo_device_information_service_is_not_initialized_cannot_request_2))
             return
         }
         audioRequestCount++
@@ -560,7 +588,10 @@ class VideoReceiveActivity : ComponentActivity() {
         }
     }
 
-    /** 无画面时先定位故障层级，再执行最小恢复动作，避免反复 stop/start 冲击控制链路。 */
+    /**
+     * 无画面时先定位故障层级，再执行最小恢复动作，避免反复 stop/start 冲击控制链路。
+     * When no image is displayed, first identify the failing layer and apply the smallest recovery action to avoid stressing the control channel with repeated stop/start calls.
+     */
     private fun handleVideoNoFrames(reason: String) {
         if (!isPreviewStarted || isCheckingVideoRecovery || videoRetryJob?.isActive == true) return
         Log.w(TAG, "handleVideoNoFrames: reason=$reason")
@@ -585,26 +616,26 @@ class VideoReceiveActivity : ComponentActivity() {
                 Log.w(TAG, "video recovery decision: reason=$reason, action=$action")
                 when (action) {
                     VideoStreamRecoveryPolicy.Action.REPORT_BLUETOOTH_DISCONNECTED ->
-                        reportVideoNoData("视频流无数据，蓝牙已断开")
+                        reportVideoNoData(demoString(R.string.demo_no_video_data_bluetooth_disconnected))
                     VideoStreamRecoveryPolicy.Action.REPORT_P2P_DISCONNECTED ->
-                        reportVideoNoData("视频流无数据，Wi-Fi P2P 已断开")
+                        reportVideoNoData(demoString(R.string.demo_no_video_data_wi_fi_p2p_disconnected))
                     VideoStreamRecoveryPolicy.Action.RESTART_LOCAL_DECODER -> restartLocalH264Decoder()
                     VideoStreamRecoveryPolicy.Action.RESTART_REMOTE_STREAM ->
                         restartRemoteVideoStreamOnce(reason)
                     VideoStreamRecoveryPolicy.Action.REPORT_NO_DATA ->
-                        reportVideoNoData("视频流无数据，请返回后重新进入预览")
+                        reportVideoNoData(demoString(R.string.demo_no_video_data_go_back_and_reopen_the))
                     VideoStreamRecoveryPolicy.Action.NONE -> Unit
                 }
             }
         } ?: runOnUiThread {
             isCheckingVideoRecovery = false
             GlobalData.setP2pConnectState(false)
-            reportVideoNoData("视频流无数据，Wi-Fi P2P 已断开")
+            reportVideoNoData(demoString(R.string.demo_no_video_data_wi_fi_p2p_disconnected))
         }
     }
 
     private fun reportVideoNoData(message: String) {
-        updateStreamState("无数据")
+        updateStreamState(demoString(R.string.demo_no_data))
         binding.tvDuration.text = message
         if (!hasReportedVideoNoFrames) {
             hasReportedVideoNoFrames = true
@@ -616,7 +647,7 @@ class VideoReceiveActivity : ComponentActivity() {
         val config = currentConfig ?: return
         val surface = binding.h264SurfaceView.holder.surface
         if (config.previewMode != PreviewMode.H264 || !surface.isValid) {
-            reportVideoNoData("视频解码无画面，请返回后重新进入预览")
+            reportVideoNoData(demoString(R.string.demo_no_decoded_video_go_back_and_reopen_the))
             return
         }
         localDecoderRestartUsed = true
@@ -627,7 +658,7 @@ class VideoReceiveActivity : ComponentActivity() {
         Log.w(TAG, "restart local H264 decoder; keep remote stream running")
         h264Decoder.start(surface, config.resolution.width, config.resolution.height)
         videoFrameRecoveryGate.resume(VideoFrameRecoveryGate.Mode.H264)
-        updateStreamState("重启本地解码器")
+        updateStreamState(demoString(R.string.demo_restarting_local_decoder))
     }
 
     private fun restartRemoteVideoStreamOnce(reason: String) {
@@ -639,7 +670,7 @@ class VideoReceiveActivity : ComponentActivity() {
         beginRemoteVideoDrain()
         videoRetryJob = lifecycleScope.launch {
             Log.w(TAG, "restart remote video stream once: reason=$reason")
-            updateStreamState("正在恢复")
+            updateStreamState(demoString(R.string.demo_recovering))
             val stopCompleted = stopRemoteVideoStreamAndAwait()
             Log.d(TAG, "stopVideoStream before controlled restart: completed=$stopCompleted")
             delay(STREAM_RETRY_DELAY_MS)
@@ -654,7 +685,10 @@ class VideoReceiveActivity : ComponentActivity() {
         }
     }
 
-    /** 停止旧流后关闭帧入口并清空本地渲染状态，排空期间的残留回调会被直接丢弃。 */
+    /**
+     * 停止旧流后关闭帧入口并清空本地渲染状态，排空期间的残留回调会被直接丢弃。
+     * After stopping the old stream, close frame intake and clear local rendering state; discard residual callbacks while draining.
+     */
     private fun beginRemoteVideoDrain() {
         videoFrameEpoch++
         videoFrameRecoveryGate.beginDrain()
@@ -672,7 +706,10 @@ class VideoReceiveActivity : ComponentActivity() {
         }
     }
 
-    /** 为新请求创建干净的解码状态；H.264 仍会由门控等待新流 IDR 后才显示。 */
+    /**
+     * 为新请求创建干净的解码状态；H.264 仍会由门控等待新流 IDR 后才显示。
+     * Create clean decoder state for the new request; the H.264 gate still waits for the new stream's IDR frame before displaying it.
+     */
     private fun resumeVideoAfterDrain(config: PreviewConfig) {
         videoFrameRecoveryGate.resume(config.previewMode.toRecoveryGateMode())
         if (config.previewMode == PreviewMode.H264) {
@@ -713,7 +750,7 @@ class VideoReceiveActivity : ComponentActivity() {
         }
         if (audioRequestCount >= MAX_STREAM_RETRY_COUNT) {
             Log.w(TAG, "retryAudioStream: audio stream failed after $audioRequestCount attempts")
-            toast("音频流启动失败，可返回后重试")
+            toast(demoString(R.string.demo_failed_to_start_audio_go_back_and_try))
             return
         }
         audioRetryJob = lifecycleScope.launch {
@@ -744,7 +781,9 @@ class VideoReceiveActivity : ComponentActivity() {
 
     /**
      * 立即发起远端停止，并保留可等待任务。使用 UNDISPATCHED 确保退出方法返回前，
+     * Start the remote stop immediately and retain a task that can be awaited. UNDISPATCHED ensures that, before the exit method returns,
      * stopVideoStream/stopAudioStream 已经真正调用到 SDK。
+     * stopVideoStream/stopAudioStream have actually been called on the SDK.
      */
     private fun scheduleCurrentStreamStop() {
         val previousStop = pendingStreamStopJob
@@ -760,7 +799,10 @@ class VideoReceiveActivity : ComponentActivity() {
         }
     }
 
-    /** 新预览必须等旧流停止回调结束；随后仍保持帧入口关闭，由调用方完成排空延迟。 */
+    /**
+     * 新预览必须等旧流停止回调结束；随后仍保持帧入口关闭，由调用方完成排空延迟。
+     * A new preview must wait for the previous stream's stop callback; keep frame intake closed afterward while the caller completes the drain delay.
+     */
     private suspend fun awaitPreviousStreamStopAndDrain() {
         val pendingStop = pendingStreamStopJob
         pendingStop?.join()
@@ -810,7 +852,7 @@ class VideoReceiveActivity : ComponentActivity() {
         PSecuritySDK.getWifiP2PClientService()?.setAutoDecodeH264ToNv21(true)
         h264RenderFpsMeter.reset()
         val duration = System.currentTimeMillis() - startTime
-        binding.tvDuration.text = "结束时长:${TimeUtils.formatDuration(duration)}"
+        binding.tvDuration.text = demoString(R.string.demo_final_duration, TimeUtils.formatDuration(duration))
         Log.d(TAG, "---------stopPreview=${currentState}")
     }
 
@@ -874,7 +916,6 @@ class VideoReceiveActivity : ComponentActivity() {
                 audioWatchdogJob?.cancel()
             }
             audioTrack.write(buffer, 0, buffer.size)
-//            Log.d(TAG,"--------onClassicBTAudioStream--")
         }
     }
 
@@ -887,7 +928,7 @@ class VideoReceiveActivity : ComponentActivity() {
         if (lastRemoteVideoRestartTime > 0L && now - lastRemoteVideoRestartTime >= RECOVERY_STABLE_TIME_MS) {
             remoteVideoRestartCount = 0
         }
-        updateStreamState("接收中")
+        updateStreamState(demoString(R.string.demo_receiving_2))
         if (!hasVideoFrame) {
             Log.d(TAG, "$source first video frame, width=$width, height=$height")
             hasVideoFrame = true
@@ -949,20 +990,20 @@ class VideoReceiveActivity : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     private fun resetFps() {
         h264RenderFpsMeter.reset()
-        binding.tvFps.text = "帧率：-- fps"
+        binding.tvFps.text = demoString(R.string.demo_frame_rate_fps)
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateFps(fps: Float) {
-        runOnUiThread { binding.tvFps.text = "帧率：${formatFps(fps)} fps" }
+        runOnUiThread { binding.tvFps.text = demoString(R.string.demo_frame_rate_fps_2, formatFps(fps)) }
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateStreamState(videoState: String) {
-        val bluetooth = if (GlobalData.btConnectState.value) "已连接" else "已断开"
-        val p2p = if (GlobalData.p2pConnectState.value) "已连接" else "已断开"
+        val bluetooth = if (GlobalData.btConnectState.value) demoString(R.string.demo_connected) else demoString(R.string.demo_disconnected)
+        val p2p = if (GlobalData.p2pConnectState.value) demoString(R.string.demo_connected) else demoString(R.string.demo_disconnected)
         runOnUiThread {
-            binding.tvStreamState.text = "蓝牙：$bluetooth  P2P：$p2p  视频：$videoState"
+            binding.tvStreamState.text = demoString(R.string.demo_bluetooth_p2p_video, bluetooth, p2p, videoState)
         }
     }
 
@@ -977,6 +1018,7 @@ class VideoReceiveActivity : ComponentActivity() {
     }
 
     /* ================= 生命周期 ================= */
+    // ================= Lifecycle =================
 
     override fun onBackPressed() {
         if (currentState == PageState.PREVIEW) {

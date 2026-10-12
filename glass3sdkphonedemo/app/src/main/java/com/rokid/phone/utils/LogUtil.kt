@@ -6,18 +6,29 @@ import android.util.Log
 
 object LogUtil {
 
-    /** 日志等级常量（与 android.util.Log 一致） */
+    /**
+     * 日志等级常量（与 android.util.Log 一致）
+     * Log level constants matching android.util.Log.
+     */
     const val VERBOSE = Log.VERBOSE
     const val DEBUG = Log.DEBUG
     const val INFO = Log.INFO
     const val WARN = Log.WARN
     const val ERROR = Log.ERROR
-    const val NONE = Int.MAX_VALUE   // 不打印任何日志
+    // 不打印任何日志
+    // Do not print any logs.
+    const val NONE = Int.MAX_VALUE
     const val Rokid = "Rokid"
-    /** 当前日志等级（初始化时设置） */
+    /**
+     * 当前日志等级（初始化时设置）
+     * Current log level, set during initialization.
+     */
     var logLevel: Int = VERBOSE
 
-    /** 默认 TAG */
+    /**
+     * 默认 TAG
+     * Default TAG.
+     */
     private const val DEFAULT_TAG = "PhonedemoLog"
 
     fun v(tag: String = DEFAULT_TAG, msg: String) {
@@ -40,7 +51,10 @@ object LogUtil {
         if (logLevel <= ERROR) Log.e(Rokid+tag, msg, tr)
     }
 
-    /** 打印长日志（按 logLevel 控制） */
+    /**
+     * 打印长日志（按 logLevel 控制）
+     * Print long logs according to logLevel.
+     */
     fun longLog(tag: String = DEFAULT_TAG, msg: String, level: Int = DEBUG) {
         if (logLevel > level) return
         val maxLength = 2000

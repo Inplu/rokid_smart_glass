@@ -74,10 +74,18 @@ class ApplicationAdapter(
                 val nextLetter = (items.getOrNull(position + 1) as? AppListItem.App)?.info?.firstLetter
 
                 val backgroundRes = when {
-                    prevLetter != currentLetter && nextLetter != currentLetter -> R.drawable.app_list_bg // 只有一个 item
-                    prevLetter != currentLetter -> R.drawable.app_list_top     // 分组起始
-                    nextLetter != currentLetter -> R.drawable.app_list_bottom  // 分组结尾
-                    else -> R.drawable.app_list_middle                         // 分组中间
+                    // 只有一个 item
+                    // There is only one item.
+                    prevLetter != currentLetter && nextLetter != currentLetter -> R.drawable.app_list_bg
+                    // 分组起始
+                    // Start of a group.
+                    prevLetter != currentLetter -> R.drawable.app_list_top
+                    // 分组结尾
+                    // End of a group.
+                    nextLetter != currentLetter -> R.drawable.app_list_bottom
+                    // 分组中间
+                    // Middle of a group.
+                    else -> R.drawable.app_list_middle
                 }
                 holder.itemView.setBackgroundResource(backgroundRes)
             }

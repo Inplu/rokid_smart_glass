@@ -46,6 +46,7 @@ abstract class MviFragment<VB : ViewBinding,State : UiState, Intent : UiIntent, 
 
     private fun observeViewModel() {
         // 观察状态变化
+        // Observe state changes.
         lifecycleScope.launch {
             viewModel.state
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -55,6 +56,7 @@ abstract class MviFragment<VB : ViewBinding,State : UiState, Intent : UiIntent, 
         }
 
         // 观察一次性事件
+        // Observe one-time events.
         lifecycleScope.launch {
             viewModel.event
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -65,12 +67,15 @@ abstract class MviFragment<VB : ViewBinding,State : UiState, Intent : UiIntent, 
     }
 
     // 必须实现：渲染状态
+    // Required implementation: render state.
     protected abstract fun render(state: State)
 
     // 可选实现：处理一次性事件
+    // Optional implementation: handle one-time events.
     protected open fun handleEvent(event: Event) {}
 
     // 发送意图
+    // Send an intent.
     protected fun dispatchIntent(intent: Intent) {
         viewModel.sendIntent(intent)
     }

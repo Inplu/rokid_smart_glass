@@ -1,5 +1,8 @@
 package com.rokid.phone
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -31,7 +34,6 @@ class MessageReceiveActivity : ComponentActivity() {
         PSecuritySDK.getMessageService()?.addMessageListener(mMessageListener)
         PSecuritySDK.getMessageService()?.getFileOperater()?.addFileReceiveV2Listener(mFileReceiveListener)
         PSecuritySDK.getMessageService()?.getBtFileOperater()?.addFileReceiveV2Listener(mFileReceiveListener)
-//        audioTrack.play()
     }
 
     private val logBuilder = StringBuilder(4000)
@@ -41,7 +43,6 @@ class MessageReceiveActivity : ComponentActivity() {
             if (logBuilder.length > 4000) {
                 logBuilder.clear()
             }
-//        logBuilder.append(msg).append("\n")
             logBuilder.insert(0, "$msg\n")
             binding.tvLog.text = logBuilder.toString()
         }
@@ -50,55 +51,41 @@ class MessageReceiveActivity : ComponentActivity() {
     private val mFileReceiveListener = object : FileReceiveV2Listener {
         override fun onStart(filePath: String) {
             super.onStart(filePath)
-            log("onStart: 本端开始接收文件,filePath=${filePath}")
+            log(demoString(R.string.demo_started_receiving_file, filePath))
         }
 
         override fun onProgressChanged(filePath: String,progress: Float) {
-            log("onProgressChanged: 本端接收文件的进度 $progress")
+            log(demoString(R.string.demo_file_reception_progress, progress))
         }
 
         override fun onComplete(filePath: String) {
-            log("onComplete: 本端接收文件完成,filePath=${filePath}")
+            log(demoString(R.string.demo_file_received, filePath))
         }
 
         override fun onFail() {
-            log("onFail: 接收文件失败")
+            log(demoString(R.string.demo_failed_to_receive_file))
         }
 
         override fun onCancel(filePath: String) {
-            log("onCancel: 对方取消了发送文件,filePath=${filePath}")
+            log(demoString(R.string.demo_sender_canceled_file_transfer, filePath))
         }
     }
-
-//    private val audioTrack = AudioTrack(
-//        AudioManager.STREAM_MUSIC,                // 音频流类型
-//        16000,                                    // 采样率（必须一致）
-//        AudioFormat.CHANNEL_OUT_MONO,             // 声道配置（与录音一致）
-//        AudioFormat.ENCODING_PCM_16BIT,           // 编码格式（必须一致）
-//        AudioTrack.getMinBufferSize(              // 合理的缓冲区大小
-//            16000,
-//            AudioFormat.CHANNEL_OUT_MONO,
-//            AudioFormat.ENCODING_PCM_16BIT
-//        ),
-//        AudioTrack.MODE_STREAM                    // 流式模式（适合实时播放）
-//    )
 
     private val mMessageListener = object : IMessageListener {
         @SuppressLint("SetTextI18n")
         override fun onClassicBTTextMessage(msg: String, clientId: String) {
             super.onClassicBTTextMessage(msg, clientId)
-            log("onClassicBTTextMessage= $msg  $clientId")
+            log(demoString(R.string.demo_onclassicbttextmessage_status_32, msg, clientId))
         }
 
         @SuppressLint("SetTextI18n")
         override fun onP2PTextMessage(msg: String, clientId: String) {
             super.onP2PTextMessage(msg, clientId)
-            log("onP2PTextMessage= $msg  $clientId")
+            log(demoString(R.string.demo_onp2ptextmessage_status_33, msg, clientId))
         }
 
         override fun onClassicBTAudioStream(buffer: ByteArray) {
-            log("接收蓝牙音频数据大小 ${buffer.size}")
-//            audioTrack.write(buffer, 0, buffer.size)
+            log(demoString(R.string.demo_bluetooth_audio_received_bytes, buffer.size))
             audioPlayer.writeAudioData(buffer)
         }
     }

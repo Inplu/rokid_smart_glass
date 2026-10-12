@@ -23,7 +23,6 @@ open class BaseGlassActivity : AppCompatActivity() {
     private lateinit var rootView: View
     private var TAG ="BaseGlassActivity"
 
-
     override fun setContentView(layoutResID: Int) {
         super.setContentView(layoutResID)
         initContentView()
@@ -44,8 +43,6 @@ open class BaseGlassActivity : AppCompatActivity() {
         ViewCompat.addOnUnhandledKeyEventListener(rootView, mOnUnhandledKeyEventListener)
     }
 
-
-
     private val mOnUnhandledKeyEventListener = ViewCompat.OnUnhandledKeyEventListenerCompat { v, event ->
         var ret = false
         when (event.action) {
@@ -56,18 +53,21 @@ open class BaseGlassActivity : AppCompatActivity() {
                         return@OnUnhandledKeyEventListenerCompat true
                     }
                     // 触摸板向前滑动
+                    // Swipe forward on the touchpad.
                     KeyEvent.KEYCODE_DPAD_RIGHT -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板向前滑动")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_FRONT)
                         return@OnUnhandledKeyEventListenerCompat true
                     }
                     // 触摸板向后滑动
+                    // Swipe backward on the touchpad.
                     KeyEvent.KEYCODE_DPAD_LEFT -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板向后滑动")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_BEHIND)
                         return@OnUnhandledKeyEventListenerCompat true
                     }
                     // 触摸板返回键
+                    // Touchpad Back key.
                     KeyEvent.KEYCODE_BACK -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板返回键")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_BACK)
@@ -93,7 +93,6 @@ open class BaseGlassActivity : AppCompatActivity() {
 
             MotionEvent.ACTION_MOVE -> {
                 Log.d(TAG, "dispatchTouchEvent ACTION_MOVE")
-//                return true
             }
 
             MotionEvent.ACTION_UP -> {
@@ -120,7 +119,6 @@ open class BaseGlassActivity : AppCompatActivity() {
         return super.dispatchTouchEvent(event)
     }
 
-
     private var lastHomeClickTime = 0L
     private var DoubleTime = 500L
     private var isDoubleClickDetected = false
@@ -134,18 +132,20 @@ open class BaseGlassActivity : AppCompatActivity() {
         Log.e("BaseGlassActivity", "ringHomeClick->$timeDiff ms | curTime:$curTime | lastHomeClickTime:$lastHomeClickTime")
 
         // 取消之前未执行的单击协程
+        // Cancel any previous pending single-click coroutine.
         clickJob?.cancel()
         clickJob = null
-        
 
         if (timeDiff < DoubleTime) {
             Log.d("BaseGlassActivity", "判定为双击：间隔${timeDiff}ms")
             GlassKeyEvent(GlassKeyEvent.KEYCODE_DOUBLE_CLICK)
         } else {
             // 启动协程延迟发送单击事件
+            // Start a coroutine to dispatch the single-click event after a delay.
             clickJob = scope.launch {
                 delay(DoubleTime)
                 // 检查协程是否仍处于活跃状态
+                // Check whether the coroutine is still active.
                 if (isActive) {
                     Log.d("BaseGlassActivity", "判定为单击：间隔${timeDiff}ms")
                     GlassKeyEvent(GlassKeyEvent.KEYCODE_CLICK)
@@ -184,33 +184,36 @@ open class BaseGlassActivity : AppCompatActivity() {
         return super.onTouchEvent(event)
     }
 
-
     private var lastKeyTime: Long = 0
     private var lastKeyCode = -1
     // 防重复时间间隔（100ms）
+    // Duplicate-event suppression interval: 100 ms.
     private val DEBOUNCE_INTERVAL: Long = 100
 
     fun GlassKeyEvent(keyEvent: Int): Boolean {
         Log.d("BaseGlassActivity", "onGlassKeyEvent:" + keyEvent)
         // 获取当前时间戳
+        // Get the current timestamp.
         val currentTime = System.currentTimeMillis()
 
         // 检查是否在100ms内按下相同的键
+        // Check whether the same key was pressed within 100 ms.
         if (keyEvent == lastKeyCode && (currentTime - lastKeyTime) < DEBOUNCE_INTERVAL) {
             // 100ms内重复按相同键，视为重复事件，直接返回
+            // Treat a repeated press of the same key within 100 ms as a duplicate and return immediately.
             Log.d("BaseGlassActivity", "忽略重复按键: " + keyEvent)
-            return true // 消费事件，不再传递
+            // 消费事件，不再传递
+            // Consume the event without forwarding it.
+            return true
         }
 
         // 不是重复事件，更新记录的时间和键值
+        // For a non-duplicate event, update the recorded timestamp and keycode.
         lastKeyTime = currentTime
         lastKeyCode = keyEvent
         onGlassKeyEvent(keyEvent)
         return false
     }
-
-
-
 
      open fun onGlassKeyEvent(@GlassKeyEvent keyEvent: Int): Boolean {
          if (keyEvent == GlassKeyEvent.KEYCODE_DOUBLE_CLICK) {
@@ -228,14 +231,5 @@ open class BaseGlassActivity : AppCompatActivity() {
         super.onPause()
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
-
-
-
-
-
-
-
-
-
 
 }

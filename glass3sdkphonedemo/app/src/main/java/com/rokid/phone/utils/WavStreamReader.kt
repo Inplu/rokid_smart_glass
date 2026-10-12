@@ -16,6 +16,7 @@ import kotlinx.coroutines.withContext
 
 /**
  * 用于从 assets 读取 WAV 文件并流式传输
+ * Read WAV files from assets and stream them.
  */
 class WavStreamSender private constructor(private val context: Context) {
 
@@ -38,6 +39,7 @@ class WavStreamSender private constructor(private val context: Context) {
 
     /**
      * 把 assets 下的 wav 文件复制到 cache 并返回路径（给一些需要路径的 API 用）
+     * Copy a WAV file from assets to cache and return its path for APIs that require a file path.
      */
     private fun getWavFilePathFromAssets(fileName: String): String {
         val cacheFile = File(context.cacheDir, fileName)
@@ -55,6 +57,7 @@ class WavStreamSender private constructor(private val context: Context) {
 
     /**
      * 从 assets 读取 wav 文件并流式传输
+     * Read a WAV file from assets and stream it.
      */
     fun sendWavFromAssets(fileName: String, callback: Callback?) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -70,6 +73,7 @@ class WavStreamSender private constructor(private val context: Context) {
                     while (inputStream.read(buffer).also { read = it } != -1) {
                         val data = buffer.copyOf(read)
                         // 这里调用 SDK 的接口发送
+                        // Invoke the SDK's sending API here.
                         PSecuritySDK.getMessageService()?.sendAudioStreamDataByClassicBT(data)
 
                         sentSize += read

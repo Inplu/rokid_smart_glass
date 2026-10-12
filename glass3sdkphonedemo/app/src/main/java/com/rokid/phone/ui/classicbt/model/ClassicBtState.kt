@@ -4,7 +4,10 @@ import com.rokid.phone.base.viewmodel.interfaces.UiEvent
 import com.rokid.phone.base.viewmodel.interfaces.UiIntent
 import com.rokid.phone.base.viewmodel.interfaces.UiState
 
-/** 经典蓝牙页面的状态、用户意图和一次性事件。 */
+/**
+ * 经典蓝牙页面的状态、用户意图和一次性事件。
+ * State, user intents, and one-time events for the classic Bluetooth screen.
+ */
 data class TestState(
     val log: String = "",
     val connect: Boolean = false,

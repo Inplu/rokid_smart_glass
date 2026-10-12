@@ -251,7 +251,6 @@ public class Texture2dProgram {
         }
         System.arraycopy(values, 0, mKernel, 0, KERNEL_SIZE);
         mColorAdjust = colorAdj;
-        //L.d(TAG, "filt kernel: " + Arrays.toString(mKernel) + ", adj=" + colorAdj);
     }
 
     /**
@@ -267,7 +266,6 @@ public class Texture2dProgram {
             -rw, 0f,    0f, 0f,     rw, 0f,
             -rw, rh,    0f, rh,     rw, rh
         };
-        //L.d(TAG, "filt size: " + width + "x" + height + ": " + Arrays.toString(mTexOffset));
     }
 
     /**

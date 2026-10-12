@@ -4,9 +4,12 @@ import java.nio.ByteBuffer
 
 /**
  * 隔离远端视频流重启前后的数据。
+ * Isolate data from before and after a remote video stream restart.
  *
  * 排空阶段拒绝所有视频包；H.264 新流允许 SPS/PPS 等配置包进入全新的解码器，
+ * Reject all video packets while draining; allow the new H.264 stream's configuration packets, such as SPS/PPS, into the fresh decoder,
  * 但在收到 IDR 关键帧前丢弃普通预测帧，避免旧 GOP 残留画面被渲染。
+ * but discard predicted frames until an IDR keyframe arrives, preventing residual images from the old GOP from being rendered.
  */
 class VideoFrameRecoveryGate {
     enum class Mode { NV21, H264 }

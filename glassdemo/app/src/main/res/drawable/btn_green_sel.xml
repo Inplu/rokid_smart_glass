@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 按下状态（点击时）-->
+    <!-- Pressed state while clicking. -->
     <item android:state_pressed="true" android:state_selected="true">
         <shape>
             <stroke android:width="2px" android:color="@color/green" />
@@ -9,6 +10,7 @@
         </shape>
     </item>
     <!-- 默认状态（未点击）-->
+    <!-- Default state when not clicked. -->
     <item>
         <shape>
             <stroke android:width="2px" android:color="@color/green_70" />

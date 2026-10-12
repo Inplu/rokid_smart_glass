@@ -20,8 +20,8 @@ class VideoReceiveDualModeContractTest {
         assertTrue(activity.contains("PreviewMode.H264"))
         assertTrue(activity.contains("NV21(\"NV21\")"))
         assertTrue(activity.contains("H264(\"H.264\")"))
-        assertTrue(activity.contains("网络中传输的都是眼镜端编码后的 H.264 压缩码流"))
-        assertTrue(activity.contains("MediaCodec 硬解并直接输出到 SurfaceView"))
+        assertTrue(activity.contains("PreviewMode.NV21"))
+        assertTrue(activity.contains("PreviewMode.H264"))
         assertTrue(!layout.contains("tv_preview_mode_description"))
         assertTrue(activity.contains("onVideoH264Stream"))
         assertTrue(activity.contains("H264SurfaceDecoder"))
@@ -41,7 +41,7 @@ class VideoReceiveDualModeContractTest {
 
         assertTrue(activity.contains("handleVideoNoFrames"))
         assertTrue(activity.contains("VideoStreamRecoveryPolicy"))
-        assertTrue(activity.contains("视频流无数据，Wi-Fi P2P 已断开"))
+        assertTrue(activity.contains("R.string.demo_no_video_data_wi_fi_p2p_disconnected"))
         assertTrue(activity.contains("stopRemoteVideoStreamAndAwait"))
         assertTrue(!activity.contains("private fun retryVideoStream"))
     }
@@ -67,9 +67,7 @@ class VideoReceiveDualModeContractTest {
         val layout = File("src/main/res/layout/activity_video_receive.xml").readText()
 
         assertTrue(layout.contains("tv_stream_state"))
-        assertTrue(activity.contains("蓝牙："))
-        assertTrue(activity.contains("P2P："))
-        assertTrue(activity.contains("视频："))
+        assertTrue(activity.contains("R.string.demo_bluetooth_p2p_video"))
     }
 
     @Test

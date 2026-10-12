@@ -46,6 +46,7 @@ class BluetoothActivity : ComponentActivity() {
         setContentView(btBinding.root)
 
         //开启蓝牙扫描，在onDeviceFound获取到在线蓝牙
+        // Start Bluetooth discovery; onDeviceFound reports available Bluetooth devices.
         btBinding.btStartScanBtn.setOnClickListener {
             if (isWifiConnected) {
                 mWifiP2PClientService
@@ -53,48 +54,13 @@ class BluetoothActivity : ComponentActivity() {
             PSecuritySDK.getClassicBlueToothClientService()?.startScan(2000)
 
         }
-        //连接蓝牙
-//        btBinding.btStartScanWifi.setOnClickListener {
-//
-//
-//            mWifiP2PClientService?.startDiscoverPeers()
-//
-//        }
-        //断开蓝牙
-//        btBinding.btDisconnectBtn.setOnClickListener {
-//            PSecuritySDK.getClassicBlueToothClientService()?.disconnect()
-////            setupBleDeviceList()
-//        }
-//        //停止扫描
-//        btBinding.btStopScanBtn.setOnClickListener {
-//            PSecuritySDK.getClassicBlueToothClientService()?.stopScan();
-//
-//        }
-//        //查询当前连接状态
-//        btBinding.btIsConnectedBtn.setOnClickListener {
-//            isConnected = PSecuritySDK.getClassicBlueToothClientService()!!.isConnected();
-//            btBinding.btIsConnectedBtn.text = isConnected.toString();
-//        }
-        //发送文本消息
-//        btBinding.btSendTextBtn.setOnClickListener {
-//
-//                val messageBean = NotificationMessage(packageName, "测试", "测试111", "测试消息222", 2000)
-//                PSecuritySDK.getAbsNotificationService()?.sendNotification(messageBean)
-//
-//            PSecuritySDK.getMessageService()?.sendTextMessageByClassicBT("测试的消息")
-//        }
-//        //发送音视频流
-//        btBinding.btSendAudioBtn.setOnClickListener {
-////            PSecuritySDK.getMessageService()?.sendAudioStreamDataByClassicBT()
-//
-//        }
         //蓝牙连接回调
+        // Bluetooth connection callback.
         PSecuritySDK.getClassicBlueToothClientService()?.addClientListener(object :
             IClassicBTClientListener {
             override fun onDeviceFound(device: BluetoothDevice) {
                 Log.e(TAG, "onDeviceFound::" + device.name + " " + device.address)
                 if(btDeviceFilter(device.name) &&  device.type != BluetoothDevice.DEVICE_TYPE_LE){
-//                    val bluetoothDeviceInfo = BluetoothDeviceInfo(name,address,type)
                     deviceList.add(device)
                     adapter.submitList(deviceList.toList())
 
@@ -109,8 +75,6 @@ class BluetoothActivity : ComponentActivity() {
 
             override fun onConnect(success: Boolean) {
                 if (success) {
-//                    Toast.makeText(BluetoothActivity,"连接成功",Toast.LENGTH_LONG).show()
-//                    Toast.makeText(this@BluetoothActivity, "蓝牙连接成功", Toast.LENGTH_LONG).show()
 
                 }
 
@@ -120,14 +84,9 @@ class BluetoothActivity : ComponentActivity() {
             override fun onConnectionRejected(reason: String, code: Int) {
             }
         })
-//        mWifiP2PClientService?.addWifiP2PClientListener(mIWifiP2PClientListener)
 
         PSecuritySDK.getClassicBlueToothClientService()?.startScan(2000)
-//        mWifiP2PClientService?.disconnect()
-//        mWifiP2PClientService?.initialize()
-//        mWifiP2PClientService?.startDiscoverPeers()
         setupBleDeviceList()
-//        setupWifiDeviceList()
     }
 
     override fun onResume() {
@@ -148,7 +107,6 @@ class BluetoothActivity : ComponentActivity() {
         override fun onWifiP2pEnabled(enabled: Boolean) {
             if (enabled){
 
-//                Toast.makeText(this@BluetoothActivity, "WiFi连接成功", Toast.LENGTH_LONG).show()
             }
             Log.e(TAG, "onWifiP2pConnect ${enabled}")
         }
@@ -178,28 +136,6 @@ class BluetoothActivity : ComponentActivity() {
         }
     }
 
-
-//    private fun setupWifiDeviceList() {
-//        Log.e(TAG, "sssss");
-//        lifecycleScope.launch {
-//            val recycler = findViewById<RecyclerView>(R.id.rv_wifi)
-//            recycler.layoutManager = LinearLayoutManager(this@BluetoothActivity)
-//           adapterP2p = WifiDeviceAdapter {
-//                handleWifiAnimation(it)
-//
-//            }
-//            recycler.adapter = adapterP2p
-//            adapterP2p.submitList(deviceWifiList)
-//        }
-//    }
-
-//    private fun handleWifiAnimation(model: WifiP2pDevice) {
-//        mDevice=model
-//        mDevice?.let { DeviceLinkerManager.saveP2pDevice(it) }
-//        mWifiP2PClientService?.connectDevice(model) {
-//
-//        }
-//    }
    private  fun btDeviceFilter(deviceName:String?):Boolean{
         if(deviceName.isNullOrEmpty() || "null".equals(deviceName.lowercase())){
             return false;
@@ -207,6 +143,7 @@ class BluetoothActivity : ComponentActivity() {
 
 
         //正式版本只展示Glass3 开头的蓝牙设备
+        // In the release version, only show Bluetooth devices whose names start with Glass3.
         if(deviceName.contains("Glass3")){
             return true
         }

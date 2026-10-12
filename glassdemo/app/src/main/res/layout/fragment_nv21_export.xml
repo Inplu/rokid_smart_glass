@@ -9,6 +9,7 @@
         android:layout_height="match_parent" />
 
     <!-- 配置面板 -->
+    <!-- Configuration panel. -->
     <ScrollView
         android:id="@+id/config_panel"
         android:layout_width="match_parent"
@@ -28,12 +29,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NV21 导出配置"
+            android:text="@string/demo_nv21_export_settings"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <!-- 分辨率 -->
+        <!-- Resolution. -->
         <LinearLayout
             android:id="@+id/row_resolution"
             android:layout_width="match_parent"
@@ -48,7 +50,7 @@
             <TextView
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:text="分辨率:"
+                android:text="@string/demo_resolution"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
@@ -75,7 +77,7 @@
             <TextView
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:text="FPS:"
+                android:text="@string/demo_fps"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
@@ -102,7 +104,7 @@
             <TextView
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
-                android:text="变焦(Zoom):"
+                android:text="@string/demo_zoom"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
@@ -120,12 +122,13 @@
                 android:layout_width="40dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="1"
+                android:text="@string/demo_1"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
         </LinearLayout>
 
         <!-- 防抖开关 -->
+        <!-- Stabilization switch. -->
         <LinearLayout
             android:id="@+id/row_eis"
             android:layout_width="match_parent"
@@ -140,7 +143,7 @@
             <TextView
                 android:layout_width="80dp"
                 android:layout_height="wrap_content"
-                android:text="防抖(EIS):"
+                android:text="@string/demo_stabilization_eis"
                 android:textColor="@android:color/white"
                 android:textSize="14sp" />
 
@@ -152,6 +155,7 @@
         </LinearLayout>
 
         <!-- 按钮 -->
+        <!-- Buttons. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -167,7 +171,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/camera_mode_button_bg"
                 android:focusable="false"
-                android:text="应用"
+                android:text="@string/demo_apply"
                 android:textColor="@android:color/white" />
 
             <Button
@@ -178,13 +182,14 @@
                 android:layout_weight="1"
                 android:background="@drawable/camera_mode_button_bg"
                 android:focusable="false"
-                android:text="隐藏"
+                android:text="@string/demo_hide"
                 android:textColor="@android:color/white" />
         </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
     <!-- 信息文本 -->
+    <!-- Information text. -->
     <TextView
         android:id="@+id/tv_info"
         android:layout_width="wrap_content"
@@ -197,6 +202,7 @@
         android:textSize="14sp" />
 
     <!-- 显示配置按钮 -->
+    <!-- Show the configuration button. -->
     <Button
         android:id="@+id/btn_show_config"
         android:layout_width="wrap_content"
@@ -204,6 +210,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:focusable="false"
-        android:text="配置" />
+        android:text="@string/demo_settings" />
 
 </FrameLayout>

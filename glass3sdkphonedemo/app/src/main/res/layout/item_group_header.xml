@@ -16,6 +16,6 @@
         android:textSize="14sp"
         android:textStyle="bold"
         android:textColor="#666666"
-        android:text="组标题" />
+        android:text="@string/demo_group_title" />
 
 </LinearLayout>

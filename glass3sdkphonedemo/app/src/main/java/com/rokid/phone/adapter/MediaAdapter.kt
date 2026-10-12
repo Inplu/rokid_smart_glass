@@ -11,7 +11,9 @@ import java.io.File
 
 class MediaAdapter(
     private val mediaList: List<File>,
-    private val onItemClick: (File) -> Unit   // 新增点击回调
+    // 新增点击回调
+    // Add a click callback.
+    private val onItemClick: (File) -> Unit
 ) : RecyclerView.Adapter<MediaAdapter.MediaViewHolder>() {
     inner class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val thumbnail: ImageView = itemView.findViewById(R.id.thumbnail)
@@ -33,8 +35,10 @@ class MediaAdapter(
             holder.videoTag.visibility = View.GONE
         }
         // 图片或视频缩略图
+        // Image or video thumbnail.
         Glide.with(context).load(file).thumbnail(0.1f).into(holder.thumbnail)
         // 点击事件
+        // Click event.
         holder.itemView.setOnClickListener {
             onItemClick(file)
         }

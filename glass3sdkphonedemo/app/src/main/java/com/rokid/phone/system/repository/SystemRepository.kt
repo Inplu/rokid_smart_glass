@@ -56,13 +56,12 @@ class SystemRepository(
 
         try {
             // 尝试使用新的断点续传方法
+            // Try the new resumable download method.
             PSecuritySDK.getOtaEngineService().otaDownloadWithResume(
                 otaUrl, filePath, createEnhancedListener(listener), downloadedSize
             )
         } catch (e: Exception) {
             L.d(TAG, "断点续传不可用，降级到普通下载: ${e.message}")
-            // 降级到普通下载
-//            downUpdate(filePath, listener)
         }
     }
 
@@ -78,17 +77,11 @@ class SystemRepository(
 
             override fun onProgress(progress: Int, downloaded: Long, total: Long) {
                 // 传递详细信息
+                // Pass detailed information.
                 originalListener.onProgress(progress, downloaded, total)
             }
         }
     }
-
-//    fun downUpdate(filePath :String,listener: DownloadListener){
-//        L.i(TAG, "downUpdate: filePath $filePath otaUrl:$otaUrl")
-//        PSecuritySDK.getOtaEngineService()?.otaDownload(otaUrl,filePath,listener)
-//
-//    }
-
 
     fun cancelDownload(){
         PSecuritySDK.getOtaEngineService()?.cancelDownload()

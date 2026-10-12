@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="@dimen/glass_base_item_margin_bottom"
-        android:singleLine="true"
+        android:singleLine="false"
         android:textColor="@color/common_text_color_selector"
         android:textSize="@dimen/glass_base_item_title_text_size"
         android:textStyle="bold" />

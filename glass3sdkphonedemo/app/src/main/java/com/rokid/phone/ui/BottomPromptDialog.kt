@@ -17,13 +17,16 @@ object BottomPromptDialog {
         onConfirm: () -> Unit
     ): BottomSheetDialog {
         // 创建BottomSheetDialog
+        // Create a BottomSheetDialog.
         val dialog = BottomSheetDialog(activity, R.style.BottomSheetDialogStyle)
         if (!activity.isFinishing && !activity.isDestroyed) {
             // 加载布局
+            // Inflate the layout.
             val view = LayoutInflater.from(activity).inflate(R.layout.dialog_bottom_prompt, null)
             dialog.setContentView(view)
 
             // 初始化控件
+            // Initialize the controls.
             val tvTitle = view.findViewById<TextView>(R.id.dialog_title)
             val tvMsg = view.findViewById<TextView>(R.id.tv_msg)
             val btnConfirm = view.findViewById<Button>(R.id.btn_confirm)
@@ -36,6 +39,7 @@ object BottomPromptDialog {
                 onConfirm()
             }
             // 设置弹窗高度为屏幕的60%
+            // Set the dialog height to 60% of the screen.
             val window = dialog.window
             window?.setLayout(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -43,6 +47,7 @@ object BottomPromptDialog {
             )
 
             // 显示弹窗
+            // Show the dialog.
             dialog.show()
         }
         return dialog

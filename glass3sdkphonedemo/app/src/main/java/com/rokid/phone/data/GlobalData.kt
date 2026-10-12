@@ -7,16 +7,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 object GlobalData {
     /**
      * p2p连接状态
+     * P2P connection state.
      */
     val p2pConnectState = MutableStateFlow(false)
 
     /**
      * 蓝牙连接状态
+     * Bluetooth connection state.
      */
     val btConnectState = MutableStateFlow(false)
 
     /**
      * sdk 初始化状态
+     * SDK initialization state.
      */
     val sdkInitState = MutableStateFlow(false)
 

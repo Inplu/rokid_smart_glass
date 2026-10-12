@@ -14,13 +14,19 @@ import java.io.FileReader
 import java.io.IOException
 import java.util.Date
 
-/** 读取设备与系统信息的工具。 */
+/**
+ * 读取设备与系统信息的工具。
+ * Utilities for reading device and system information.
+ */
 object DeviceUtil {
     val TAG: String = DeviceUtil::class.java.getSimpleName()
 
     @get:Throws(Exception::class)
     val version: Array<String?>
-        /* 返回值依次为：内核版本、系统版本、设备型号、固件版本和品牌。 */
+        /*
+         * 返回值依次为：内核版本、系统版本、设备型号、固件版本和品牌。
+         * Return values, in order: kernel version, system version, device model, firmware version, and brand.
+         */
         get() {
             val version = arrayOf<String?>("null", "null", "null", "null", "null")
             val str1 = "/proc/version"
@@ -46,8 +52,10 @@ object DeviceUtil {
 
     fun getVersionName(context: Context): String? {
         // 获取packagemanager的实例
+        // Get a PackageManager instance.
         val packageManager = context.getPackageManager()
         // getPackageName()是你当前类的包名，0代表是获取版本信息
+        // getPackageName() returns the current app package name; pass flags of 0 to retrieve package version information.
         try {
             val packInfo = packageManager.getPackageInfo(context.getPackageName(), 0)
             val version = packInfo.versionName
@@ -60,8 +68,10 @@ object DeviceUtil {
 
     fun getVersionCode(context: Context): String? {
         // 获取packagemanager的实例
+        // Get a PackageManager instance.
         val packageManager = context.getPackageManager()
         // getPackageName()是你当前类的包名，0代表是获取版本信息
+        // getPackageName() returns the current app package name; pass flags of 0 to retrieve package version information.
         try {
             val packInfo = packageManager.getPackageInfo(context.getPackageName(), 0)
             val version = packInfo.versionCode
@@ -75,6 +85,7 @@ object DeviceUtil {
     val systemVersion: String?
         /**
          * 获得其中的当前版本
+         * Get the current version.
          *
          * @return
          */
@@ -96,6 +107,7 @@ object DeviceUtil {
     val currentThreeDigitVersion: String?
         /**
          * 获得当前的三位数字版本
+         * Get the current three-number version.
          *
          * @return
          */
@@ -113,16 +125,20 @@ object DeviceUtil {
     val systemModel: String?
         /**
          * 获取手机型号
+         * Get the phone model.
          *
          * @return 手机型号
+         * The phone model.
          */
         get() = Build.MODEL
 
     val deviceBrand: String?
         /**
          * 获取手机厂商
+         * Get the phone manufacturer.
          *
          * @return 手机厂商
+         * The phone manufacturer.
          */
         get() = Build.BRAND
 
@@ -194,17 +210,25 @@ object DeviceUtil {
 
     /**
      * 判断眼镜是否带上
+     * Determine whether the glasses are being worn.
      * true 表示带上眼镜
+     * true means the glasses are being worn.
      * false 表示未带上眼镜
+     * false means the glasses are not being worn.
      * 1是佩戴，0是摘下
+     * 1 means worn; 0 means removed.
      */
     val isGlassTackOn: Boolean get() = "1" == getSystemProp("vendor.rkd.glasses.is_take_on")
 
     /**
      * 获取眼镜是否折叠
+     * Determine whether the glasses are folded.
      * true 表示折叠眼镜腿
+     * true means the temples are folded.
      * false 表示未折叠眼镜腿
+     * false means the temples are unfolded.
      * 1是展开，0是折叠
+     * 1 means unfolded; 0 means folded.
      */
     val isGlassLegFold: Boolean get() = "0" == getSystemProp("vendor.rkd.glasses.is_spread")
 
@@ -212,6 +236,7 @@ object DeviceUtil {
 
     /**
      * 重启设备
+     * Restart the device.
      */
     fun rebootDevice() {
         L.v("DeviceUtil", "rebootDevice() call")

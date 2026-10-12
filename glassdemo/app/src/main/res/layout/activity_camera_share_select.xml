@@ -1,67 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="32dp">
+    android:fillViewport="true"
+    android:background="@android:color/black">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:text="相机数据输出 Demo"
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
-        android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/btn_surface_mode"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/camera_mode_button_bg"
-        android:backgroundTint="@null"
-        android:focusable="false"
-        android:padding="16dp"
-        android:text="Surface 实时预览"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/btn_nv21_mode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/camera_mode_button_bg"
-        android:backgroundTint="@null"
-        android:focusable="false"
-        android:padding="16dp"
-        android:text="NV21 帧数据导出"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/btn_mix_mode"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/camera_mode_button_bg"
-        android:backgroundTint="@null"
-        android:focusable="false"
-        android:padding="16dp"
-        android:text="混合画面录制"
-        android:textColor="@android:color/white"
-        android:textSize="16sp" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
+        android:background="@android:color/black"
         android:gravity="center"
-        android:text="选择一个模式进入演示\n按返回键可回到此页面"
-        android:textColor="@android:color/darker_gray"
-        android:textSize="12sp" />
+        android:orientation="vertical"
+        android:padding="32dp">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:text="@string/demo_camera_output_demo"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_surface_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/camera_mode_button_bg"
+            android:backgroundTint="@null"
+            android:focusable="false"
+            android:padding="16dp"
+            android:text="@string/demo_surface_live_preview"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_nv21_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/camera_mode_button_bg"
+            android:backgroundTint="@null"
+            android:focusable="false"
+            android:padding="16dp"
+            android:text="@string/demo_nv21_frame_export"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/btn_mix_mode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/camera_mode_button_bg"
+            android:backgroundTint="@null"
+            android:focusable="false"
+            android:padding="16dp"
+            android:text="@string/demo_mixed_video_recording"
+            android:textColor="@android:color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:gravity="center"
+            android:text="@string/demo_select_a_mode_to_start_the_demo_npress"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+</ScrollView>

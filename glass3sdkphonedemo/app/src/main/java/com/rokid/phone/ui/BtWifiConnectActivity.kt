@@ -1,5 +1,7 @@
 package com.rokid.phone.ui
 
+import com.rokid.phone.utils.demoString
+
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
@@ -78,6 +80,7 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
         lifecycleScope.launch {
             mFrameAnimationUtil = FrameAnimationUtil(binding.ivDiscoverGif)
             // 动态创建帧列表（资源ID + 持续时间）
+            // Build the frame list dynamically from resource IDs and durations.
             mFrameAnimationUtil?.initFromFrames(MyApplication.frameList, lifecycleScope)
         }
     }
@@ -91,7 +94,6 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
             if (it) {
                 PSecuritySDK.getWifiP2PClientService()?.stopPeerDiscovery { }
                 PSecuritySDK.getWifiP2PClientService()?.disconnect()
-//                GlobalData.setP2pConnectState(true)
             }
         }
 
@@ -144,7 +146,7 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
                         curStatus = PARI_SUCCESS_STATUS
                         if (isConnetP2p) {
                             if (!GlobalData.p2pConnectState.value) {
-                                ToastUtils.makeText(this@BtWifiConnectActivity, "蓝牙已连接,正在进行P2P配对")
+                                ToastUtils.makeText(this@BtWifiConnectActivity, demoString(R.string.demo_bluetooth_connected_pairing_p2p))
                                 startDiscoverTask()
                             } else {
                                 completePair()
@@ -181,7 +183,7 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
     private fun jumpToBtActivity() {
         mClassicBlueToothClientService?.disconnect()
         lifecycleScope.launch {
-            Toast.makeText(this@BtWifiConnectActivity, "蓝牙连接失败", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@BtWifiConnectActivity, demoString(R.string.demo_bluetooth_connection_failed), Toast.LENGTH_SHORT).show()
         }
         val intent = Intent(this, ClassicBtActivity::class.java)
         startActivity(intent)
@@ -191,13 +193,14 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
 
     private fun startDiscoverTask() {
         if (!SystemStateUtils.isWifiEnabled(this)) {
-            Toast.makeText(this@BtWifiConnectActivity, "wifi未开启", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@BtWifiConnectActivity, demoString(R.string.demo_wi_fi_is_off), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
         curStatus = PARI_ING_STATUS
         showStatus()
         //自动连接p2p
+        // Connect P2P automatically.
         mWifiP2PClientService?.addWifiP2PClientListener(mIWifiP2PClientListener)
         mWifiP2PClientService?.sendConnectP2pRequest {}
         outTimeTask(20 * 1000)
@@ -228,7 +231,7 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
     override fun onResume() {
         super.onResume()
         if (!SystemStateUtils.isWifiEnabled(this)) {
-            Toast.makeText(this@BtWifiConnectActivity, "wifi未开启", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@BtWifiConnectActivity, demoString(R.string.demo_wi_fi_is_off), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -269,8 +272,8 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
         Log.i(TAG, "showStatus: $curStatus")
         when (curStatus) {
             PARI_PRE_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "连接中..."
-                binding.tvSubtitleDiscoverDevice.text = "请耐心等待"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_connecting_2)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_please_wait)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvPairComplete.visibility = View.GONE
@@ -281,8 +284,8 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
             }
 
             PARI_ING_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "连接中..."
-                binding.tvSubtitleDiscoverDevice.text = "请耐心等待"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_connecting_2)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_please_wait)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.ivDiscoverGif.visibility = View.VISIBLE
@@ -294,7 +297,7 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
 
             PARI_SUCCESS_STATUS -> {
                 mFrameAnimationUtil?.stop()
-                binding.tvTitleDiscoverDevice.text = "配对成功"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_paired_successfully)
                 binding.tvSubtitleDiscoverDevice.visibility = View.INVISIBLE
                 binding.ivShow.setImageResource(R.mipmap.icon_pair_complete)
                 binding.ivShow.visibility = View.VISIBLE
@@ -306,15 +309,15 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
 
             PARI_FAILED_STATUS -> {
                 mFrameAnimationUtil?.stop()
-                binding.tvTitleDiscoverDevice.text = "配对失败"
-                binding.tvSubtitleDiscoverDevice.text = "设备蓝牙名称可从眼镜主页获取"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_pairing_failed)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_find_the_bluetooth_name_on_the_glasses_home)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvPairComplete.visibility = View.GONE
                 binding.ivShow.setImageResource(R.mipmap.icon_rokid_big)
                 binding.ivDiscoverGif.visibility = View.GONE
                 binding.btnPairDevice.visibility = View.VISIBLE
-                binding.btnPairDevice.text = "重试"
+                binding.btnPairDevice.text = demoString(R.string.demo_retry)
             }
         }
         binding.tvDeviceName.text = DeviceLinkerManager.mConnectingBluetoothDevice?.name
@@ -324,14 +327,16 @@ class BtWifiConnectActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() 
 
     @SuppressLint("SetTextI18n")
     private fun completePair() {
-        Toast.makeText(this, "配对成功", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, demoString(R.string.demo_paired_successfully), Toast.LENGTH_SHORT).show()
         completeJob?.cancel()
         completeJob = lifecycleScope.launch {
             repeat(countDown) { second ->
                 val remainingTime = countDown - second
-                binding.tvTitleDiscoverDevice.text = "配对成功"
-                binding.btnPairDevice.text = "进入首页($remainingTime)"
-                delay(1000) // 延迟2秒
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_paired_successfully)
+                binding.btnPairDevice.text = demoString(R.string.demo_go_to_home, remainingTime)
+                // 延迟2秒
+                // Delay for two seconds.
+                delay(1000)
             }
             finish()
         }

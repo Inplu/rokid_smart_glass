@@ -11,7 +11,10 @@ import com.rokid.phone.ui.classicbt.model.TestState
 import com.rokid.phone.ui.classicbt.repository.ClassicBtRepository
 import kotlinx.coroutines.launch
 
-/** 协调经典蓝牙连接操作与界面状态。 */
+/**
+ * 协调经典蓝牙连接操作与界面状态。
+ * Coordinate classic Bluetooth connections and UI state.
+ */
 class ClassicBtViewModel(
     private val repository: ClassicBtRepository
 ) : MviViewModel<TestState, TestIntent, TestEvent>() {
@@ -35,6 +38,7 @@ class ClassicBtViewModel(
 
     init {
         // 观察Repository数据变化
+        // Observe Repository data changes.
         viewModelScope.launch {
             repository._events.collect { btEvent ->
                 when (btEvent) {

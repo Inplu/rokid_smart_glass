@@ -1,5 +1,8 @@
 package com.rokid.glass
 
+import com.rokid.glass.utils.demoString
+import com.rokid.glesse.R
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
@@ -28,11 +31,13 @@ class ActivityQRView : BaseGlassActivity() {
             object : GlassScanCallback {
                 override fun onScanSuccess(content: String?, barcode: Barcode) {
                     // 扫码成功
-                    log(content ?: "没有返回结果")
+                    // QR/barcode scanning succeeded.
+                    log(content ?: demoString(R.string.demo_no_result_returned))
                 }
 
                 override fun onScanFailure(error: String) {
                     // 扫码失败
+                    // QR/barcode scanning failed.
                     log(error)
                 }
             }, scanType = ScanType.QR_CODE_ONLY,
@@ -41,6 +46,7 @@ class ActivityQRView : BaseGlassActivity() {
             cameraZoomLevel = 5
         )
         // 设置取景框比例
+        // Set the viewfinder aspect ratio.
         binding.scannerView.setViewfinderFrameRatio(0.4f)
     }
 

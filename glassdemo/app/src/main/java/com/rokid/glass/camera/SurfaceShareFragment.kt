@@ -1,5 +1,7 @@
 package com.rokid.glass.camera
 
+import com.rokid.glass.utils.demoString
+
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
@@ -26,14 +28,20 @@ import javax.microedition.khronos.opengles.GL10
 
 /**
  * Surface 共享模式 Fragment
+ * Fragment for Surface sharing mode.
  * 仅渲染相机画面到 GLSurfaceView
+ * Render only the camera image to GLSurfaceView.
  */
 class SurfaceShareFragment : Fragment() {
 
     companion object {
         private const val TAG = "SurfaceShareFragment"
-        private const val FIRST_SWITCH_DELAY_MS = 15_000L   // 第一次切换：15秒
-        private const val SECOND_SWITCH_DELAY_MS = 15_000L  // 第二次切换：再过15秒
+        // 第一次切换：15秒
+        // First switch: after 15 seconds.
+        private const val FIRST_SWITCH_DELAY_MS = 15_000L
+        // 第二次切换：再过15秒
+        // Second switch: after another 15 seconds.
+        private const val SECOND_SWITCH_DELAY_MS = 15_000L
 
         fun newInstance(): SurfaceShareFragment {
             return SurfaceShareFragment()
@@ -50,8 +58,12 @@ class SurfaceShareFragment : Fragment() {
     private var renderer: SurfaceShareRenderer? = null
     private var frameCount = 0L
     private var lastFpsTime = 0L
-    private var currentConfigText = "" // 当前配置文本
-    private var currentZoomLevel = 1 // 当前 zoom 级别
+    // 当前配置文本
+    // Current configuration text.
+    private var currentConfigText = ""
+    // 当前 zoom 级别
+    // Current zoom level.
+    private var currentZoomLevel = 1
     private var configSwitchInFlight = false
 
     override fun onCreateView(
@@ -64,10 +76,10 @@ class SurfaceShareFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         glSurfaceView = view.findViewById(R.id.gl_surface_view)
         tvInfo = view.findViewById(R.id.tv_info)
-        
+
         setupGLSurfaceView()
     }
 
@@ -77,11 +89,17 @@ class SurfaceShareFragment : Fragment() {
         lastFpsTime = 0L
         glSurfaceView.onResume()
         // 确保渲染线程恢复后 Surface 共享被正确拉起。
+        // Ensure Surface sharing starts correctly after the rendering thread resumes.
         // onSurfaceCreated 在 EGL 重建时触发，但 teardownGlResourcesBlocking 只销毁了
+        // EGL recreation triggers onSurfaceCreated, but teardownGlResourcesBlocking only destroys
         // GL 资源（shader/texture）而没有破坏 EGL Surface，onResume 恢复后可能不会
+        // the GL resources (shaders/textures), leaving the EGL Surface intact; resuming through onResume may therefore not
         // 重新触发 onSurfaceCreated → startSurfaceShare()。
+        // trigger onSurfaceCreated and startSurfaceShare() again.
         // 此外，即使 EGL 上下文被保留（未重建），shader program 已被 rend.release()
+        // Furthermore, even if the EGL context is preserved without recreation, rend.release() has already
         // 删除，需要通过 queueEvent 一并恢复 shader + 纹理 + Surface 共享。
+        // deleted the shader program, so use queueEvent to restore the shaders, textures, and Surface sharing together.
         glSurfaceView.queueEvent {
             if (!surfaceHelper.isSurfaceActive()) {
                 renderer?.initShaderProgram()
@@ -93,8 +111,11 @@ class SurfaceShareFragment : Fragment() {
 
     /**
      * 必须在 [GLSurfaceView.onPause] **之前**、且渲染线程仍在处理队列时执行完 GL 侧释放。
+     * Complete GL cleanup **before** [GLSurfaceView.onPause], while the rendering thread is still processing its queue.
      * 若在 [onDestroyView] 才异步 [queueEvent] 又立刻 [onPause]，易出现上下文销毁与 BufferQueue/fence 交错，
+     * Asynchronously calling [queueEvent] only in [onDestroyView] and then immediately calling [onPause] can interleave context destruction with BufferQueue/fence operations,
      * 系统 HWUI [RenderThread] 上可能触发 fdsan（duplicate close）。
+     * potentially triggering fdsan (duplicate close) on the system HWUI [RenderThread].
      */
     private fun teardownGlResourcesBlocking() {
         firstSwitchRunnable?.let { mainHandler.removeCallbacks(it) }
@@ -178,7 +199,7 @@ class SurfaceShareFragment : Fragment() {
         )
 
         currentConfigText =
-            "1280x720@15fps, EIS=OFF, zoom=1\n演示提示: 15秒后自动切换到1920x1080@15fps, zoom=2"
+            demoString(R.string.demo_1280x720_15fps_eis_off_zoom_1_ndemo_switching)
         currentZoomLevel = 1
 
         Log.d(TAG, "Starting surface share: ${initialConfig.previewWidth}x${initialConfig.previewHeight}@${initialConfig.previewTargetFps}fps")
@@ -222,7 +243,7 @@ class SurfaceShareFragment : Fragment() {
             override fun onError(code: Int, msg: String) {
                 Log.e(TAG, "Surface error: code=$code, msg=$msg")
                 activity?.runOnUiThread {
-                    tvInfo.text = "错误: $code, $msg"
+                    tvInfo.text = demoString(R.string.demo_error, code, msg)
                 }
             }
 
@@ -266,27 +287,29 @@ class SurfaceShareFragment : Fragment() {
         firstSwitchRunnable = null
         secondSwitchRunnable = null
     }
-    
+
     /**
      * 更新信息显示
+     * Update the information display.
      */
     private fun updateInfoDisplay(width: Int, height: Int) {
         val (displayWidth, displayHeight) = toDisplayResolution(width, height)
         val fpsText = if (lastFpsTime > 0) {
             val elapsed = System.currentTimeMillis() - lastFpsTime
             if (elapsed >= 1000 && frameCount > 0) {
-                "\n实时帧率: %.1f fps".format(frameCount * 1000f / elapsed)
+                demoString(R.string.demo_nlive_frame_rate_fps).format(frameCount * 1000f / elapsed)
             } else {
                 ""
             }
         } else {
             ""
         }
-        tvInfo.text = "已连接: ${displayWidth}x${displayHeight}\n配置: $currentConfigText$fpsText"
+        tvInfo.text = demoString(R.string.demo_connected_x_nconfiguration, displayWidth, displayHeight, currentConfigText, fpsText)
     }
-    
+
     /**
      * 第一次配置切换：15秒后切换到 1080P@15fps, zoom=2
+     * First configuration switch: after 15 seconds, switch to 1080P at 15 fps with zoom=2.
      */
     private fun scheduleFirstConfigSwitch() {
         firstSwitchRunnable?.let { mainHandler.removeCallbacks(it) }
@@ -301,19 +324,21 @@ class SurfaceShareFragment : Fragment() {
                 zoomLevel = 2,
             )
             currentConfigText =
-                "1920x1080@15fps, EIS=OFF, zoom=2\n演示提示: 已自动切换，15秒后切换到24fps, zoom=1"
+                demoString(R.string.demo_1920x1080_15fps_eis_off_zoom_2_ndemo_switched)
             currentZoomLevel = 2
             switchToNewConfig(config)
-            
+
             // 再过15秒进行第二次切换
+            // Perform the second switch after another 15 seconds.
             scheduleSecondConfigSwitch()
         }
         firstSwitchRunnable = switchRunnable
         mainHandler.postDelayed(switchRunnable, FIRST_SWITCH_DELAY_MS)
     }
-    
+
     /**
      * 第二次配置切换：再过15秒后切换到 1080P@24fps, zoom=1
+     * Second configuration switch: after another 15 seconds, switch to 1080P at 24 fps with zoom=1.
      */
     private fun scheduleSecondConfigSwitch() {
         secondSwitchRunnable?.let { mainHandler.removeCallbacks(it) }
@@ -328,16 +353,17 @@ class SurfaceShareFragment : Fragment() {
                 zoomLevel = 1,
             )
             currentConfigText =
-                "1920x1080@24fps, EIS=OFF, zoom=1\n演示提示: 自动切换演示完成"
+                demoString(R.string.demo_1920x1080_24fps_eis_off_zoom_1_ndemo_automatic)
             currentZoomLevel = 1
             switchToNewConfig(config)
         }
         secondSwitchRunnable = switchRunnable
         mainHandler.postDelayed(switchRunnable, SECOND_SWITCH_DELAY_MS)
     }
-    
+
     /**
      * 切换到新配置
+     * Switch to the new configuration.
      */
     private fun switchToNewConfig(config: CameraShareConfig) {
         if (!::glSurfaceView.isInitialized) return
@@ -445,7 +471,9 @@ class SurfaceShareFragment : Fragment() {
 
         /**
          * SDK 的 SurfaceTexture 变换矩阵负责相机纹理的 90° 旋转；这里按旋转后的
+         * The SDK's SurfaceTexture transform matrix handles the camera texture's 90-degree rotation; use the rotated
          * 宽高比缩放顶点做 FIT_CENTER，完整显示预览帧并避免非等比拉伸。
+         * aspect ratio to scale vertices for FIT_CENTER, displaying the entire preview frame without non-uniform stretching.
          */
         private fun updateCenterCropVertices() {
             if (!::vertexBuffer.isInitialized ||

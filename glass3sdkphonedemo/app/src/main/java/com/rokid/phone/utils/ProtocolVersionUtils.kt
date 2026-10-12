@@ -14,6 +14,7 @@ object ProtocolVersionUtils {
 
     /**
      * 眼镜SDK协议版本1.0
+     * Glasses SDK protocol version 1.0.
      */
     fun isGlassVersion1(): Boolean{
         val glassProtocolVersion = msDeviceInfoService?.getGlassDeviceInfo()?.version ?: "-1"
@@ -23,6 +24,7 @@ object ProtocolVersionUtils {
 
     /**
      * 眼镜端协议版本低于手机端
+     * The glasses protocol version is lower than the phone protocol version.
      */
     fun isGlassVersionLow(): Boolean{
         val glassProtocolVersion = msDeviceInfoService?.getGlassDeviceInfo()?.version ?: "-1"

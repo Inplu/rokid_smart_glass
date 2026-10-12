@@ -1,5 +1,7 @@
 package com.rokid.glass
 
+import com.rokid.glass.utils.demoString
+
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.text.format.DateFormat
@@ -19,6 +21,7 @@ import java.util.Locale
 
 /**
  * 离线语音指令测试,推荐3-5个词，不要有叠音
+ * Offline voice command test; use 3-5 words and avoid repeated syllables.
  */
 class OfflineCmdTestActivity : BaseGlassActivity() {
 
@@ -55,7 +58,7 @@ class OfflineCmdTestActivity : BaseGlassActivity() {
         setContentView(binding.root)
         GlassSdk.getGlassOfflineCmdService()?.init()
         refreshCurrentLanguage()
-        appendLog("page init done")
+        appendLog(demoString(R.string.demo_page_init_done_status_0))
         unAllSelectState(binding.llMain)
         selectBtn(binding.btnSwitchZh)
         initView()
@@ -74,7 +77,7 @@ class OfflineCmdTestActivity : BaseGlassActivity() {
         return object : IVoiceCallback.Stub() {
             override fun onVoiceTriggered() {
                 runOnUiThread {
-                    appendLog("triggered: $word")
+                    appendLog(demoString(R.string.demo_triggered_status_1, word))
                 }
             }
         }
@@ -84,47 +87,44 @@ class OfflineCmdTestActivity : BaseGlassActivity() {
         return try {
             GlassSdk.getGlassOfflineCmdService()?.language ?: "ZH_CN"
         } catch (t: Throwable) {
-            appendLog("getLanguage failed: ${t.message}")
+            appendLog(demoString(R.string.demo_getlanguage_failed_status_2, t.message))
             "ZH_CN"
         }
     }
 
     private fun setLanguage(language: String) {
         try {
-//            GlassSdk.getGlassOfflineCmdService()?.setLanguage(language)
             GlassSdk.setOfflineCmdLanguage(language)
-            appendLog("setLanguage: $language")
+            appendLog(demoString(R.string.demo_setlanguage_status_3, language))
             refreshCurrentLanguage()
         } catch (t: Throwable) {
-            appendLog("setLanguage failed (old service?): ${t.message}")
+            appendLog(demoString(R.string.demo_setlanguage_failed_old_service_status_4, t.message))
         }
     }
 
     private fun setWords(language: String, words: List<VoiceAction>) {
         try {
-//            GlassSdk.getGlassOfflineCmdService()?.setWords(language, words)
             GlassSdk.setOfflineCmdWords(language, words)
-            appendLog("setWords($language): ${words.map { it.text }}")
+            appendLog(demoString(R.string.demo_setwords_status_5, language, words.map { it.text }))
             refreshCurrentLanguage()
         } catch (t: Throwable) {
-            appendLog("setWords failed (old service?): ${t.message}")
+            appendLog(demoString(R.string.demo_setwords_failed_old_service_status_6, t.message))
         }
     }
 
     private fun clearWords(language: String) {
         try {
-//            GlassSdk.getGlassOfflineCmdService()?.clearWords(language)
             GlassSdk.clearOfflineCmdWords(language)
-            appendLog("clearWords: $language")
+            appendLog(demoString(R.string.demo_clearwords_status_7, language))
         } catch (t: Throwable) {
-            appendLog("clearWords failed (old service?): ${t.message}")
+            appendLog(demoString(R.string.demo_clearwords_failed_old_service_status_8, t.message))
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun refreshCurrentLanguage() {
         val current = getLanguage()
-        binding.tvCurrentLanguage.text = "Current: $current"
+        binding.tvCurrentLanguage.text = demoString(R.string.demo_current_status_9, current)
     }
 
     private fun appendLog(message: String) {
@@ -302,5 +302,4 @@ class OfflineCmdTestActivity : BaseGlassActivity() {
     }
 
 }
-
 

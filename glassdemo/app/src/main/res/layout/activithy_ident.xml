@@ -9,36 +9,42 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btStartIdent"
-        android:layout_width="56dp"
-        android:layout_height="36dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/bg_ident_button"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
+        android:minWidth="72dp"
+        android:minHeight="36dp"
+        android:ellipsize="none"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:stateListAnimator="@null"
-        android:text="开始识别"
+        android:text="@string/demo_start_recognition"
         android:textColor="@color/ident_button_text"
         android:textSize="10sp"
+        app:layout_constraintEnd_toStartOf="@id/btEndIdent"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btEndIdent"
-        android:layout_width="56dp"
-        android:layout_height="36dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:background="@drawable/bg_ident_button"
-        android:minWidth="0dp"
-        android:minHeight="0dp"
+        android:minWidth="72dp"
+        android:minHeight="36dp"
+        android:ellipsize="none"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:stateListAnimator="@null"
-        android:text="结束识别"
+        android:text="@string/demo_end_recognition"
         android:textColor="@color/ident_button_text"
         android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintLeft_toRightOf="@+id/btStartIdent"
         app:layout_constraintTop_toTopOf="@id/btStartIdent" />
 
@@ -94,13 +100,14 @@
 
             <TextView
                 android:id="@+id/tv_load_tips"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:textColor="@color/green_normal_70"
                 android:textSize="14px"
                 app:layout_constraintBottom_toBottomOf="@+id/iv_load"
                 app:layout_constraintLeft_toRightOf="@+id/iv_load"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/iv_load"
                 tools:text="提示" />
 

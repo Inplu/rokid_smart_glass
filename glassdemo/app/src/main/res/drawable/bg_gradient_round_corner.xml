@@ -9,7 +9,9 @@
         android:color="@color/green" />
 
     <!-- 圆角半径 -->
+    <!-- Corner radius. -->
     <corners android:radius="12dp" />
 
     <!-- 阴影（需配合 CardView 使用） -->
+    <!-- Shadow (requires use with CardView). -->
 </shape>

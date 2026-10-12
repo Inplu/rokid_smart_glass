@@ -19,9 +19,12 @@ object ApkInstallUtil {
 
     /**
      * APK 下载/接收完成后调用，自动拉起系统安装器执行覆盖安装。
+     * Call after the APK download or transfer completes to open the system installer for an in-place update.
      *
      * 注意：普通三方应用无法完全静默安装 APK，系统仍可能要求用户确认安装。
+     * Ordinary third-party apps cannot install APKs fully silently; the system may still require user confirmation.
      * 如果设备侧把当前应用做成系统/特权应用并授予安装权限，系统安装器可能直接完成更新。
+     * If this app is installed as a system or privileged app with installation permission, the system installer may complete the update directly.
      */
     fun installApk(context: Context, apkPath: String): Boolean {
         val apkFile = File(apkPath)

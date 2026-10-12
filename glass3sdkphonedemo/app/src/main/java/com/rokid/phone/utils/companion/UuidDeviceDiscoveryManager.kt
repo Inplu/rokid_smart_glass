@@ -1,5 +1,9 @@
 package com.rokid.phone.utils.companion
 
+import com.rokid.phone.R
+
+import com.rokid.phone.utils.demoString
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -42,14 +46,18 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
         private const val TAG = "UuidDeviceDiscoveryManager"
         
         // 静态存储全局launcher
+        // Store the global launcher statically.
         private var globalDeviceDiscoveryLauncher: ActivityResultLauncher<IntentSenderRequest>? = null
         private var currentCallback: DeviceDiscoveryCallback? = null
         
         /**
          * 在Activity的onCreate中初始化全局设备发现launcher
+         * Initialize the global device discovery launcher in the Activity's onCreate method.
          * 这个方法必须在Activity的onCreate方法中调用
+         * This method must be called from the Activity's onCreate method.
          * 
          * @param activity 注册launcher的Activity
+         * Activity that registers the launcher.
          */
         fun initGlobalDeviceDiscoveryLauncher(activity: FragmentActivity) {
             Log.d(TAG, "Initializing global device discovery launcher")
@@ -67,6 +75,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
         
         /**
          * 获取全局设备发现launcher
+         * Get the global device discovery launcher.
          */
         fun getGlobalDeviceDiscoveryLauncher(): ActivityResultLauncher<IntentSenderRequest>? {
             return globalDeviceDiscoveryLauncher
@@ -74,6 +83,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
         
         /**
          * 处理设备发现结果
+         * Handle the device discovery result.
          */
         @SuppressLint("MissingPermission")
         private fun processDeviceDiscoveryResult(result: ActivityResult, callback: DeviceDiscoveryCallback) {
@@ -85,10 +95,12 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
                     Log.d(TAG, "RESULT_OK received, intent data: $data")
 
                     // 直接从数据中获取关联设备信息
+                    // Read the associated device information directly from the data.
                     var deviceFound = false
                     
                     if (data != null) {
                         // 首先尝试Tiramisu+的API
+                        // Try the Tiramisu+ API first.
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             val associationInfo = data.getParcelableExtra(
                                 CompanionDeviceManager.EXTRA_ASSOCIATION,
@@ -98,20 +110,32 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
                             
                             if (associationInfo != null) {
                                 // 获取MAC地址
+                                // Get the MAC address.
                                 val macAddress = (associationInfo.deviceMacAddress ?: "N/A").toString()
                                 Log.d(TAG, "Device MAC address: $macAddress")
                                 
                                 // 尝试根据MAC地址获取BluetoothDevice
+                                // Try to obtain a BluetoothDevice from the MAC address.
                                 val bluetoothDevice = try {
                                     if (macAddress != "N/A") {
                                         // 格式化MAC地址 - 转换为大写并确保正确的格式
+                                        // Format the MAC address by converting it to uppercase and validating the format.
                                         val formattedMac = macAddress
-                                            .replace(":", "")  // 移除所有冒号
-                                            .replace(".", "")  // 移除所有点
-                                            .replace("-", "")  // 移除所有短线
-                                            .uppercase()  // 转为大写
+                                            // 移除所有冒号
+                                            // Remove all colons.
+                                            .replace(":", "")
+                                            // 移除所有点
+                                            // Remove all periods.
+                                            .replace(".", "")
+                                            // 移除所有短线
+                                            // Remove all hyphens.
+                                            .replace("-", "")
+                                            // 转为大写
+                                            // Convert to uppercase.
+                                            .uppercase()
                                         
                                         // 重新格式化为 XX:XX:XX:XX:XX:XX 格式
+                                        // Reformat as XX:XX:XX:XX:XX:XX.
                                         val standardMac = if (formattedMac.length == 12) {
                                             formattedMac.chunked(2).joinToString(":")
                                         } else null
@@ -132,7 +156,9 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
                                     id = associationInfo.id,
                                     address = macAddress,
                                     name = (associationInfo.displayName ?: "N/A").toString(),
-                                    device = bluetoothDevice // 从 MAC 地址创建的 BluetoothDevice
+                                    // 从 MAC 地址创建的 BluetoothDevice
+                                    // BluetoothDevice created from the MAC address.
+                                    device = bluetoothDevice
                                 )
                                 
                                 if (bluetoothDevice != null) {
@@ -147,6 +173,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
                             }
                         } else {
                             // 旧版API处理
+                            // Handle older API versions.
                             @Suppress("DEPRECATION")
                             val scanResult = data.getParcelableExtra<BluetoothDevice>(CompanionDeviceManager.EXTRA_DEVICE)
                             Log.d(TAG, "Pre-Tiramisu scan result: $scanResult")
@@ -207,11 +234,16 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
 
     /**
      * 获取设备发现所需的IntentSender
+     * Get the IntentSender required for device discovery.
      * 这个方法只负责准备设备发现流程，不执行任何生命周期相关操作
+     * This method only prepares device discovery and performs no lifecycle-related operations.
      *
      * @param serviceUuid 要发现的服务UUID
+     * UUID of the service to discover.
      * @param singleDevice 是否只查找单个设备
+     * Whether to search for only one device.
      * @return IntentSender 用于启动设备发现UI
+     * IntentSender that launches the device discovery UI.
      */
     @SuppressLint("MissingPermission")
     suspend fun prepareDeviceDiscovery(
@@ -230,11 +262,16 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
     
     /**
      * 创建用于设备发现的ActivityResultLauncher
+     * Create an ActivityResultLauncher for device discovery.
      * 该方法必须在Activity/Fragment的onCreate中调用，以符合Android生命周期限制
+     * Call this method in Activity/Fragment onCreate to comply with Android lifecycle restrictions.
      *
      * @param activity FragmentActivity实例
+     * FragmentActivity instance.
      * @param callback 用于接收发现结果的回调
+     * Callback that receives discovery results.
      * @return ActivityResultLauncher 用于启动设备发现
+     * ActivityResultLauncher that starts device discovery.
      */
     fun createDeviceDiscoveryLauncher(
         activity: FragmentActivity,
@@ -250,10 +287,14 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
     
     /**
      * 使用预先创建的launcher启动设备发现
+     * Start device discovery using a previously created launcher.
      * 
      * @param launcher 预先创建的ActivityResultLauncher
+     * Previously created ActivityResultLauncher.
      * @param serviceUuid 要发现的服务UUID
+     * UUID of the service to discover.
      * @param singleDevice 是否只查找单个设备
+     * Whether to search for only one device.
      */
     suspend fun startDeviceDiscovery(
         launcher: ActivityResultLauncher<IntentSenderRequest>,
@@ -264,7 +305,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
             val intentSender = prepareDeviceDiscovery(address, singleDevice)
             launcher.launch(IntentSenderRequest.Builder(intentSender).build())
         } catch (e: Exception) {
-            val errorMsg = e.message ?: "Unknown error occurred"
+            val errorMsg = e.message ?: demoString(R.string.demo_unknown_error_occurred_status_37)
             Log.d(TAG, "Exception during device discovery: ${e.javaClass.name}")
             Log.d(TAG, "Error message: $errorMsg")
             Log.d(TAG, "Stack trace: ${e.stackTraceToString()}")
@@ -275,11 +316,16 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
     
     /**
      * 使用全局launcher启动设备发现
+     * Start device discovery using the global launcher.
      * 这个方法会使用静态全局launcher，适用于生命周期的任何阶段
+     * This method uses the static global launcher and can be called at any lifecycle stage.
      * 
      * @param serviceUuid 要发现的服务UUID
+     * UUID of the service to discover.
      * @param singleDevice 是否只查找单个设备
+     * Whether to search for only one device.
      * @param callback 用于接收发现结果的回调
+     * Callback that receives discovery results.
      */
     suspend fun startDeviceDiscoveryWithGlobalLauncher(
         address: String,
@@ -299,14 +345,16 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
             }
             
             // 设置当前回调
+            // Set the current callback.
             currentCallback = callback
             
             // 准备和启动设备发现
+            // Prepare and start device discovery.
             val intentSender = prepareDeviceDiscovery(address, singleDevice)
             Log.d(TAG, "Launching device discovery with global launcher")
             globalLauncher.launch(IntentSenderRequest.Builder(intentSender).build())
         } catch (e: Exception) {
-            val errorMsg = e.message ?: "Unknown error occurred"
+            val errorMsg = e.message ?: demoString(R.string.demo_unknown_error_occurred_status_38)
             Log.d(TAG, "Exception during global device discovery: ${e.javaClass.name}")
             Log.d(TAG, "Error message: $errorMsg")
             Log.d(TAG, "Stack trace: ${e.stackTraceToString()}")
@@ -324,7 +372,9 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
 
     /**
      * 兼容旧版API - 不推荐使用
+     * Compatibility with the older API; use is not recommended.
      * 这个方法可能在Activity的RESUMED状态下失败
+     * This method may fail when the Activity is in the RESUMED state.
      */
     @Deprecated("Use createDeviceDiscoveryLauncher and startDeviceDiscovery instead", ReplaceWith("createDeviceDiscoveryLauncher(activity, callback) and startDeviceDiscovery(launcher, serviceUuid, singleDevice)"))
     @SuppressLint("MissingPermission")
@@ -351,6 +401,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
             val intentSender = requestDeviceAssociation(address, singleDevice)
 
             // Create ActivityResultLauncher - 这里可能会失败，因为Activity可能已经处于RESUMED状态
+            // Create ActivityResultLauncher; this may fail if the Activity is already in the RESUMED state.
             val launcher = activity.registerForActivityResult(
                 ActivityResultContracts.StartIntentSenderForResult()
             ) { result ->
@@ -360,7 +411,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
             // Launch device association UI
             launcher.launch(IntentSenderRequest.Builder(intentSender).build())
         } catch (e: Exception) {
-            val errorMsg = e.message ?: "Unknown error occurred"
+            val errorMsg = e.message ?: demoString(R.string.demo_unknown_error_occurred_status_39)
             Log.d(TAG, "Exception during device discovery: ${e.javaClass.name}")
             Log.d(TAG, "Error message: $errorMsg")
             Log.d(TAG, "Stack trace: ${e.stackTraceToString()}")
@@ -417,7 +468,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
                 callback.onError(error)
             }
             else -> {
-                val error = "Unknown error with result code: ${result.resultCode}"
+                val error = demoString(R.string.demo_unknown_error_with_result_code_status_40, result.resultCode)
                 Log.d(TAG, error)
                 _discoveryState.value = DiscoveryState.Error(error)
                 callback.onError(error)
@@ -507,7 +558,7 @@ class UuidDeviceDiscoveryManager(private val context: Context) {
             }
 
             override fun onFailure(errorMessage: CharSequence?) {
-                val error = errorMessage?.toString() ?: "Unknown error"
+                val error = errorMessage?.toString() ?: demoString(R.string.demo_unknown_error_status_41)
                 Log.d(TAG, "CompanionDeviceManager callback onFailure: $error")
                 Log.d(TAG, "Error message type: ${errorMessage?.javaClass?.name ?: "null"}")
                 if (errorMessage != null) {

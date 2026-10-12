@@ -13,9 +13,12 @@ object SystemStateUtils {
 
     /**
      * 检查 Wi-Fi 是否已启用
+     * Check whether Wi-Fi is enabled.
      *
      * @param context 上下文
+     * Context.
      * @return Wi-Fi 已启用返回 true，否则返回 false
+     * true if Wi-Fi is enabled, otherwise false.
      */
     @JvmStatic
     fun isWifiEnabled(context: Context): Boolean {
@@ -25,8 +28,10 @@ object SystemStateUtils {
 
     /**
      * 检查蓝牙是否已启用
+     * Check whether Bluetooth is enabled.
      *
      * @return 蓝牙已启用返回 true，否则返回 false
+     * true if Bluetooth is enabled, otherwise false.
      */
     @JvmStatic
     fun isBluetoothEnabled(): Boolean {

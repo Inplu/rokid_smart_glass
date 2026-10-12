@@ -1,5 +1,7 @@
 package com.rokid.glass.speech.privateservice
 
+import com.rokid.glass.utils.demoString
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -73,8 +75,8 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
             }
         }
         pager.post { renderPosition(navigation.current) }
-        log("domain=${config.domain.ifBlank { "-" }} asrPath=${config.asrPath} ttsPath=${config.ttsPath}")
-        log("ak=${mask(config.ak)} sk=${mask(config.sk)} trustAllCerts=${config.trustAllCerts}")
+        log(demoString(R.string.demo_domain_asrpath_ttspath_status_28, config.domain.ifBlank { "-" }, config.asrPath, config.ttsPath))
+        log(demoString(R.string.demo_ak_sk_trustallcerts_status_29, mask(config.ak), mask(config.sk), config.trustAllCerts))
         bindOpenSdkService()
     }
 
@@ -95,12 +97,12 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
     }
 
     private fun dispatchAction(action: PrivateSpeechAction) {
-        log("执行操作：${action.name}")
+        log(demoString(R.string.demo_action, action.name))
         when (action) {
             PrivateSpeechAction.INIT -> initializePrivateSession()
             PrivateSpeechAction.RELEASE -> {
                 closePrivateSession()
-                log("私有语音资源已释放")
+                log(demoString(R.string.demo_private_speech_resources_released))
             }
             PrivateSpeechAction.ASR_CONNECT -> connectAsr()
             PrivateSpeechAction.ASR_START -> startAsr()
@@ -129,11 +131,11 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
 
     private fun initializePrivateSession() {
         val missing = config.missingRequiredFields()
-        if (missing.isNotEmpty()) return log("缺少配置: ${missing.joinToString()}")
+        if (missing.isNotEmpty()) return log(demoString(R.string.demo_missing_configuration, missing.joinToString()))
         if (!GlassSdk.isReady()) {
             initializeWhenBound = true
             bindOpenSdkService()
-            log("正在绑定 GlassSdk，绑定完成后自动初始化")
+            log(demoString(R.string.demo_binding_glasssdk_initialization_will_follow_automatically))
             return
         }
         createPrivateSession()
@@ -160,7 +162,7 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
         sdk = privateSdk
         asr = privateSdk.createAsrClient().attachAudioSource(audioSource).also(::setupAsrCallbacks)
         tts = privateSdk.createTtsClient().attachStreamPlayer(streamPlayer).also(::setupTtsCallbacks)
-        log("私有 SDK 初始化完成")
+        log(demoString(R.string.demo_private_sdk_initialized))
     }
 
     private fun bindOpenSdkService() {
@@ -169,7 +171,7 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
         GlassSdk.bindSecurityService(this, object : IServiceConnectionCallback {
             override fun onServiceConnected() {
                 isBindingRequested = false
-                log("GlassSdk 服务已连接")
+                log(demoString(R.string.demo_glasssdk_service_connected))
                 if (initializeWhenBound) {
                     createPrivateSession()
                 }
@@ -177,20 +179,20 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
 
             override fun onServiceDisconnected() {
                 isBindingRequested = false
-                log("GlassSdk 服务已断开")
+                log(demoString(R.string.demo_glasssdk_service_disconnected))
             }
 
             override fun onBindingDied() {
                 isBindingRequested = false
-                log("GlassSdk 服务绑定失效")
+                log(demoString(R.string.demo_glasssdk_service_binding_invalidated))
             }
         })
     }
 
     private fun connectAsr() {
-        val client = asr ?: return log("请先初始化私有 SDK")
+        val client = asr ?: return log(demoString(R.string.demo_initialize_the_private_sdk_first))
         client.connect()
-        log("正在连接私有 ASR")
+        log(demoString(R.string.demo_connecting_to_private_asr))
     }
 
     private fun startAsr() {
@@ -198,19 +200,19 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), REQUEST_RECORD_AUDIO)
             return
         }
-        val client = asr ?: return log("请先初始化私有 SDK")
-        if (!asrConnected) return log("请先连接私有 ASR")
+        val client = asr ?: return log(demoString(R.string.demo_initialize_the_private_sdk_first))
+        if (!asrConnected) return log(demoString(R.string.demo_connect_to_private_asr_first))
         runCatching { client.startAsrWithMic() }
-            .onSuccess { asrMicRunning = true; log("私有 ASR 已开始，请说话") }
-            .onFailure { log("私有 ASR 启动失败：${it.message}") }
+            .onSuccess { asrMicRunning = true; log(demoString(R.string.demo_private_asr_started_please_speak)) }
+            .onFailure { log(demoString(R.string.demo_failed_to_start_private_asr, it.message)) }
     }
 
     private fun stopAsr() {
-        val client = asr ?: return log("私有 ASR 尚未初始化")
-        if (!asrMicRunning) return log("私有 ASR 麦克风未运行")
+        val client = asr ?: return log(demoString(R.string.demo_private_asr_is_not_initialized))
+        if (!asrMicRunning) return log(demoString(R.string.demo_private_asr_microphone_is_not_running))
         runCatching { client.stopAsrWithMic() }
-            .onSuccess { asrMicRunning = false; log("私有 ASR 已停止") }
-            .onFailure { log("私有 ASR 停止失败：${it.message}") }
+            .onSuccess { asrMicRunning = false; log(demoString(R.string.demo_private_asr_stopped)) }
+            .onFailure { log(demoString(R.string.demo_failed_to_stop_private_asr, it.message)) }
     }
 
     private fun closeAsrClient() {
@@ -218,63 +220,63 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
         runCatching { asr?.close() }
         asrConnected = false
         asrMicRunning = false
-        log("私有 ASR 已关闭")
+        log(demoString(R.string.demo_private_asr_closed))
     }
 
     private fun connectTts() {
-        val client = tts ?: return log("请先初始化私有 SDK")
+        val client = tts ?: return log(demoString(R.string.demo_initialize_the_private_sdk_first))
         client.connect()
-        log("正在连接私有 TTS")
+        log(demoString(R.string.demo_connecting_to_private_tts))
     }
 
     private fun playTts() {
-        val client = tts ?: return log("请先初始化私有 SDK")
-        if (!ttsConnected) return log("请先连接私有 TTS")
-        log("开始私有 TTS；测试时请关闭投屏，避免声音路由到投屏设备")
+        val client = tts ?: return log(demoString(R.string.demo_initialize_the_private_sdk_first))
+        if (!ttsConnected) return log(demoString(R.string.demo_connect_to_private_tts_first))
+        log(demoString(R.string.demo_starting_private_tts_turn_off_screen_mirroring_during))
         client.speak(DEFAULT_TTS_TEXT, TtsAudioConfig())
     }
 
     private fun stopTts() {
-        val client = tts ?: return log("私有 TTS 尚未初始化")
+        val client = tts ?: return log(demoString(R.string.demo_private_tts_is_not_initialized))
         client.stop()
-        log("私有 TTS 已停止")
+        log(demoString(R.string.demo_private_tts_stopped))
     }
 
     private fun closeTtsClient() {
         runCatching { tts?.stop() }
         runCatching { tts?.close() }
         ttsConnected = false
-        log("私有 TTS 已关闭")
+        log(demoString(R.string.demo_private_tts_closed))
     }
 
     private fun setupAsrCallbacks(client: AsrClient) {
         client.setListener(object : AsrClient.Listener {
-            override fun onOpen() { asrConnected = true; log("私有 ASR WebSocket 已连接") }
-            override fun onStart(taskId: String) = log("私有 ASR 任务开始：$taskId")
-            override fun onPartialResult(taskId: String, text: String) = log("私有 ASR 中间结果：$text")
-            override fun onFinalResult(taskId: String, text: String) = log("私有 ASR 最终结果：$text")
-            override fun onFinished(taskId: String) = log("私有 ASR 任务结束：$taskId")
-            override fun onError(code: Int, message: String) = log("私有 ASR 错误：$code $message")
+            override fun onOpen() { asrConnected = true; log(demoString(R.string.demo_private_asr_websocket_connected)) }
+            override fun onStart(taskId: String) = log(demoString(R.string.demo_private_asr_task_started, taskId))
+            override fun onPartialResult(taskId: String, text: String) = log(demoString(R.string.demo_private_asr_partial_result, text))
+            override fun onFinalResult(taskId: String, text: String) = log(demoString(R.string.demo_private_asr_final_result, text))
+            override fun onFinished(taskId: String) = log(demoString(R.string.demo_private_asr_task_ended, taskId))
+            override fun onError(code: Int, message: String) = log(demoString(R.string.demo_private_asr_error, code, message))
             override fun onClosed(code: Int, reason: String) {
                 asrConnected = false
                 asrMicRunning = false
-                log("私有 ASR 已关闭：$code $reason")
+                log(demoString(R.string.demo_private_asr_closed_2, code, reason))
             }
         })
     }
 
     private fun setupTtsCallbacks(client: TtsClient) {
         client.setListener(object : TtsClient.Listener {
-            override fun onOpen() { ttsConnected = true; log("私有 TTS WebSocket 已连接") }
-            override fun onStart(taskId: String) = log("私有 TTS 任务开始：$taskId")
-            override fun onAudioChunk(taskId: String, audio: ByteArray) = log("私有 TTS 音频块：${audio.size}")
-            override fun onFinished(taskId: String) = log("私有 TTS 任务结束：$taskId")
-            override fun onError(code: Int, message: String) = log("私有 TTS 错误：$code $message")
+            override fun onOpen() { ttsConnected = true; log(demoString(R.string.demo_private_tts_websocket_connected)) }
+            override fun onStart(taskId: String) = log(demoString(R.string.demo_private_tts_task_started, taskId))
+            override fun onAudioChunk(taskId: String, audio: ByteArray) = log(demoString(R.string.demo_private_tts_audio_chunk_bytes, audio.size))
+            override fun onFinished(taskId: String) = log(demoString(R.string.demo_private_tts_task_ended, taskId))
+            override fun onError(code: Int, message: String) = log(demoString(R.string.demo_private_tts_error, code, message))
             override fun onClosed(code: Int, reason: String) {
                 ttsConnected = false
-                log("私有 TTS 已关闭：$code $reason")
+                log(demoString(R.string.demo_private_tts_closed_2, code, reason))
             }
-            override fun onPlaybackStateChanged(state: TtsPlaybackState) = log("私有 TTS 播放状态：$state")
+            override fun onPlaybackStateChanged(state: TtsPlaybackState) = log(demoString(R.string.demo_private_tts_playback_state, state))
         })
     }
 
@@ -320,8 +322,8 @@ class PrivateSpeechActivity : SpeechGestureActivity() {
     companion object {
         private const val REQUEST_RECORD_AUDIO = 702
         private const val MAX_LOG_LINES = 160
-        private const val DEFAULT_TTS_TEXT = "这是独立部署在眼镜端的在线 ASR/TTS 应用"
-        private val TAB_TITLES = listOf("初始化", "ASR", "TTS")
+        private val DEFAULT_TTS_TEXT: String get() = demoString(R.string.demo_this_is_an_online_asr_tts_app_running)
+        private val TAB_TITLES get() = listOf(demoString(R.string.demo_initialize), "ASR", "TTS")
         private val ACTION_GROUPS = listOf(
             listOf(PrivateSpeechAction.INIT, PrivateSpeechAction.RELEASE),
             listOf(

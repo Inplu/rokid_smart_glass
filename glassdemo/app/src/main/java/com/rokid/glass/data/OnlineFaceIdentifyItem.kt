@@ -10,7 +10,9 @@ data class OnlineFaceIdentifyItem(
     var trackId: String,
     var bitmap: Bitmap? = null,
     var personInfo: RecognizePersonInfo? = null,
-    var loadState:  Int = 0, // 0 加载中, 1 加载完成, 2 加载失败,
+    // 0 加载中, 1 加载完成, 2 加载失败,
+    // 0: loading; 1: loaded; 2: loading failed.
+    var loadState:  Int = 0,
     var errormsg: String? = null
 
 )

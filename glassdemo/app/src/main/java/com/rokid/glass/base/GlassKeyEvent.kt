@@ -17,39 +17,47 @@ import com.rokid.glass.base.GlassKeyEvent.Companion.KEYCODE_FRONT
 @IntDef(
     /**
      * 点击
+     * Click.
      * **/
     KEYCODE_DPAD_DOWN,
     /**
      * 向后滑
+     * Swipe backward.
      * **/
     KEYCODE_BEHIND,
     /**
      * 向前滑
+     * Swipe forward.
      * **/
     KEYCODE_FRONT,
     /**
      * 返回
+     * Back.
      * **/
     KEYCODE_BACK,
 
 
     /**
      * 向后滑双击(指环)
+     * Backward swipe double-click on the ring.
      * **/
     KEYCODE_DOUBLE_BEHIND,
 
     /**
      * 向前滑双击(指环)
+     * Forward swipe double-click on the ring.
      * **/
     KEYCODE_DOUBLE_FRONT,
 
     /**
      * 指环中间键单击
+     * Single click of the ring's center button.
      * **/
     KEYCODE_CLICK,
 
     /**
      * 指环中间键双击
+     * Double click of the ring's center button.
      * **/
     KEYCODE_DOUBLE_CLICK,
 )

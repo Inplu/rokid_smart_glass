@@ -1,5 +1,8 @@
 package com.rokid.glass.speech
 
+import com.rokid.glass.utils.demoString
+import com.rokid.glesse.R
+
 /** Only a known direct route with no local Internet network can be rejected locally.
  * Phone connectivity cannot be inferred from the glasses' ConnectivityManager.
  */
@@ -8,8 +11,8 @@ internal object SpeechNetworkPolicy {
         route != 1 || localInternet != false
 
     fun hint(route: Int?): String = when (route) {
-        0 -> "当前使用手机中继，请保持手机端 App 连接，并确保手机能访问语音服务；手机网络状态尚未确认"
-        1 -> "当前使用眼镜直连，请确保眼镜能访问语音服务"
-        else -> "当前语音网络路径未知，将尝试请求，由服务回调或超时判断结果"
+        0 -> demoString(R.string.demo_using_phone_relay_keep_the_phone_app_connected)
+        1 -> demoString(R.string.demo_using_glasses_direct_mode_ensure_the_glasses_can)
+        else -> demoString(R.string.demo_unknown_speech_network_route_attempting_the_request_awaiting)
     }
 }

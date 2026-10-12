@@ -1,5 +1,8 @@
 package com.rokid.phone
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.content.Context
 import android.media.AudioFormat
 import android.media.AudioManager
@@ -37,6 +40,7 @@ class SendMessageActivity : ComponentActivity() {
 
     /**
      * P2P发送文件管理器
+     * Manager for sending files over P2P.
      */
     private val mFileOperator by lazy {
         PSecuritySDK.getMessageService()?.getFileOperater()
@@ -44,6 +48,7 @@ class SendMessageActivity : ComponentActivity() {
 
     /**
      * 蓝牙发送文件管理器
+     * Manager for sending files over Bluetooth.
      */
     private val mBTFileOperator by lazy {
         PSecuritySDK.getMessageService()?.getBtFileOperater()
@@ -52,15 +57,16 @@ class SendMessageActivity : ComponentActivity() {
     private val fileReceiveListener = object : FileReceiveListener {
         override fun onStart() {
             startTime = System.currentTimeMillis()
-            log("onStart: 本端开始发送文件")
+            log(demoString(R.string.demo_started_sending_file))
         }
 
         override fun onProgressChanged(progress: Float) {
-            log("onProgressChanged: 本端发送文件的进度 $progress")
+            log(demoString(R.string.demo_file_transfer_progress, progress))
         }
 
         /**
          * 眼镜端发送文件路径
+         * Path of the file sent from the glasses.
          */
         override fun onComplete(filePath: String) {
             // storage/emulated/0/Download/receiver/aaaascene.jpg
@@ -68,18 +74,18 @@ class SendMessageActivity : ComponentActivity() {
             val fileSize = FileSizeUtil.formatFileSize(FileSizeUtil.getFileSizeBytes(curFile).toDouble())
             if (duration > 1000) {
                 duration = duration / 1000
-                log("onComplete: 本端发送文件完成，${duration}秒,${fileSize},$filePath")
+                log(demoString(R.string.demo_file_sent_in_seconds, duration, fileSize, filePath))
             } else {
-                log("onComplete: 本端发送文件完成，${duration}毫秒,${fileSize},$filePath")
+                log(demoString(R.string.demo_file_sent_in_ms, duration, fileSize, filePath))
             }
         }
 
         override fun onFail() {
-            log("onFail: 本端发送文件失败")
+            log(demoString(R.string.demo_failed_to_send_file))
         }
 
         override fun onCancel() {
-            log("onCancel: 对方取消了发送文件")
+            log(demoString(R.string.demo_sender_canceled_file_transfer_2))
         }
     }
 
@@ -100,16 +106,17 @@ class SendMessageActivity : ComponentActivity() {
         copyFileFromAssetsToFileCache(this, a3File)
 
         //wifi模式发送文本
+        // Send text in Wi-Fi mode.
         binding.wfSendTextBtn.setOnClickListener {
-            PSecuritySDK.getMessageService()?.sendTextMessageByP2P("P2P测试的消息", "GlassSample")
-            log("P2P测试的消息")
+            PSecuritySDK.getMessageService()?.sendTextMessageByP2P(demoString(R.string.demo_p2p_test_message), "GlassSample")
+            log(demoString(R.string.demo_p2p_test_message))
         }
         binding.wfSendFileBtn.setOnClickListener {
             val fileToSend1 = File(sdDownload, a1File)
             val fileToSend2 = File(sdDownload, a2File)
 
             logBuilder.clear()
-            log("准备发送文件...")
+            log(demoString(R.string.demo_preparing_to_send_file))
             if (randomFile) {
                 randomFile = false
                 Log.e(TAG, "文件目录: ${fileToSend1.absolutePath}")
@@ -124,29 +131,31 @@ class SendMessageActivity : ComponentActivity() {
         }
         binding.btSendTextBtn.setOnClickListener {
             mMsgCount++
-            var msg = "秋天不回来，我要去爬山啦"
+            var msg = demoString(R.string.demo_autumn_is_not_coming_back_i_am_going)
             if (mMsgCount % 2 == 0) {
-                msg = "蓝牙消息测试"
+                msg = demoString(R.string.demo_bluetooth_test_message)
             }
             PSecuritySDK.getMessageService()?.sendTextMessageByClassicBT(msg, "GlassSample")
-            log("蓝牙消息测试")
+            log(demoString(R.string.demo_bluetooth_test_message))
         }
         binding.btSendFileBtn.setOnClickListener {
             val fileToSend1 = File(sdDownload, a1File)
             val fileToSend2 = File(sdDownload, a2File)
             logBuilder.clear()
-            log("准备发送文件...")
+            log(demoString(R.string.demo_preparing_to_send_file))
             if (randomFile) {
                 randomFile = false
                 curFile = fileToSend1
-                log("蓝牙发送---->文件目录: ${fileToSend1.absolutePath}")
+                log(demoString(R.string.demo_sending_via_bluetooth_file_path, fileToSend1.absolutePath))
                 mBTFileOperator?.sendFile(null, fileToSend1, fileReceiveListener) {}
             } else {
                 randomFile = true
                 curFile = fileToSend2
-                log("蓝牙发送---->文件目录: ${fileToSend2.absolutePath}")
+                log(demoString(R.string.demo_sending_via_bluetooth_file_path, fileToSend2.absolutePath))
                 // /storage/emulated/0/Download/receiver/test1girl.png 眼镜端接收文件目录
+                // /storage/emulated/0/Download/receiver/test1girl.png is the receiving file path on the glasses.
                 // 眼镜端文件名的前面增加了一段内容,原本的文件名前面增加了前缀，dir 可以写空字符串 或为 null
+                // A prefix is added to the original file name on the glasses; dir may be an empty string or null.
                 mBTFileOperator?.sendFile(null, fileToSend2, fileReceiveListener) {}
             }
         }
@@ -156,34 +165,34 @@ class SendMessageActivity : ComponentActivity() {
             mCount++
             val messageBean = NotificationMessage(
                 packageName, appLabel,
-                "通知标题：下雪了$mCount", "通知内容：零下${mCount}度", System.currentTimeMillis()
+                demoString(R.string.demo_notification_title_snow, mCount), demoString(R.string.demo_notification_degrees_below_zero, mCount), System.currentTimeMillis()
             )
             PSecuritySDK.getAbsNotificationService()?.sendNotification(messageBean)
-            log("通知标题：下雪了\r\n通知内容：零下3度")
+            log(demoString(R.string.demo_notification_title_snow_r_nnotification_3_degrees_below))
         }
         binding.installApkBtn.setOnClickListener {
             if (!GlobalData.p2pConnectState.value) {
-                ToastUtils.makeText(this, "请先连接P2P(WIFI直连)")
+                ToastUtils.makeText(this, demoString(R.string.demo_connect_p2p_wi_fi_direct_first))
                 return@setOnClickListener
             }
             val tesApk = File(sdDownload, a3File)
             PSecuritySDK.getMessageService()?.getApkFileOperator()?.sendFile(tesApk, object : TransferProgressListener {
                 override fun onProgress(transferred: Long, total: Long) {
                     val progress = transferred.toFloat() / total
-                    log("发送 apk进度 ${String.format("%.2f", progress)}")
+                    log(demoString(R.string.demo_apk_transfer_progress, String.format("%.2f", progress)))
                 }
 
                 override fun onComplete() {
-                    log("安装APK成功")
+                    log(demoString(R.string.demo_apk_installed))
                 }
 
                 override fun onError(message: String) {
-                    log("安装APK失败 $message")
+                    log(demoString(R.string.demo_apk_installation_failed, message))
                 }
 
 
                 override fun onCanceled() {
-                    log("安装APK取消")
+                    log(demoString(R.string.demo_apk_installation_canceled))
                 }
             })
         }
@@ -202,9 +211,10 @@ class SendMessageActivity : ComponentActivity() {
 
     fun copyFileFromAssetsToFileCache(context: Context, fileName: String) {
         // 检查权限
+        // Check permissions.
         val inputStream: InputStream? = context.assets.open(fileName)
         if (inputStream == null) {
-            ToastUtils.makeText(this, "文件不存在")
+            ToastUtils.makeText(this, demoString(R.string.demo_file_not_found))
             return
         }
         var outputStream: OutputStream? = null
@@ -217,6 +227,7 @@ class SendMessageActivity : ComponentActivity() {
             inputStream.copyTo(outputStream)
             outputStream.flush()
             // 文件写入成功
+            // The file was written successfully.
         } catch (e: IOException) {
             e.printStackTrace()
         } finally {
@@ -231,6 +242,7 @@ class SendMessageActivity : ComponentActivity() {
                 val assetFile = context.assets.open(fileName)
 
                 // WAV PCM 常用参数
+                // Common WAV PCM parameters.
                 val sampleRate = 16000
                 val channelConfig = AudioFormat.CHANNEL_OUT_STEREO
                 val audioFormat = AudioFormat.ENCODING_PCM_16BIT
@@ -251,6 +263,7 @@ class SendMessageActivity : ComponentActivity() {
                 )
 
                 // 最大音量
+                // Maximum volume.
                 audioTrack.setVolume(1.0f)
 
                 audioTrack.play()
@@ -266,7 +279,7 @@ class SendMessageActivity : ComponentActivity() {
                 assetFile.close()
             } catch (e: Exception) {
                 e.printStackTrace()
-                log("播放失败: ${e.message}")
+                log(demoString(R.string.demo_playback_failed, e.message))
             }
         }.start()
     }

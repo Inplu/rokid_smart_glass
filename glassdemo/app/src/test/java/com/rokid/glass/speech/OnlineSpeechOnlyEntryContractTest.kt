@@ -11,7 +11,7 @@ class OnlineSpeechOnlyEntryContractTest {
         val home = File("src/main/java/com/rokid/glass/HomeActivity.kt").readText()
         val manifest = File("src/main/AndroidManifest.xml").readText()
 
-        assertTrue(home.contains("\"独立ASR/TTS\""))
+        assertTrue(home.contains("R.string.demo_standalone_asr_tts"))
         assertTrue(home.contains("Intent(this, PrivateSpeechActivity::class.java)"))
         assertFalse(home.contains("SpeechServiceChooserActivity"))
         assertFalse(manifest.contains("SpeechServiceChooserActivity"))

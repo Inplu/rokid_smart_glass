@@ -5,18 +5,22 @@ import android.os.Handler
 import android.os.Looper
 import com.rokid.glass.utils.ToastUtil
 
-
-/** 眼镜端 Demo 的应用入口。 */
+/**
+ * 眼镜端 Demo 的应用入口。
+ * Application entry point for the glasses demo.
+ */
 class MyApplication : Application() {
     companion object {
         // 仅保存 Application Context，避免持有 Activity 引用。
+        // Keep only the Application Context to avoid retaining an Activity reference.
         @Volatile
         var mContext: MyApplication? = null
 
-        //        val APP_ID = "GlassSample"
         // 眼镜腿物理按键单击
+        // Single press of the physical temple button.
         const val ACTION_BUTTON_CLICK = "com.rokid.glass3.action.button.CLICK"
         // 眼镜腿物理按键双击
+        // Double press of the physical temple button.
         const val ACTION_BUTTON_DOUBLE_CLICK = "com.rokid.glass3.action.button.DOUBLE_CLICK"
         const val ACTION_LONG_PRESS: String = "com.android.action.ACTION_SPRITE_BUTTON_LONG_PRESS"
         const val ACTION_BUTTON_DOWN: String = "com.android.action.ACTION_SPRITE_BUTTON_DOWN"
@@ -27,7 +31,6 @@ class MyApplication : Application() {
         var gMainHandler: Handler? = null
         var curIsCameraActivity = false
 
-//        var sendVideoStatus = false
         var sendAudioStatus = false
         fun getContext(): MyApplication {
             return mContext ?: throw IllegalStateException("Application not initialized")
@@ -37,10 +40,10 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         // 初始化全局 Context
+        // Initialize the global Context.
         mContext = this
         gMainHandler = Handler(Looper.getMainLooper())
         ToastUtil.init(this)
     }
-
 
 }

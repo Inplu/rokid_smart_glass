@@ -33,17 +33,25 @@ class LoadingDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 设置图片旋转动画
+        // Configure the image rotation animation.
         val rotateAnimation = RotateAnimation(
             0f, 360f,
             RotateAnimation.RELATIVE_TO_SELF, 0.5f,
             RotateAnimation.RELATIVE_TO_SELF, 0.5f
         ).apply {
-            duration = 1000 // 动画时长1秒
-            repeatCount = RotateAnimation.INFINITE // 无限循环
-            interpolator = LinearInterpolator() // 匀速旋转
+            // 动画时长1秒
+            // The animation lasts one second.
+            duration = 1000
+            // 无限循环
+            // Repeat indefinitely.
+            repeatCount = RotateAnimation.INFINITE
+            // 匀速旋转
+            // Rotate at a constant speed.
+            interpolator = LinearInterpolator()
         }
 
         // 启动动画
+        // Start the animation.
         binding.loadingImage.startAnimation(rotateAnimation)
     }
 

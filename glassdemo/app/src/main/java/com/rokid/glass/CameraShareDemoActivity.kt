@@ -11,7 +11,9 @@ import com.rokid.glass.camera.SurfaceShareFragment
 
 /**
  * Camera Share Demo 主 Activity
+ * Main Activity for the Camera Share Demo.
  * 根据传入的模式参数显示对应的 Fragment
+ * Display the Fragment corresponding to the supplied mode parameter.
  */
 class CameraShareDemoActivity : BaseGlassActivity() {
 

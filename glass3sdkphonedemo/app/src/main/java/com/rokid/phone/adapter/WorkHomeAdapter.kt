@@ -13,11 +13,15 @@ class WorkHomeAdapter(
     private val itemWidth: Int
 ) : RecyclerView.Adapter<WorkHomeAdapter.ViewHolder>() {
 
-    private val data = List(12) { "Item $it" }  // 假数据
+    // 假数据
+    // Sample data.
+    private val data = List(12) { "Item $it" }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.item_work_home, parent, false)
-        view.layoutParams.width = itemWidth  // 设置宽度，保证每页 3 个
+        // 设置宽度，保证每页 3 个
+        // Set the width so that each page contains three items.
+        view.layoutParams.width = itemWidth
         return ViewHolder(view)
     }
 

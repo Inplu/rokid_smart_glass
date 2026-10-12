@@ -12,10 +12,13 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- 获取手机震动服务 -->
+    <!-- Access the phone's vibration service. -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 获取网络服务 -->
+    <!-- Access network services. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- 获取Wi-Fi服务 -->
+    <!-- Access the Wi-Fi service. -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
@@ -30,17 +33,23 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 这是 Android 12 (API 31) 及以上使用 Wi-Fi P2P / Wi-Fi 扫描必须声明的权限 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!-- 这是 Android 12 (API 31) 及以上使用 Wi-Fi P2P / Wi-Fi 扫描必须声明的权限 -->
+    <!-- This permission must be declared for Wi-Fi P2P or Wi-Fi scanning on Android 12 (API 31) and later. -->
     <uses-permission
         android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation"
-        tools:targetApi="31" /> <!-- 声明支持 Wi-Fi Direct 功能 -->
+        tools:targetApi="31" />
+    <!-- 声明支持 Wi-Fi Direct 功能 -->
+    <!-- Declare support for Wi-Fi Direct. -->
     <uses-feature
         android:name="android.hardware.wifi.direct"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" /> <!-- 需要系统签名 应用通过反射方式开启设备蓝牙可见性 需要该权限 -->
+        android:required="false" />
+    <!-- 需要系统签名 应用通过反射方式开启设备蓝牙可见性 需要该权限 -->
+    <!-- Requires a system signature; this permission is needed to enable Bluetooth discoverability through reflection. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH_PRIVILEGED"
         tools:ignore="ProtectedPermissions" />
@@ -52,6 +61,7 @@
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         tools:ignore="BackgroundLocationPolicy" />
     <!-- Android 10+ 特殊情况：SYSTEM_ALERT_WINDOW 权限  后台启动activity  蓝牙可发现状态的权限弹窗 需要该权限 -->
+    <!-- On Android 10 and later, SYSTEM_ALERT_WINDOW is needed for this case: launching an activity from the background to show the Bluetooth discoverability permission dialog. -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />

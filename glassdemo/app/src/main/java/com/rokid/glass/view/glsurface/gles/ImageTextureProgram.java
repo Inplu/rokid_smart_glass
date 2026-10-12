@@ -62,7 +62,6 @@ public class ImageTextureProgram {
         muvTextureLoc = GLES20.glGetUniformLocation(mProgramHandle,  "uvTexture");
         GlUtil.checkLocation(muvTextureLoc, "uvTexture");
     }
-	
 
 	public void drawNV21ImageData(int width, int height, ByteBuffer YBuffer, ByteBuffer uvFloatBuffer, FloatBuffer vertexCoordsBuffer, FloatBuffer textureCoordsCoords) {
 		if(mTextureID[0] == 0 || mTextureID[1] == 0) {
@@ -71,7 +70,6 @@ public class ImageTextureProgram {
 		}
 		
 		GLES20.glUseProgram(mProgramHandle);
-        //GlUtil.checkGlError("glUseProgram");
         
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[0]);
@@ -82,8 +80,7 @@ public class ImageTextureProgram {
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[1]);
 		GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE_ALPHA, width / 2, height / 2, 0, GLES20.GL_LUMINANCE_ALPHA, GLES20.GL_UNSIGNED_BYTE, uvFloatBuffer);
 		GLES20.glUniform1i(muvTextureLoc, 1);
-		
-	        
+
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTexCoord);
 		

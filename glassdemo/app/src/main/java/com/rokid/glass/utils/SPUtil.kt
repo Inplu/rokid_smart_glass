@@ -15,6 +15,7 @@ class SPUtil private constructor(context: Context) {
 
         /**
          * 获取工具类实例（单例）
+         * Get the singleton utility instance.
          */
         fun getInstance(context: Context): SPUtil {
             return instance ?: synchronized(this) {
@@ -28,9 +29,11 @@ class SPUtil private constructor(context: Context) {
     }
 
     // region 基本数据类型存储
+    // Region: storing primitive data types.
 
     /**
      * 存储字符串
+     * Store a string.
      */
     fun putString(key: String, value: String) {
         sp.edit { putString(key, value) }
@@ -38,6 +41,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取字符串
+     * Get a string.
      */
     fun getString(key: String, defaultValue: String = ""): String {
         return sp.getString(key, defaultValue) ?: defaultValue
@@ -45,6 +49,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 存储布尔值
+     * Store a boolean.
      */
     fun putBoolean(key: String, value: Boolean) {
         sp.edit { putBoolean(key, value) }
@@ -52,6 +57,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取布尔值
+     * Get a boolean.
      */
     fun getBoolean(key: String, defaultValue: Boolean = false): Boolean {
         return sp.getBoolean(key, defaultValue)
@@ -59,6 +65,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 存储整数
+     * Store an integer.
      */
     fun putInt(key: String, value: Int) {
         sp.edit { putInt(key, value) }
@@ -66,6 +73,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取整数
+     * Get an integer.
      */
     fun getInt(key: String, defaultValue: Int = 0): Int {
         return sp.getInt(key, defaultValue)
@@ -73,6 +81,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 存储长整型
+     * Store a long integer.
      */
     fun putLong(key: String, value: Long) {
         sp.edit { putLong(key, value) }
@@ -80,6 +89,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取长整型
+     * Get a long integer.
      */
     fun getLong(key: String, defaultValue: Long = 0L): Long {
         return sp.getLong(key, defaultValue)
@@ -87,6 +97,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 存储浮点型
+     * Store a floating-point value.
      */
     fun putFloat(key: String, value: Float) {
         sp.edit { putFloat(key, value) }
@@ -94,6 +105,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取浮点型
+     * Get a floating-point value.
      */
     fun getFloat(key: String, defaultValue: Float = 0f): Float {
         return sp.getFloat(key, defaultValue)
@@ -101,6 +113,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 存储字符串集合
+     * Store a set of strings.
      */
     fun putStringSet(key: String, value: Set<String>) {
         sp.edit { putStringSet(key, value) }
@@ -108,6 +121,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 获取字符串集合
+     * Get a set of strings.
      */
     fun getStringSet(key: String, defaultValue: Set<String> = emptySet()): Set<String> {
         return sp.getStringSet(key, defaultValue) ?: defaultValue
@@ -116,9 +130,11 @@ class SPUtil private constructor(context: Context) {
     // endregion
 
     // region 便捷操作
+    // Region: convenience operations.
 
     /**
      * 移除键值对
+     * Remove a key-value pair.
      */
     fun remove(key: String) {
         sp.edit { remove(key) }
@@ -126,6 +142,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 清除所有数据
+     * Clear all data.
      */
     fun clear() {
         sp.edit { clear() }
@@ -133,6 +150,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 检查是否包含某个键
+     * Check whether a key exists.
      */
     fun contains(key: String): Boolean {
         return sp.contains(key)
@@ -141,9 +159,11 @@ class SPUtil private constructor(context: Context) {
     // endregion
 
     // region 委托属性支持
+    // Region: delegated property support.
 
     /**
      * 字符串委托属性
+     * Delegated string property.
      */
     fun stringPreference(key: String, defaultValue: String = "") =
         object : ReadWriteProperty<Any?, String> {
@@ -158,6 +178,7 @@ class SPUtil private constructor(context: Context) {
 
     /**
      * 布尔值委托属性
+     * Delegated boolean property.
      */
     fun booleanPreference(key: String, defaultValue: Boolean = false) =
         object : ReadWriteProperty<Any?, Boolean> {
@@ -171,6 +192,7 @@ class SPUtil private constructor(context: Context) {
         }
 
     // 同理可添加其他类型的委托属性...
+    // Delegated properties for other types can be added in the same way.
 
     // endregion
 }

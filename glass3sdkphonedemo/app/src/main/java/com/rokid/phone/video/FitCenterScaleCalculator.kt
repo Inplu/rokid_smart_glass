@@ -2,7 +2,10 @@ package com.rokid.phone.video
 
 import kotlin.math.roundToInt
 
-/** 计算完整显示图像且保持宽高比时，OpenGL 顶点在 X/Y 方向的缩放比例。 */
+/**
+ * 计算完整显示图像且保持宽高比时，OpenGL 顶点在 X/Y 方向的缩放比例。
+ * Calculate X/Y scaling for OpenGL vertices to display the entire image while preserving its aspect ratio.
+ */
 object FitCenterScaleCalculator {
     data class Scale(val x: Float, val y: Float)
     data class Size(val width: Int, val height: Int)
@@ -26,7 +29,10 @@ object FitCenterScaleCalculator {
         }
     }
 
-    /** 计算能够完整放入容器、保持原始宽高比的最大整数尺寸。 */
+    /**
+     * 计算能够完整放入容器、保持原始宽高比的最大整数尺寸。
+     * Calculate the largest integer dimensions that fit inside the container while preserving the original aspect ratio.
+     */
     fun calculateSize(
         frameWidth: Int,
         frameHeight: Int,

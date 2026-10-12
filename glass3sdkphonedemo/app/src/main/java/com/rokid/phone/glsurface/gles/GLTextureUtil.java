@@ -5,13 +5,19 @@ package com.rokid.phone.glsurface.gles;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 
-/** OpenGL ES 纹理工具。 */
+/**
+ * OpenGL ES 纹理工具。
+ * OpenGL ES texture utilities.
+ */
 public class GLTextureUtil {
 
     private static final String TAG = GLTextureUtil.class.getSimpleName();
 
 
-    /** 创建并初始化一个 OES 外部纹理。 */
+    /**
+     * 创建并初始化一个 OES 外部纹理。
+     * Create and initialize an OES external texture.
+     */
     public static int createOESTextureID() {
         final int[] tex = new int[1];
         GLES20.glGenTextures(1, tex, 0);

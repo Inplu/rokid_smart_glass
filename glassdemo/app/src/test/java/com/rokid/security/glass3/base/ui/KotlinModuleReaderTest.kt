@@ -103,6 +103,7 @@ class KotlinModuleReaderTest {
 
     private fun detectKotlinVersion(bytes: ByteArray, content: String) {
         // 方法 1: 从文件头部解析魔术字节和版本
+        // Method 1: parse the magic bytes and version from the file header.
         if (bytes.size >= 4) {
             val magicBytes = bytes.take(4)
             println("Magic bytes: ${magicBytes.joinToString(" ") { "%02X".format(it) }}")
@@ -112,6 +113,7 @@ class KotlinModuleReaderTest {
                 println("Version indicator (byte 4): $versionByte")
 
                 // Kotlin metadata 版本映射
+                // Kotlin metadata version mapping.
                 val metadataVersions = mapOf(
                     1 to "1.0.x",
                     2 to "1.1.x",
@@ -132,6 +134,7 @@ class KotlinModuleReaderTest {
         println()
 
         // 方法 2: 查找所有可能的版本号模式
+        // Method 2: find all possible version number patterns.
         val versionPatterns = listOf(
             Regex("""(\d+\.\d+\.\d+)"""),
             Regex("""(\d+\.\d+)"""),
@@ -155,10 +158,12 @@ class KotlinModuleReaderTest {
         println()
 
         // 方法 3: 查看完整的二进制内容中的版本信息
+        // Method 3: inspect version information in the complete binary content.
         println("Searching in raw bytes for version-like patterns...")
         val hexString = bytes.joinToString("") { "%02X".format(it) }
 
         // 扩展的 Kotlin 版本列表 (ASCII 十六进制)
+        // Extended list of Kotlin versions in hexadecimal ASCII.
         val commonVersions = mapOf(
             // Kotlin 1.0.x - 1.3.x
             "1.0.0" to "31 2E 30 2E 30",
@@ -191,6 +196,7 @@ class KotlinModuleReaderTest {
             "1.8.22" to "31 2E 38 2E 32 32",
 
             // Kotlin 1.9.x (常用版本)
+            // Kotlin 1.9.x (commonly used versions).
             "1.9.0" to "31 2E 39 2E 30",
             "1.9.10" to "31 2E 39 2E 31 30",
             "1.9.20" to "31 2E 39 2E 32 30",
@@ -233,6 +239,7 @@ class KotlinModuleReaderTest {
         }
 
         // 方法 4: 输出所有数字序列供人工分析
+        // Method 4: print all numeric sequences for manual analysis.
         println("\n=== All numeric sequences in file ===")
         val numericPattern = Regex("""\d+\.\d+[\.\d]*""")
         val allNumbers = numericPattern.findAll(content)

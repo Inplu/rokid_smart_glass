@@ -1,5 +1,8 @@
 package com.rokid.glass
 
+import com.rokid.glass.utils.demoString
+import com.rokid.glesse.R
+
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
@@ -22,32 +25,39 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class MessageReceiveActivity : BaseActivity() {
 
-    //    private val mFileOperater by lazy {
-//        GlassSdk.getGlassMessageService()?.getGlassFileOperater()
-//    }
     private lateinit var binding: ActivityMessageReceiveBinding
     private val TAG = "MessageActivity"
     private val isTtsPlaying = AtomicBoolean(false)
 
     private val audioTrack = AudioTrack(
-        AudioManager.STREAM_MUSIC,                // 音频流类型
-        16000,                                    // 采样率（必须一致）
-        AudioFormat.CHANNEL_OUT_MONO,             // 声道配置（与录音一致）
-        AudioFormat.ENCODING_PCM_16BIT,           // 编码格式（必须一致）
-        AudioTrack.getMinBufferSize(              // 合理的缓冲区大小
+        // 音频流类型
+        // Audio stream type.
+        AudioManager.STREAM_MUSIC,
+        // 采样率（必须一致）
+        // Sample rate, which must match.
+        16000,
+        // 声道配置（与录音一致）
+        // Channel configuration, matching the recording configuration.
+        AudioFormat.CHANNEL_OUT_MONO,
+        // 编码格式（必须一致）
+        // Encoding format, which must match.
+        AudioFormat.ENCODING_PCM_16BIT,
+        // 合理的缓冲区大小
+        // An appropriate buffer size.
+        AudioTrack.getMinBufferSize(
             16000,
             AudioFormat.CHANNEL_OUT_MONO,
             AudioFormat.ENCODING_PCM_16BIT
         ),
-        AudioTrack.MODE_STREAM                    // 流式模式（适合实时播放）
+        // 流式模式（适合实时播放）
+        // Streaming mode, suitable for real-time playback.
+        AudioTrack.MODE_STREAM
     )
 
     private val mMessageListener = object : IMessageListener.Stub() {
         override fun onTextMessage(msg: String) {
             log(msg)
             GlassSdk.getGlassTtsService()?.apply {
-                // 连续收到文本时先停止上一段
-//                doCancelTts()
                 isTtsPlaying.set(true)
                 doSpeechTts(msg)
             }
@@ -55,26 +65,27 @@ class MessageReceiveActivity : BaseActivity() {
 
         override fun onAudioStream(buffer: ByteArray) {
             // doSpeechTts 会自行播放；TTS 期间回调的 PCM 不再通过 AudioTrack 重复播放。
+            // The doSpeechTts call plays audio itself; do not play the PCM callbacks again through AudioTrack during TTS.
             if (isTtsPlaying.get()) {
                 return
             }
-            log("收到音频流，大小=${buffer.size}")
+            log(demoString(R.string.demo_audio_stream_received_bytes, buffer.size))
             audioTrack.write(buffer, 0, buffer.size)
         }
 
         override fun onStreamDataReceived(tag: String, data: ByteArray) {
-            log("onStreamDataReceived，大小=${data.size},tag=${tag}")
+            log(demoString(R.string.demo_stream_data_received_bytes_tag, data.size, tag))
         }
     }
 
     private val speechCompleteListener = object : SpeechCompleteListener.Stub() {
         override fun onComplete() {
-            log("TTS 播放完成")
+            log(demoString(R.string.demo_tts_playback_complete))
             isTtsPlaying.set(false)
         }
 
         override fun onServiceConnectState(connected: Boolean) {
-            log("TTS 播放服务连接状态：$connected")
+            log(demoString(R.string.demo_tts_playback_service_connected, connected))
             if (!connected) {
                 isTtsPlaying.set(false)
             }
@@ -109,10 +120,12 @@ class MessageReceiveActivity : BaseActivity() {
     }
 
     private var mNotificationListener = object : NotificationListener.Stub() {
-        /***
+        /**
          * 通知到达
+         * A notification has arrived.
          * @param notification 通知消息
-         * */
+         * The notification message.
+         */
         override fun onNotificationReceived(notification: NotificationMessage?) {
             Log.d(TAG, "收到了通知")
             notification?.apply {
@@ -120,12 +133,14 @@ class MessageReceiveActivity : BaseActivity() {
             }
         }
 
-        /***
+        /**
          * 人脸识别通知
+         * Face recognition notification.
          * @param face1
          * @param face2
          * @param message 通知消息
-         * */
+         * The notification message.
+         */
         override fun onFaceRecognizeNotification(face1: ByteArray?, face2: ByteArray?, message: String?) {
             Log.d(TAG, "收到了人脸识别通知")
             face1?.let {
@@ -142,7 +157,6 @@ class MessageReceiveActivity : BaseActivity() {
         if (logBuilder.length > 5000) {
             logBuilder.clear()
         }
-//        logBuilder.append(msg).append("\n")
         logBuilder.insert(0, "$msg\n")
         lifecycleScope.launch(Dispatchers.Main) {
             binding.tvLog.text = logBuilder.toString()
@@ -152,63 +166,51 @@ class MessageReceiveActivity : BaseActivity() {
 
     private val mFileReceiveListener = object : FileReceiveListener.Stub() {
         override fun onStart() {
-            log("onStart: 本端开始接收文件")
+            log(demoString(R.string.demo_started_receiving_file))
         }
 
         override fun onProgressChanged(progress: Float) {
-            log("onProgressChanged: 本端接收文件的进度 $progress")
+            log(demoString(R.string.demo_file_reception_progress, progress))
         }
 
         override fun onComplete(filePath: String) {
-            log("接收文件完成 $filePath")
+            log(demoString(R.string.demo_file_received, filePath))
             handleReceivedFile(filePath)
         }
 
         override fun onFail() {
-            log("onFail: 接收文件失败")
+            log(demoString(R.string.demo_failed_to_receive_file))
         }
 
         override fun onCancel() {
-            log("onCancel: 对方取消了发送文件")
+            log(demoString(R.string.demo_sender_canceled_file_transfer))
         }
     }
 
     private val mBtFileReceiveListener = object : FileReceiveListener.Stub() {
         override fun onStart() {
-            log("蓝牙本端开始接收文件")
+            log(demoString(R.string.demo_started_receiving_file_via_bluetooth))
         }
 
         override fun onProgressChanged(progress: Float) {
-            log("蓝牙接收文件的进度 $progress")
+            log(demoString(R.string.demo_bluetooth_file_reception_progress, progress))
         }
 
         override fun onComplete(filePath: String) {
-            log("蓝牙接收文件完成 $filePath")
+            log(demoString(R.string.demo_file_received_via_bluetooth, filePath))
             handleReceivedFile(filePath)
         }
 
         override fun onFail() {
-            log("onFail()蓝牙接收文件失败")
+            log(demoString(R.string.demo_failed_to_receive_file_via_bluetooth))
         }
 
         override fun onCancel() {
-            log("onCancel()蓝牙对方取消了发送文件")
+            log(demoString(R.string.demo_bluetooth_sender_canceled_file_transfer))
         }
     }
 
     private fun handleReceivedFile(filePath: String) {
-//        if (!ApkInstallUtil.isApkFile(filePath)) {
-//            return
-//        }
-//
-//        Log.d(TAG, "检测到 APK 文件，准备安装: $filePath")
-//        log("检测到 APK，准备安装")
-//        val started = ApkInstallUtil.installApk(this, filePath)
-//        if (!started) {
-//            log("APK 安装启动失败，请检查文件或安装权限")
-//        }
     }
-
-
 
 }

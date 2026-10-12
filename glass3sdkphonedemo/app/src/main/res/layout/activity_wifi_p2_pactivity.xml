@@ -13,7 +13,7 @@
         android:layout_marginVertical="700dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="扫描Wifi"
+        android:text="@string/demo_scan_wi_fi"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -23,7 +23,7 @@
         android:layout_marginVertical="600dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="获取WifiP2pInfo"
+        android:text="@string/demo_get_wi_fi_p2p_information"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -33,7 +33,7 @@
         android:layout_marginVertical="500dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="连接"
+        android:text="@string/demo_connect"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -44,29 +44,9 @@
         android:layout_marginVertical="250dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="获取wifi连接状态"
+        android:text="@string/demo_get_wi_fi_connection_status"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-<!--    <Button-->
-<!--        android:id="@+id/wf_sendText_btn"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginVertical="200dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        android:text="发送文本"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
-<!--    <Button-->
-<!--        android:id="@+id/wf_sendAudio_btn"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginVertical="100dp"-->
-<!--        android:layout_marginEnd="16dp"-->
-<!--        android:layout_marginBottom="16dp"-->
-<!--        android:text="发送Audio"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toEndOf="parent" />-->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_wifi"

@@ -1,5 +1,9 @@
 package com.rokid.phone.utils
 
+import com.rokid.phone.R
+
+import com.rokid.phone.utils.demoString
+
 import android.media.AudioFormat
 import android.media.AudioManager
 import android.media.AudioTrack
@@ -28,28 +32,38 @@ class ExternalAudioPlayer(
     private var listener: AudioStreamListener? = null
 
     // 创建专用的单线程调度器，设置为音频优先级
+    // Create a dedicated single-thread dispatcher with audio priority.
     private val audioDispatcher = Executors.newSingleThreadExecutor { runnable ->
         Thread(runnable, "AudioPlaybackThread").apply {
-            priority = Thread.MAX_PRIORITY // 设置为最高优先级
+            // 设置为最高优先级
+            // Set the highest priority.
+            priority = Thread.MAX_PRIORITY
         }
     }.asCoroutineDispatcher()
 
     private var sendScope: CoroutineScope? = null
 
     // 音频缓冲区大小，设置为200ms音频数据
+    // Size the audio buffer for 200 ms of audio data.
     private val BUFFER_DURATION_MS = 200
 
     // 每帧字节数（16位单声道：2字节/帧）
+    // Bytes per frame (16-bit mono: 2 bytes per frame).
     private val BYTES_PER_FRAME = 2
 
     // 计算缓冲区帧数
+    // Calculate the number of buffer frames.
     private val BUFFER_FRAMES = (sampleRate * BUFFER_DURATION_MS / 1000).toInt()
 
     // 计算缓冲区字节数，确保是帧大小的整数倍
+    // Calculate the buffer size in bytes, ensuring it is a multiple of the frame size.
     private val BUFFER_BYTES = BUFFER_FRAMES * BYTES_PER_FRAME
 
     // 循环缓冲区和指针
-    private val circularBuffer = ByteArray(BUFFER_BYTES * 2) // 双倍缓冲区减少溢出风险
+    // Circular buffer and pointers.
+    // 双倍缓冲区减少溢出风险
+    // Double the buffer size to reduce the risk of overflow.
+    private val circularBuffer = ByteArray(BUFFER_BYTES * 2)
     private var writePosition = 0
     private var readPosition = 0
     private var bufferSize = 0
@@ -74,6 +88,7 @@ class ExternalAudioPlayer(
         if (isPlaying) return
         sendScope = CoroutineScope(audioDispatcher)
         // 重置缓冲区状态
+        // Reset the buffer state.
         resetBuffer()
 
         val bufferSize = AudioTrack.getMinBufferSize(
@@ -94,7 +109,7 @@ class ExternalAudioPlayer(
         ).apply {
             initAudioTraceListener()
             if (state != AudioTrack.STATE_INITIALIZED) {
-                notifyError("AudioTrack initialization failed")
+                notifyError(demoString(R.string.demo_audiotrack_initialization_failed_status_35))
                 return
             }
         }
@@ -115,17 +130,20 @@ class ExternalAudioPlayer(
             setPlaybackPositionUpdateListener(object : AudioTrack.OnPlaybackPositionUpdateListener {
                 override fun onMarkerReached(track: AudioTrack) {
                     // 不适用于流模式
+                    // Not applicable to streaming mode.
                 }
 
                 override fun onPeriodicNotification(track: AudioTrack) {
                     Log.d(TAG, "onPeriodicNotification bufferSize:" + bufferSize + " " + dataChannel.isEmpty)
                     if (bufferSize == 0 && dataChannel.isEmpty) {
                         // 数据已全部播放
+                        // All data has been played.
                         listener?.onComplete()
                     }
                 }
             })
             // 每 100ms 检查一次
+            // Check every 100 ms.
             positionNotificationPeriod = (sampleRate * 0.1).toInt()
         }
     }
@@ -136,6 +154,7 @@ class ExternalAudioPlayer(
             sendScope?.launch {
                 try {
                     // 确保数据长度是帧大小的整数倍
+                    // Ensure the data length is a multiple of the frame size.
                     val alignedData = ensureFrameAlignment(data)
                     dataChannel.send(alignedData)
                 } catch (e: Exception) {
@@ -169,7 +188,10 @@ class ExternalAudioPlayer(
 
         try {
             // 等待缓冲区积累足够数据再开始播放，避免播放不完整
-            delay(100) // 等待100ms
+            // Wait for enough buffered data before playback to avoid incomplete playback.
+            // 等待100ms
+            // Wait 100 ms.
+            delay(100)
 
             synchronized(this) {
                 audioTrack?.play()
@@ -177,25 +199,31 @@ class ExternalAudioPlayer(
             }
             Log.d(TAG, "dataChannel size:" + dataChannel.isEmpty)
             // 主播放循环
+            // Main playback loop.
             for (buffer in dataChannel) {
                 if (!isPlaying) break
 
                 // 将数据写入循环缓冲区
+                // Write data to the circular buffer.
                 writeToBuffer(buffer)
 
                 // 从缓冲区读取并写入AudioTrack
+                // Read from the buffer and write to AudioTrack.
                 playFromBuffer()
             }
 
             // 播放缓冲区中剩余的数据
+            // Play the remaining buffered data.
             playRemainingBuffer()
 
         } catch (e: Exception) {
             Log.e(TAG, "Error in playbackRunnable: ${e.message}")
-            notifyError("Playback error: ${e.message}")
+            notifyError(demoString(R.string.demo_playback_error_status_36, e.message))
         } finally {
             Log.d(TAG, "playbackRunnable finished listener:" + listener)
-            listener?.onComplete() // 新增：调用onComplete
+            // 新增：调用onComplete
+            // New: invoke onComplete.
+            listener?.onComplete()
             synchronized(this) {
                 try {
                     audioTrack?.stop()
@@ -217,11 +245,13 @@ class ExternalAudioPlayer(
         checkCompleteJob?.cancel()
         val bytesToWrite = data.size
         // 处理缓冲区溢出
+        // Handle buffer overflow.
         if (bufferSize + bytesToWrite > circularBuffer.size) {
             Log.w(TAG, "Buffer overflow, dropping ${bytesToWrite - (circularBuffer.size - bufferSize)} bytes")
         }
 
         // 将数据写入循环缓冲区
+        // Write data to the circular buffer.
         val bytesToEnd = circularBuffer.size - writePosition
         if (bytesToWrite <= bytesToEnd) {
             System.arraycopy(data, 0, circularBuffer, writePosition, bytesToWrite)
@@ -231,6 +261,7 @@ class ExternalAudioPlayer(
             }
         } else {
             // 数据需要分两部分写入
+            // The data must be written in two parts.
             System.arraycopy(data, 0, circularBuffer, writePosition, bytesToEnd)
             System.arraycopy(data, bytesToEnd, circularBuffer, 0, bytesToWrite - bytesToEnd)
             writePosition = bytesToWrite - bytesToEnd
@@ -241,6 +272,7 @@ class ExternalAudioPlayer(
 
     private fun playFromBuffer() {
         // 确保有足够数据可播放
+        // Ensure enough data is available for playback.
         checkCompleteJob?.cancel()
         if (bufferSize < BUFFER_BYTES / 2) {
             checkCompleteJob = workScope.launch {
@@ -255,6 +287,7 @@ class ExternalAudioPlayer(
         val tempBuffer = ByteArray(bytesToPlay)
 
         // 从循环缓冲区读取数据
+        // Read data from the circular buffer.
         val bytesToEnd = circularBuffer.size - readPosition
         if (bytesToPlay <= bytesToEnd) {
             System.arraycopy(circularBuffer, readPosition, tempBuffer, 0, bytesToPlay)
@@ -271,6 +304,7 @@ class ExternalAudioPlayer(
         bufferSize -= bytesToPlay
 
         // 将数据写入AudioTrack
+        // Write data to AudioTrack.
         audioTrack?.write(tempBuffer, 0, tempBuffer.size)
 
         checkCompleteJob = workScope.launch {
@@ -292,6 +326,7 @@ class ExternalAudioPlayer(
         val tempBuffer = ByteArray(bufferSize)
 
         // 从循环缓冲区读取剩余数据
+        // Read the remaining data from the circular buffer.
         val bytesToEnd = circularBuffer.size - readPosition
         if (bufferSize <= bytesToEnd) {
             System.arraycopy(circularBuffer, readPosition, tempBuffer, 0, bufferSize)
@@ -301,11 +336,13 @@ class ExternalAudioPlayer(
         }
 
         // 将剩余数据写入AudioTrack
+        // Write the remaining data to AudioTrack.
         audioTrack?.write(tempBuffer, 0, tempBuffer.size)
     }
 
     private fun ensureFrameAlignment(data: ByteArray): ByteArray {
         // 确保数据长度是帧大小的整数倍
+        // Ensure the data length is a multiple of the frame size.
         val remainder = data.size % BYTES_PER_FRAME
         return if (remainder == 0) {
             data

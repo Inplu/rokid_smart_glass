@@ -1,6 +1,9 @@
 package com.rokid.glass.utils
 
-/** 集合类型的通用扩展函数。 */
+/**
+ * 集合类型的通用扩展函数。
+ * General extension functions for collection types.
+ */
 
 fun <T> List<T>?.values(func: (List<T>) -> Unit) {
     if (!isNullOrEmpty()) {

@@ -4,7 +4,10 @@ import com.rokid.glesse.R
 
 
 
-/** 眼镜端首页菜单项及其显示顺序。 */
+/**
+ * 眼镜端首页菜单项及其显示顺序。
+ * Home screen menu items on the glasses and their display order.
+ */
 enum class HomeMenuIndexEnum(val code: Int, val chineseName: String) {
     FACE_RECOG(0,
         R.string.item_face_recog.toString()),

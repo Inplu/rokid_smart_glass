@@ -10,7 +10,10 @@ import com.rokid.security.phone.sdk.api.bluetooth.classic.listener.IClassicBTCli
 import com.rokid.phone.ui.classicbt.model.BluetoothDeviceInfo
 import kotlinx.coroutines.flow.MutableSharedFlow
 
-/** 封装经典蓝牙扫描、连接和消息发送操作。 */
+/**
+ * 封装经典蓝牙扫描、连接和消息发送操作。
+ * Wrap classic Bluetooth discovery, connection, and message sending operations.
+ */
 class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
 
     private val TAG = "ClassicBtRepository"
@@ -18,7 +21,9 @@ class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
 
     private val _foundDevices = mutableListOf<BluetoothDeviceInfo>()
     val _events = MutableSharedFlow<BluetoothEvent>(
-        replay = 1, // 重放最近的一个事件给新的收集器
+        // 重放最近的一个事件给新的收集器
+        // Replay the most recent event to new collectors.
+        replay = 1,
         extraBufferCapacity = 10
     )
     fun addListener() {
@@ -28,7 +33,9 @@ class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
     }
 
     fun startScan(timeout: Long) {
-        _foundDevices.clear() // 清空以备下次扫描
+        // 清空以备下次扫描
+        // Clear the list for the next scan.
+        _foundDevices.clear()
         pSecuritySDK.getClassicBlueToothClientService()?.startScan(timeout)
     }
 
@@ -63,23 +70,9 @@ class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
             return false
         }
         // 如需限制可发现设备，可在此处按设备名称实现过滤规则。
-//        if(deviceName.contains("Rokid")
-//            || deviceName.contains("P30")
-//            || deviceName.contains("HUAWEI")
-//            || deviceName.contains("Mate")
-//            || deviceName.contains("OPPO")
-//            || deviceName.contains("VIVO")
-//            || deviceName.contains("P40")
-//            || deviceName.contains("Honor")
-//            || deviceName.contains("Redmi")
-//            || deviceName.contains("OnePlus")
-//            || deviceName.contains("Bolon")
-//            || deviceName.contains("Glass3")
-//            || deviceName.contains("Glasses")
-//        ){
-//            return true
-//        }
+        // To restrict discoverable devices, add a filter by device name here.
         //正式版本只展示Glass3 开头的蓝牙设备
+        // In the release version, only show Bluetooth devices whose names start with Glass3.
         if (deviceName.contains("Glass3")) {
             return true
         }
@@ -92,7 +85,6 @@ class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
             val address = device.address
             val type = device.type
             Log.d(TAG, "onDeviceFound ----  ${name} --- ${address} ---- ${type}")
-//            Log.d(TAG, "onDeviceFound " + _foundDevices.size)
             if (btDeviceFilter(name) && type != BluetoothDevice.DEVICE_TYPE_LE) {
                 val bluetoothDeviceInfo = BluetoothDeviceInfo(name, address, type)
                 _foundDevices.add(bluetoothDeviceInfo)
@@ -103,6 +95,7 @@ class ClassicBtRepository(private val pSecuritySDK: PSecuritySDK) {
 
         override fun onScanFinished() {
             // 扫描完成时发送累积的设备列表副本
+            // Send a copy of the accumulated device list when discovery completes.
             Log.d(TAG, "ScanFinished " + _foundDevices.size)
             _events.tryEmit(BluetoothEvent.ScanFinished(ArrayList(_foundDevices)))
 

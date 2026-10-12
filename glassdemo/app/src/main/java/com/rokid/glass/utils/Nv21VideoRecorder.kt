@@ -15,8 +15,10 @@ import java.util.Locale
 
 /**
  * NV21 → MP4 视频录制器（仅视频，无音频）
+ * NV21 to MP4 recorder for video only, without audio.
  *
  * 将NV21帧数据编码为H.264并通过MediaMuxer写入MP4文件
+ * Encode NV21 frames as H.264 and write them to an MP4 file using MediaMuxer.
  */
 class Nv21VideoRecorder(
     private val context: Context,

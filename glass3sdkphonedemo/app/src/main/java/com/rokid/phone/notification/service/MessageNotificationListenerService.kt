@@ -48,51 +48,34 @@ class MessageNotificationListenerService : NotificationListenerService() {
 
         val isEnableNotification = SPUtil.getInstance(this).getBoolean( PREF_KEY_ENABLE_NOTIFICATION_MESSAGE, false)
 
-//        val isHasScreen = GlassDeviceManager.getInstance().getDeviceHaveScreen()
-
         val isOnlyScreen = SPUtil.getInstance(this).getBoolean( PREF_KEY_ONLY_LOCKSCREEN_NOTIFY, false)
         val isDeviceLocked = isDeviceLocked(baseContext)
 
         val isEnableAllNotification = SPUtil.getInstance(this).getBoolean(PREF_KEY_ENABLE_ALL_NOTIFICATION, false)
 
-//        val isWearing = DeviceInfoManager.getWearingStatus() == "1"
-
         Log.d(TAG, "[Notification] onNotificationPosted() get message from : $packageName, title=$notificationTitle, isMediaMessage=$isMediaMessage, isEnableNotification=$isEnableNotification, isOnlyScreen=$isOnlyScreen, isDeviceLocked=$isDeviceLocked, isEnableAllNotification=$isEnableAllNotification notificationText:"+notificationText+" ")
 
         // 发送消息给眼镜
+        // Send a message to the glasses.
         if (isEnableNotification && GlobalData.btConnectState.value && !isMediaMessage  && !notificationTitle.isNullOrEmpty() && !notificationText.isNullOrEmpty()) {
             Log.d(TAG, "[Notification] PASS");
-            // 过滤AI服务消息
-//            if (packageName == "com.rokid.sprite.aiapp" && notificationTitle == GlobalConstant.AI_SERVICE_NAME) {
-//                return
-//            }
-//            if (isOnlyScreen && !isDeviceLocked){
-//                Log.d(TAG, "[Notification] Not in lockscreen, so return")
-//                return
-//            }
 
             if (!isEnableAllNotification && !appsList.contains(packageName)){
                 Log.d(TAG, "[Notification] Not in appsList, so return")
                 return
             }
-//
             if (packageName == "android" && notificationTitle.contains("USB", true)){
                 Log.d(TAG, "[Notification] ignore android connect usb message")
                 return
             }
 
             // 精简消息：眼镜端默认通知条展示空间有限，超长截断（标题20字/正文60字）
+            // Shorten messages for the limited space in the default glasses notification bar: truncate titles to 20 characters and bodies to 60 characters.
             val shortTitle = notificationTitle.toString().let { if (it.length > 20) it.substring(0, 20) + "…" else it }
             val shortText = notificationText.toString().let { if (it.length > 60) it.substring(0, 60) + "…" else it }
             val messageBean = NotificationMessage(packageName, getAppNameByPackageName(packageName),
                 shortTitle, shortText, postTime)
             PSecuritySDK.getAbsNotificationService()?.sendNotification(messageBean)
-//            PSecuritySDK.getAbsNotificationService()?.se
-            //            val args = Caps()
-//            args.write(BtcCst.Ntf.Ntf_SendNewMsg)
-//            args.write(gson.toJson(messageBean))
-//            //RKLogger.dWithTag(TAG, "[Notification] onNotificationPosted() send the message to glass, json : ${gson.toJson(messageBean)}")
-//            ConnectManager.getInstance().send(BtcCst.Ntf.MODULE_NAME, args, null)
         }
     }
 
@@ -121,6 +104,7 @@ class MessageNotificationListenerService : NotificationListenerService() {
         val pm = baseContext.packageManager
 
         // 先禁用 Service
+        // Disable the Service first.
         pm.setComponentEnabledSetting(
             componentName,
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -128,6 +112,7 @@ class MessageNotificationListenerService : NotificationListenerService() {
         )
 
         // 重新启用 Service
+        // Enable the Service again.
         pm.setComponentEnabledSetting(
             componentName,
             PackageManager.COMPONENT_ENABLED_STATE_ENABLED,

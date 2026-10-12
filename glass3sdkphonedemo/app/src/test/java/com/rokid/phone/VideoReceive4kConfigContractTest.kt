@@ -1,6 +1,8 @@
 package com.rokid.phone
 
 import java.io.File
+import javax.xml.parsers.DocumentBuilderFactory
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -10,7 +12,6 @@ class VideoReceive4kConfigContractTest {
         val source = File(
             "src/main/java/com/rokid/phone/VideoReceiveActivity.kt"
         ).readText()
-        val layout = File("src/main/res/layout/activity_video_receive.xml").readText()
 
         assertTrue(source.contains("private val defaultFps = 15"))
         assertTrue(source.contains("private val defaultBitrate = 20_000_000"))
@@ -28,8 +29,23 @@ class VideoReceive4kConfigContractTest {
         assertTrue(!source.contains("ResolutionOption(2340, 1080)"))
         assertTrue(!source.contains("ResolutionOption(3840, 2160)"))
         assertTrue(source.contains("500_000..30_000_000"))
-        assertTrue(layout.contains("android:hint=\"15\""))
-        assertTrue(layout.contains("android:hint=\"20000000\""))
-        assertTrue(layout.contains("android:hint=\"1800\""))
+        assertEquals("15", inputHint("et_frame_rate"))
+        assertEquals("20000000", inputHint("et_bitrate"))
+        assertEquals("1800", inputHint("et_resolution_height"))
+    }
+
+    private fun inputHint(id: String): String {
+        val parser = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+        val inputs = parser.parse(File("src/main/res/layout/activity_video_receive.xml"))
+            .getElementsByTagName("EditText")
+        val input = (0 until inputs.length).map { inputs.item(it) }
+            .single { it.attributes.getNamedItem("android:id").nodeValue == "@+id/$id" }
+        val hint = input.attributes.getNamedItem("android:hint").nodeValue
+        if (!hint.startsWith("@string/")) return hint
+        val strings = parser.parse(File("src/main/res/values/strings.xml"))
+            .getElementsByTagName("string")
+        return (0 until strings.length).map { strings.item(it) }
+            .single { it.attributes.getNamedItem("name").nodeValue == hint.removePrefix("@string/") }
+            .textContent
     }
 }

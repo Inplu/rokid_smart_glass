@@ -15,14 +15,23 @@ object AnimationUtils {
 
     /**
      * 创建旋转动画
+     * Create a rotation animation.
      * @param fromDegrees 起始角度
+     * Starting angle.
      * @param toDegrees 结束角度
+     * Ending angle.
      * @param pivotX 旋转中心X轴 (相对自身比例 0f-1f)
+     * Rotation center on the X axis, relative to this view (0f-1f).
      * @param pivotY 旋转中心Y轴 (相对自身比例 0f-1f)
+     * Rotation center on the Y axis, relative to this view (0f-1f).
      * @param duration 动画时长(ms)
+     * Animation duration in milliseconds.
      * @param repeatCount 重复次数 (-1表示无限)
+     * Repeat count (-1 means infinite repetition).
      * @param repeatMode 重复模式 (RESTART/REVERSE)
+     * Repeat mode (RESTART/REVERSE).
      * @param interpolator 插值器
+     * Animation interpolator.
      */
     fun createRotationAnimation(
         fromDegrees: Float,
@@ -49,12 +58,19 @@ object AnimationUtils {
 
     /**
      * 创建缩放动画
+     * Create a scale animation.
      * @param fromX 初始X轴缩放比例
+     * Initial scale on the X axis.
      * @param toX 目标X轴缩放比例
+     * Target scale on the X axis.
      * @param fromY 初始Y轴缩放比例
+     * Initial scale on the Y axis.
      * @param toY 目标Y轴缩放比例
+     * Target scale on the Y axis.
      * @param pivotX 缩放中心X轴
+     * Scaling center on the X axis.
      * @param pivotY 缩放中心Y轴
+     * Scaling center on the Y axis.
      */
     fun createScaleAnimation(
         fromX: Float,
@@ -83,10 +99,15 @@ object AnimationUtils {
 
     /**
      * 创建平移动画
+     * Create a translation animation.
      * @param fromXDelta X轴起始位置(相对自身)
+     * Starting X position relative to this view.
      * @param toXDelta X轴目标位置(相对自身)
+     * Target X position relative to this view.
      * @param fromYDelta Y轴起始位置(相对自身)
+     * Starting Y position relative to this view.
      * @param toYDelta Y轴目标位置(相对自身)
+     * Target Y position relative to this view.
      */
     fun createTranslateAnimation(
         fromXDelta: Float,
@@ -114,8 +135,11 @@ object AnimationUtils {
 
     /**
      * 创建透明度动画
+     * Create an alpha animation.
      * @param fromAlpha 初始透明度(0f-1f)
+     * Initial opacity (0f-1f).
      * @param toAlpha 目标透明度(0f-1f)
+     * Target opacity (0f-1f).
      */
     fun createAlphaAnimation(
         fromAlpha: Float,
@@ -136,8 +160,11 @@ object AnimationUtils {
 
     /**
      * 创建组合动画
+     * Create a combined animation.
      * @param animations 动画列表
+     * List of animations.
      * @param shareInterpolator 是否共享插值器
+     * Whether to share the interpolator.
      */
     fun createAnimationSet(
         animations: List<Animation>,
@@ -152,9 +179,13 @@ object AnimationUtils {
 
     /**
      * 启动动画
+     * Start the animation.
      * @param view 目标视图
+     * Target view.
      * @param animation 动画实例
+     * Animation instance.
      * @param listener 动画监听器
+     * Animation listener.
      */
     fun startAnimation(
         view: View,
@@ -162,24 +193,30 @@ object AnimationUtils {
         listener: AnimationListener? = null
     ) {
         // 先取消可能存在的动画
+        // Cancel any existing animation first.
         view.clearAnimation()
         // 设置监听器
+        // Set the listener.
         listener?.let { animation.setAnimationListener(it) }
         // 启动动画
+        // Start the animation.
         view.startAnimation(animation)
     }
 
     /**
      * 停止视图上的所有动画
+     * Stop all animations on the view.
      */
     fun stopAnimation(view: View) {
         view.clearAnimation()
     }
 
     // -------------------------- 常用动画快捷方法 --------------------------
+    // -------------------------- Common animation shortcuts --------------------------
 
     /**
      * 快速创建无限旋转动画
+     * Quickly create an infinitely repeating rotation animation.
      */
     fun createInfiniteRotation(duration: Long = 2000): RotateAnimation {
         return createRotationAnimation(
@@ -193,7 +230,9 @@ object AnimationUtils {
 
     /**
      * 创建旋转动画（单次播放专用）
+     * Create a rotation animation for a single playback.
      * 简化配置，默认不重复，专注于单次动画场景
+     * Simplify configuration with no repetition by default for single-playback use cases.
      */
     fun createSingleRotationAnimation(
         fromDegrees: Float,
@@ -209,7 +248,9 @@ object AnimationUtils {
             pivotX = pivotX,
             pivotY = pivotY,
             duration = duration,
-            repeatCount = 0, // 强制单次播放
+            // 强制单次播放
+            // Force a single playback.
+            repeatCount = 0,
             repeatMode = Animation.RESTART,
             interpolator = interpolator
         )
@@ -219,6 +260,7 @@ object AnimationUtils {
 
     /**
      * 快速创建淡入动画
+     * Quickly create a fade-in animation.
      */
     fun createFadeInAnimation(duration: Long = 500): AlphaAnimation {
         return createAlphaAnimation(
@@ -230,6 +272,7 @@ object AnimationUtils {
 
     /**
      * 快速创建淡出动画
+     * Quickly create a fade-out animation.
      */
     fun createFadeOutAnimation(duration: Long = 500): AlphaAnimation {
         return createAlphaAnimation(
@@ -241,6 +284,7 @@ object AnimationUtils {
 
     /**
      * 快速创建缩放进入动画
+     * Quickly create a scale-in animation.
      */
     fun createScaleInAnimation(duration: Long = 500): ScaleAnimation {
         return createScaleAnimation(

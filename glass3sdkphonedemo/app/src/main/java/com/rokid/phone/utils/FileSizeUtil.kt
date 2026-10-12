@@ -13,6 +13,7 @@ object FileSizeUtil {
 
     /**
      * 获取文件大小并自动选择合适单位
+     * Get the file size and automatically choose an appropriate unit.
      */
     fun getFileSizeAuto(file: File): String {
         return if (!file.exists()) {
@@ -24,6 +25,7 @@ object FileSizeUtil {
 
     /**
      * 获取文件大小（字节）
+     * Get the file size in bytes.
      */
     fun getFileSizeBytes(file: File): Long {
         return if (file.exists()) file.length() else 0
@@ -31,6 +33,7 @@ object FileSizeUtil {
 
     /**
      * 获取文件大小（KB）
+     * Get the file size in KB.
      */
     fun getFileSizeKB(file: File): Double {
         return if (file.exists()) file.length() / KB else 0.0
@@ -38,6 +41,7 @@ object FileSizeUtil {
 
     /**
      * 获取文件大小（MB）
+     * Get the file size in MB.
      */
     fun getFileSizeMB(file: File): Double {
         return if (file.exists()) file.length() / MB else 0.0
@@ -45,6 +49,7 @@ object FileSizeUtil {
 
     /**
      * 获取文件大小（GB）
+     * Get the file size in GB.
      */
     fun getFileSizeGB(file: File): Double {
         return if (file.exists()) file.length() / GB else 0.0
@@ -52,6 +57,7 @@ object FileSizeUtil {
 
     /**
      * 格式化文件大小，自动选择单位
+     * Format the file size with an automatically selected unit.
      */
     fun formatFileSize(sizeInBytes: Double): String {
         return when {
@@ -64,6 +70,7 @@ object FileSizeUtil {
 
     /**
      * 格式化文件大小，指定单位
+     * Format the file size using the specified unit.
      */
     fun formatFileSize(sizeInBytes: Double, unit: SizeUnit): String {
         return when (unit) {

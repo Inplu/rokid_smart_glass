@@ -8,14 +8,11 @@ import java.nio.FloatBuffer;
 
 public class RectProgram {
 	 private static final String VERTEX_SHADER =
-	    		//"uniform mat4 uMVPMatrix;" +
 	            "attribute vec4 aPosition;" +
 	            "uniform vec4 uColor;" +
 	            "varying vec4 aColor;\n" +
-	            //"uniform float uPointSize;" +
 	            "void main() {" +
 	            "    gl_Position =  aPosition;" +
-	            //"    gl_PointSize = uPointSize;" +
 	            "    aColor =  uColor;" +
 	            "}";
 
@@ -46,15 +43,10 @@ public class RectProgram {
 
 	        mPositionLoc = GLES20.glGetAttribLocation(mProgramHandle, "aPosition");
 	        GlUtil.checkLocation(mPositionLoc, "aPosition");
-	       /* muPointSizeLoc = GLES20.glGetUniformLocation(mProgramHandle, "uPointSize");
-	        GlUtil.checkLocation(muPointSizeLoc, "uPointSize");*/
 	        muColorLoc = GLES20.glGetUniformLocation(mProgramHandle, "uColor");
 	        GlUtil.checkLocation(muColorLoc, "uColor");
-	        /*muMVPMatrixLoc = GLES20.glGetUniformLocation(mProgramHandle, "uMVPMatrix");
-	        GlUtil.checkLocation(muMVPMatrixLoc, "uMVPMatrix");*/
 	    	
 	    }
-
 
 	    /**
 	     * Releases the program.
@@ -71,14 +63,6 @@ public class RectProgram {
 	        // Select the program.
 	        GLES20.glUseProgram(mProgramHandle);
 	        GlUtil.checkGlError("glUseProgram");
-	        
-	        // Copy the model / view / projection matrix over.
-	       /* GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, 0);
-	        GlUtil.checkGlError("glUniformMatrix4fv");*/
-
-	        //
-	       /* GLES20.glUniform1f(muPointSizeLoc, pointSize);
-	        GlUtil.checkGlError("glUniform1f");*/
 
 	        // Copy the color vector in.
 	        GLES20.glUniform4fv(muColorLoc, 1, color, 0);

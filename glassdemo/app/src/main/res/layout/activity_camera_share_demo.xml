@@ -11,6 +11,7 @@
         android:orientation="vertical">
 
         <!-- 上方：Surface纹理共享实时画面 -->
+        <!-- Top: live preview using shared Surface textures. -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -55,6 +56,7 @@
             android:background="#40FFFFFF" />
 
         <!-- 下方：NV21数据渲染 -->
+        <!-- Bottom: rendered NV21 data. -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
@@ -93,6 +95,7 @@
     </LinearLayout>
 
     <!-- 叠加模式录制状态面板 -->
+    <!-- Recording status panel for overlay mode. -->
     <LinearLayout
         android:id="@+id/mix_record_panel"
         android:layout_width="match_parent"
@@ -154,6 +157,7 @@
     </LinearLayout>
 
     <!-- 叠加模式覆盖层：始终显示在屏幕上，mix模式时会被VirtualDisplay捕获 -->
+    <!-- Overlay for mixed recording: always visible on screen and captured by VirtualDisplay in mix mode. -->
     <LinearLayout
         android:id="@+id/overlay_container"
         android:layout_width="match_parent"
@@ -162,6 +166,7 @@
         android:visibility="gone">
 
         <!-- 顶部横幅 -->
+        <!-- Top banner. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -202,6 +207,7 @@
             android:layout_weight="1" />
 
         <!-- 底部信息条 -->
+        <!-- Bottom information bar. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

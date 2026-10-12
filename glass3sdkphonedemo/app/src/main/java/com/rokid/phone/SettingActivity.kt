@@ -1,5 +1,8 @@
 package com.rokid.phone
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -16,11 +19,11 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
     override fun onInit(savedInstanceState: Bundle?) {
         binding.clOta.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成设备蓝牙连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             if (!GlobalData.p2pConnectState.value) {
-                Toast.makeText(this, "请先完成P2P连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_p2p_first), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             startActivity(Intent(this, SystemOtaActivity::class.java))
@@ -28,7 +31,7 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
 
         binding.clDeviceLinker.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成设备蓝牙连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             var intent = Intent(this, DeviceLinerActivity::class.java)

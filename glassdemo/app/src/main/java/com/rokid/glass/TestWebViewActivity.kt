@@ -21,17 +21,27 @@ import kotlin.math.abs
 
 /**
  * 本页面用于验证 AR 眼镜触摸板与 WebView 的交互。
+ * This page verifies interaction between the AR glasses touchpad and WebView.
  *
  * 主要能力：
+ * Main capabilities:
  * 1. 使用本地 HTML，不访问网络，便于在眼镜端稳定测试。
+ * 1. Use local HTML without network access for reliable testing on the glasses.
  * 2. 触摸板前后轻滑：切换上一个/下一个卡片，并把目标卡片滚到合适位置。
+ * 2. Swipe the touchpad forward/back to select the previous/next card and scroll it to a suitable position.
  * 3. 触摸板点击：触发当前高亮卡片的点击态。
+ * 3. Tap the touchpad to trigger the click state of the highlighted card.
  * 4. WebView 首帧黑底 + 延迟显示，避免单绿色 AR 眼镜上出现白色闪屏。
+ * 4. Use a black background for the WebView's first frame and delay showing it to avoid white flashes on monochrome green AR glasses.
  *
  * 设计说明：
+ * Design notes:
  * - 不直接使用 WebView.scrollBy() 滚动网页内容，因为部分眼镜系统 WebView 上
+ * - Do not use WebView.scrollBy() directly to scroll page content because, on some glasses' system WebViews,
  *   原生 scrollY 可能不等于网页 document 的 scrollTop，导致页面看起来不动。
+ * the native scrollY may differ from the document's scrollTop, making the page appear stationary.
  * - Android 侧统一通过 evaluateJavascript 调用网页内部函数，让网页自己滚动和维护高亮态。
+ * - Android consistently calls page functions through evaluateJavascript so the page handles scrolling and highlighting itself.
  */
 class TestWebViewActivity : BaseActivity() {
 
@@ -39,19 +49,23 @@ class TestWebViewActivity : BaseActivity() {
     private lateinit var progressBar: ProgressBar
 
     // 一次触摸手势的起点，用于判断 ACTION_UP 时是点击还是滑动。
+    // Starting point of a touch gesture, used at ACTION_UP to distinguish taps from swipes.
     private var touchDownX = 0f
     private var touchDownY = 0f
 
     // 上一次 MOVE 的坐标，用于计算连续 MOVE 的增量滚动距离。
+    // Coordinates of the previous MOVE, used to calculate incremental scroll distances between MOVE events.
     private var lastTouchX = 0f
     private var lastTouchY = 0f
 
     // 手势开始时间和移动统计，只用于 Logcat 调试输出。
+    // Gesture start time and movement statistics, used only for Logcat debugging.
     private var touchDownTime = 0L
     private var moveCount = 0
     private var gestureScrollY = 0
 
     // 页面完成加载后才允许执行网页滚动/点击 JS，避免 JS 函数还未注册。
+    // Allow scrolling/click JavaScript only after the page loads, to avoid calling functions before they are registered.
     private var pageFinished = false
 
     companion object {
@@ -59,20 +73,26 @@ class TestWebViewActivity : BaseActivity() {
         private const val EXTRA_URL = "extra_url"
 
         // 抬手时位移小于该阈值，认为是触摸板点击。
+        // Treat movement below this threshold at touch release as a touchpad tap.
         private const val CLICK_MAX_DISTANCE_PX = 12f
 
         // 真实 MotionEvent MOVE 转成网页滚动距离的倍率。
+        // Multiplier for converting actual MotionEvent MOVE distances into webpage scrolling distances.
         // 目前前后轻滑主要走 DPAD 按键路径，这个值用于有连续触摸事件的设备。
+        // Forward/back swipes currently mainly use the DPAD key path; this value applies to devices reporting continuous touch events.
         private const val TOUCH_SCROLL_SCALE = 1.4f
 
         // DPAD_UP/DOWN 作为普通滚动兜底时的步长。
+        // Step size when DPAD_UP/DOWN is used as a fallback for ordinary scrolling.
         private const val KEY_SCROLL_STEP_PX = 150
 
         // 选中上/下一个卡片时，网页端 requestAnimationFrame 动画时长。
+        // Duration of the webpage's requestAnimationFrame animation when selecting the previous/next card.
         private const val KEY_SCROLL_DURATION_MS = 260
 
         /**
          * 保留 url 参数是为了兼容旧调用方；当前 Activity 固定加载本地 HTML。
+         * Keep the url parameter for compatibility with old callers; this Activity always loads local HTML now.
          */
         fun start(context: Context, url: String = "") {
             val intent = Intent(context, TestWebViewActivity::class.java).apply {
@@ -86,6 +106,7 @@ class TestWebViewActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
 
         // 单绿色 AR 眼镜上白底闪屏非常明显，所以在 setContentView 前就把窗口刷成黑色。
+        // White flashes are prominent on monochrome green AR glasses, so set the window background to black before setContentView.
         window.setBackgroundDrawable(ColorDrawable(Color.BLACK))
         window.decorView.setBackgroundColor(Color.BLACK)
         setContentView(R.layout.activity_test_network)
@@ -100,31 +121,39 @@ class TestWebViewActivity : BaseActivity() {
         val webSettings = webView.settings
 
         // 本地 HTML 中需要执行滚动/选中 JS，所以必须打开 JavaScript。
+        // Enable JavaScript because the local HTML needs it for scrolling and selection.
         webSettings.javaScriptEnabled = true
         webSettings.domStorageEnabled = true
         webSettings.databaseEnabled = true
 
         // 测试页完全本地生成，不需要缓存，避免调试时旧页面残留。
+        // The test page is generated entirely locally and needs no cache; disabling it prevents stale pages during debugging.
         webSettings.cacheMode = WebSettings.LOAD_NO_CACHE
 
         // 关闭缩放相关能力，避免触摸板手势被 WebView 当成缩放/控件操作。
+        // Disable zoom features so WebView does not treat touchpad gestures as zoom or control interactions.
         webSettings.setSupportZoom(false)
         webSettings.builtInZoomControls = false
         webSettings.displayZoomControls = false
-        webSettings.loadsImagesAutomatically = true //支持自动加载图片
+        // 支持自动加载图片
+        // Enable automatic image loading.
+        webSettings.loadsImagesAutomatically = true
         webSettings.javaScriptCanOpenWindowsAutomatically = false
         webSettings.allowFileAccess = false
 
         // 自适应眼镜屏幕尺寸。
+        // Adapt to the glasses' screen dimensions.
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
         // 让 WebView 获取焦点，才能收到 DPAD_LEFT / DPAD_RIGHT / ENTER 等按键。
+        // Give WebView focus so it can receive DPAD_LEFT, DPAD_RIGHT, ENTER, and other keys.
         webView.isFocusable = true
         webView.isFocusableInTouchMode = true
 
         // 防闪屏：WebView 自身也设置黑底，并隐藏滚动条/越界效果。
+        // Prevent flashes by also making WebView itself black and hiding scrollbars and overscroll effects.
         webView.setBackgroundColor(Color.BLACK)
         webView.overScrollMode = View.OVER_SCROLL_NEVER
         webView.isVerticalScrollBarEnabled = false
@@ -134,11 +163,13 @@ class TestWebViewActivity : BaseActivity() {
         webView.webViewClient = object : WebViewClient() {
             override fun onPageCommitVisible(view: WebView?, url: String?) {
                 // 首帧内容已经可见时再显示 WebView，减少加载期间的白色/透明闪屏。
+                // Show WebView only after its first content frame becomes visible to reduce white or transparent flashes during loading.
                 showWebView()
             }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 // 页面完成后，网页里的 __glassXXX 函数已经注册，可以执行滚动和点击逻辑。
+                // Once the page loads, its __glassXXX functions are registered and scrolling/click logic can run.
                 pageFinished = true
                 showWebView()
                 evaluateScrollInfo("页面加载完成")
@@ -146,6 +177,7 @@ class TestWebViewActivity : BaseActivity() {
         }
 
         // 加载本地 HTML，不访问网络。
+        // Load local HTML without accessing the network.
         webView.loadDataWithBaseURL(
             "https://local.touchpad/",
             buildLocalHtml(),
@@ -155,6 +187,7 @@ class TestWebViewActivity : BaseActivity() {
         )
 
         // 某些系统 WebView 回调不稳定，兜底显示，避免一直 invisible 造成黑屏。
+        // Some system WebViews have unreliable callbacks; show the view as a fallback to avoid a black screen caused by remaining invisible.
         webView.postDelayed({ showWebView() }, 800)
         Log.i(TAG, "本地触摸板事件测试页已加载，日志只输出到 Logcat")
     }
@@ -170,6 +203,7 @@ class TestWebViewActivity : BaseActivity() {
             when (it.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     // 记录手势起点和上一次 MOVE 坐标。
+                    // Record the gesture start and previous MOVE coordinates.
                     touchDownX = it.x
                     touchDownY = it.y
                     lastTouchX = it.x
@@ -183,6 +217,7 @@ class TestWebViewActivity : BaseActivity() {
 
                 MotionEvent.ACTION_MOVE -> {
                     // 如果设备真的上报连续触摸 MOVE，就把 MOVE 增量转换为网页滚动。
+                    // If the device reports continuous touch MOVE events, convert their deltas into webpage scrolling.
                     moveCount++
                     scrollWebViewByTouch(it)
                     return true
@@ -192,6 +227,7 @@ class TestWebViewActivity : BaseActivity() {
                     logTouchFinish("触摸抬起", it)
 
                     // 位移很小认为是点击，点击当前网页里被高亮的卡片。
+                    // Treat very small movements as taps and click the currently highlighted card on the webpage.
                     if (isTouchClick(it)) {
                         clickActiveCard("触摸板点击")
                     }
@@ -212,7 +248,9 @@ class TestWebViewActivity : BaseActivity() {
             Log.i(TAG, "按键按下 keyCode=${event.keyCode} name=${KeyEvent.keyCodeToString(event.keyCode)}")
             when (event.keyCode) {
                 // 眼镜触摸板前后轻滑一般会映射成 DPAD_LEFT / DPAD_RIGHT。
+                // Forward/back touchpad swipes on the glasses usually map to DPAD_LEFT / DPAD_RIGHT.
                 // 这里不按固定距离滚动，而是稳定切换上/下一个卡片。
+                // Reliably select the previous/next card here instead of scrolling a fixed distance.
                 KeyEvent.KEYCODE_DPAD_LEFT -> {
                     selectSiblingCard("向后轻滑/DPAD_LEFT", -1)
                     return true
@@ -224,20 +262,17 @@ class TestWebViewActivity : BaseActivity() {
                 }
 
                 KeyEvent.KEYCODE_DPAD_DOWN -> {
-                    // 如需上下键按距离滚动，可恢复下面代码。
-//                    scrollPageByKey("DPAD_DOWN", KEY_SCROLL_STEP_PX)
                     return true
                 }
 
                 KeyEvent.KEYCODE_DPAD_UP -> {
-                    // 如需上下键按距离滚动，可恢复下面代码。
-//                    scrollPageByKey("DPAD_UP", -KEY_SCROLL_STEP_PX)
                     return true
                 }
 
                 KeyEvent.KEYCODE_DPAD_CENTER,
                 KeyEvent.KEYCODE_ENTER -> {
                     // 中键/回车点击当前高亮卡片。
+                    // The center/Enter key clicks the highlighted card.
                     clickActiveCard("按键点击/${KeyEvent.keyCodeToString(event.keyCode)}")
                     return true
                 }
@@ -250,6 +285,7 @@ class TestWebViewActivity : BaseActivity() {
         Log.i(TAG, "识别事件 ${glassKeyName(keyEvent)}")
 
         // BaseActivity 识别出的触摸板/中键单击，也映射到当前卡片点击。
+        // Map touchpad/center-key single clicks recognized by BaseActivity to the current card click as well.
         if (keyEvent == GlassKeyEvent.KEYCODE_CLICK) {
             clickActiveCard("GlassKeyEvent点击")
             return true
@@ -258,6 +294,7 @@ class TestWebViewActivity : BaseActivity() {
     }
 
     // 处理返回键
+    // Handle the Back key.
     override fun onBackPressed() {
         if (webView.canGoBack()) {
             webView.goBack()
@@ -269,6 +306,7 @@ class TestWebViewActivity : BaseActivity() {
     override fun onDestroy() {
         webView.apply {
             // 主动释放 WebView，避免 Activity 销毁后仍持有页面/JS 上下文。
+            // Release WebView explicitly to avoid retaining page/JavaScript contexts after the Activity is destroyed.
             stopLoading()
             webChromeClient = null
             destroy()
@@ -283,7 +321,9 @@ class TestWebViewActivity : BaseActivity() {
         lastTouchY = event.y
 
         // 取横向/纵向中更明显的那个方向作为滚动来源。
+        // Use the more pronounced of the horizontal and vertical movements as the scroll source.
         // 取负号是为了让手指/触摸板滑动方向更接近自然滚动体验。
+        // Negate the distance so finger/touchpad motion feels closer to natural scrolling.
         val dominantDelta = if (abs(dx) >= abs(dy)) -dx else -dy
         val scrollY = (dominantDelta * TOUCH_SCROLL_SCALE).toInt()
         if (scrollY == 0) return
@@ -307,7 +347,9 @@ class TestWebViewActivity : BaseActivity() {
         }
 
         // step = 1 选下一个；step = -1 选上一个。
+        // step = 1 selects the next card; step = -1 selects the previous card.
         // 网页端负责：清理旧 active/clicked、设置新 active、滚动到目标卡片。
+        // The webpage clears old active/clicked states, sets the new active card, and scrolls to it.
         val script = """
             window.__glassSelectSibling($step, $KEY_SCROLL_DURATION_MS);
         """.trimIndent()
@@ -325,7 +367,9 @@ class TestWebViewActivity : BaseActivity() {
         val duration = if (smooth) KEY_SCROLL_DURATION_MS else 0
 
         // 让网页 document 自己滚动，不使用 WebView.scrollBy。
+        // Let the document scroll itself rather than using WebView.scrollBy.
         // 这样可以避免某些系统上 WebView.scrollY 与网页 scrollTop 不一致的问题。
+        // This avoids mismatches between WebView.scrollY and the page's scrollTop on some systems.
         val script = """
             window.__glassScrollBy($deltaY, $smooth, $duration);
         """.trimIndent()
@@ -341,6 +385,7 @@ class TestWebViewActivity : BaseActivity() {
         }
 
         // 点击网页当前 active 卡片，结果会返回 index/title/clicked。
+        // Click the webpage's active card; the result returns index/title/clicked.
         webView.evaluateJavascript("window.__glassClickActive();") { result ->
             Log.i(TAG, "网页点击 reason=$reason result=$result")
         }
@@ -378,6 +423,7 @@ class TestWebViewActivity : BaseActivity() {
 
     private fun isTouchClick(event: MotionEvent): Boolean {
         // ACTION_DOWN 到 ACTION_UP 的位移很小，就认为是轻点。
+        // Treat a very small displacement between ACTION_DOWN and ACTION_UP as a tap.
         return abs(event.x - touchDownX) <= CLICK_MAX_DISTANCE_PX &&
                 abs(event.y - touchDownY) <= CLICK_MAX_DISTANCE_PX
     }
@@ -397,13 +443,17 @@ class TestWebViewActivity : BaseActivity() {
     }
 
     private fun buildLocalHtml(): String {
+        val chinese = resources.configuration.locales[0].language.equals("zh", ignoreCase = true)
+        val pageTitle = android.text.TextUtils.htmlEncode(getString(R.string.web_test_page_title))
+        val heading = android.text.TextUtils.htmlEncode(getString(R.string.web_test_heading))
+        val hint = android.text.TextUtils.htmlEncode(getString(R.string.web_test_hint)).replace("\n", "<br/>")
         return """
             <!doctype html>
-            <html lang="zh-CN">
+            <html lang="${if (chinese) "zh" else "en"}">
             <head>
               <meta charset="utf-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-              <title>AR 眼镜触摸板事件</title>
+              <title>$pageTitle</title>
               <style>
                 /* 所有元素使用 border-box，避免选中态 border-width 变化导致尺寸计算过于意外。 */
                 * { box-sizing: border-box; }
@@ -777,11 +827,9 @@ class TestWebViewActivity : BaseActivity() {
             </head>
             <body>
               <div class="page">
-                <h1>触摸板滚动测试</h1>
+                <h1>$heading</h1>
                 <div class="hint">
-                  本页面完全本地加载，不请求网络。滑动眼镜触摸板时，WebView 会跟随滚动。
-                  <br/><br/>
-                  过滤命令：adb logcat -s TestWebViewActivity
+                  $hint
                 </div>
                 ${buildDemoCards()}
                 <div class="bottom-spacer"></div>
@@ -792,11 +840,13 @@ class TestWebViewActivity : BaseActivity() {
     }
 
     private fun buildDemoCards(): String {
+        val cardTitle = android.text.TextUtils.htmlEncode(getString(R.string.web_test_card_title))
+        val cardText = android.text.TextUtils.htmlEncode(getString(R.string.web_test_card_text))
         return (1..10).joinToString(separator = "\n") { index ->
             """
-                <div class="card" data-index="$index" data-title="本地内容 #$index">
+                <div class="card" data-index="$index" data-title="$cardTitle #$index">
                   <span class="index">#$index</span>
-                  这是一段本地网页内容，用于验证 AR 眼镜触摸板滚动。继续滑动触摸板，页面应该像鼠标滚轮或手势一样上下移动。
+                  $cardText
                 </div>
             """.trimIndent()
         }

@@ -1,5 +1,8 @@
 package com.rokid.phone
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -37,20 +40,20 @@ class GalleryActivity : ComponentActivity() {
     private val fileReceiveListener = object : FileReceiveV2Listener {
         override fun onStart(filePath: String) {
             runOnUiThread {
-                showReceiveProgress(filePath, 0f, "正在接收")
+                showReceiveProgress(filePath, 0f, demoString(R.string.demo_receiving))
             }
         }
 
         override fun onProgressChanged(filePath: String, progress: Float) {
             runOnUiThread {
-                showReceiveProgress(filePath, progress, "正在接收")
+                showReceiveProgress(filePath, progress, demoString(R.string.demo_receiving))
             }
         }
 
         override fun onComplete(filePath: String) {
             val file = File(filePath)
             runOnUiThread {
-                showReceiveProgress(filePath, 100f, "接收完成")
+                showReceiveProgress(filePath, 100f, demoString(R.string.demo_reception_complete))
                 if (file.exists() && isImageOrVideo(file)) {
                     addOrUpdateMedia(file)
                 }
@@ -60,14 +63,14 @@ class GalleryActivity : ComponentActivity() {
 
         override fun onFail() {
             runOnUiThread {
-                showReceiveProgress("", 0f, "接收失败")
+                showReceiveProgress("", 0f, demoString(R.string.demo_reception_failed))
                 hideReceiveProgressDelayed()
             }
         }
 
         override fun onCancel(filePath: String) {
             runOnUiThread {
-                showReceiveProgress(filePath, 0f, "接收已取消")
+                showReceiveProgress(filePath, 0f, demoString(R.string.demo_reception_canceled))
                 hideReceiveProgressDelayed()
             }
         }
@@ -88,18 +91,25 @@ class GalleryActivity : ComponentActivity() {
                 val uri: Uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", file)
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(uri, "video/mp4")
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)  // 重要：授予临时读取权限
-                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)  // 如果需要的话
+                    // 重要：授予临时读取权限
+                    // Important: grant temporary read permission.
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    // 如果需要的话
+                    // If needed.
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
                 // 检查是否有应用可以处理这个 Intent
+                // Check whether an app can handle this Intent.
                 if (intent.resolveActivity(packageManager) != null) {
                     startActivity(intent)
                 } else {
                     // 没有找到可以处理视频的应用
-                    Toast.makeText(this, "没有找到可以播放视频的应用", Toast.LENGTH_SHORT).show()
+                    // No app was found that can play the video.
+                    Toast.makeText(this, demoString(R.string.demo_no_app_available_to_play_this_video), Toast.LENGTH_SHORT).show()
                 }
             } else {
                 // 打开图片预览
+                // Open the image preview.
                 val imagePaths = mediaList
                     .filter { isImage(it) }
                     .map { it.absolutePath }

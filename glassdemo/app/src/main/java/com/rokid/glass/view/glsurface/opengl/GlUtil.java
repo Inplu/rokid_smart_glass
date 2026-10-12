@@ -51,13 +51,10 @@ public class GlUtil {
 
     private static final int SIZEOF_FLOAT = 4;
 
-
     private GlUtil() {
     }     // do not instantiate
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
-
-
 
     public static void initMyEGL(final EGLContext eglContext, int width, int height) {
         // EGL config attributes
@@ -162,7 +159,6 @@ public class GlUtil {
         eglCtx = EGL14.EGL_NO_CONTEXT;
         eglSurface = EGL14.EGL_NO_SURFACE;
     }
-
 
     /**
      * Creates a new program from the supplied vertex and fragment shaders.
@@ -302,16 +298,10 @@ public class GlUtil {
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
         GlUtil.checkGlError("loadImageTexture");
 
-//        // Load the data from the buffer into the texture handle.
-//        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, /*level*/ 0, format,
-//                width, height, /*border*/ 0, format, GLES20.GL_UNSIGNED_BYTE, data);
-//        GlUtil.checkGlError("loadImageTexture");
-
         return textureHandle;
     }
 
     public static int CreateOESTexture() {
-
 
         int[] texture = new int[1];
         GLES20.glGenTextures(1, texture, 0);
@@ -348,16 +338,6 @@ public class GlUtil {
         L.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
         L.i(TAG, "version : " + GLES20.glGetString(GLES20.GL_VERSION));
 
-//        if (false) {
-//            int[] values = new int[1];
-//            GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
-//            int majorVersion = values[0];
-//            GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
-//            int minorVersion = values[0];
-//            if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
-//                L.i(TAG, "iversion: " + majorVersion + "." + minorVersion);
-//            }
-//        }
     }
 
     /**
@@ -376,7 +356,6 @@ public class GlUtil {
 
         return tex[0];
     }
-
 
     /**
      * delete specific texture

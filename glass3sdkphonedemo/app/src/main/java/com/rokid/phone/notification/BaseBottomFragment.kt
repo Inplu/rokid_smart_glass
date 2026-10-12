@@ -29,6 +29,7 @@ abstract class BaseBottomFragment<VB : ViewBinding> : BottomSheetDialogFragment(
         savedInstanceState: Bundle?
     ): View? {
         // 初始化 ViewBinding
+        // Initialize ViewBinding.
         _binding = getViewBinding(inflater, container)
         isVisible = true
         return binding.root
@@ -36,22 +37,30 @@ abstract class BaseBottomFragment<VB : ViewBinding> : BottomSheetDialogFragment(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViews()        // 初始化视图
-        observeViewModel() // 观察 ViewModel
+        // 初始化视图
+        // Initialize the views.
+        initViews()
+        // 观察 ViewModel
+        // Observe the ViewModel.
+        observeViewModel()
     }
 
     // 用于获取具体 Fragment 的 ViewBinding
+    // Get the concrete Fragment's ViewBinding.
     protected abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): VB
 
     // 初始化视图，由具体的 Fragment 实现
+    // Initialize the views; implemented by the concrete Fragment.
     protected abstract fun initViews()
 
     // 可选：观察 ViewModel，具体 Fragment 实现
+    // Optional: observe the ViewModel in the concrete Fragment.
     protected open fun observeViewModel() {}
 
     protected open fun removeObservers() {}
 
     // 懒加载数据，Fragment 可见时调用
+    // Load data lazily when the Fragment becomes visible.
     open fun loadData() {}
 
     override fun onDestroyView() {
@@ -64,7 +73,6 @@ abstract class BaseBottomFragment<VB : ViewBinding> : BottomSheetDialogFragment(
 
     override fun onResume() {
         super.onResume()
-//        (activity as? BaseMainActivity<*>)?.setTabBarVisibility(activityTabBarVisibility())
     }
 
     protected open fun activityTabBarVisibility() : Boolean {
@@ -73,12 +81,12 @@ abstract class BaseBottomFragment<VB : ViewBinding> : BottomSheetDialogFragment(
 
 
     // 可选：日志输出方法
+    // Optional logging method.
     protected fun logDebug(message: String) {
        Log.d(TAG, message)
     }
 
     protected fun showToast(msg: String) {
-//        ToastUtils.showShort(requireContext(), msg)
     }
 
     fun showLoading() {

@@ -43,7 +43,7 @@ class PrivateSpeechActionContractTest {
 
         assertTrue(
             activitySource.contains(
-                "DEFAULT_TTS_TEXT = \"这是独立部署在眼镜端的在线 ASR/TTS 应用\""
+                "DEFAULT_TTS_TEXT: String get() = demoString(R.string.demo_this_is_an_online_asr_tts_app_running)"
             )
         )
     }

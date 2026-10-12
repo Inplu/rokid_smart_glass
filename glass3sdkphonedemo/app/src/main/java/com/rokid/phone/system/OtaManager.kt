@@ -1,5 +1,7 @@
 package com.rokid.phone.system
 
+import com.rokid.phone.utils.demoString
+
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -28,12 +30,18 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * OTA 通知管理器（与前台服务完全分离）
+ * OTA notification manager, completely separate from the foreground service.
  *
  * 关键设计：
+ * Key design choices:
  * - 通知 ID: 2688（高位 ID，避免冲突）
+ * - Notification ID: 2688, a high ID to avoid conflicts.
  * - 通知渠道: ota_progress_channel（独立于前台服务）
+ * - Notification channel: ota_progress_channel, separate from the foreground service.
  * - 不使用 setOngoing(true)，确保可被用户清除
+ * - Do not use setOngoing(true), so users can dismiss the notification.
  * - MIUI 专项清除策略（空壳通知 + 延迟 cancel）
+ * - MIUI-specific dismissal strategy: replace with an empty notification, then cancel after a delay.
  */
 object OtaManager {
 
@@ -42,21 +50,24 @@ object OtaManager {
     private val notificationManager = MyApplication.instance.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     // ✅ OTA 专用通知渠道（与前台服务的 "companion_device_channel" 完全隔离）
+    // Dedicated OTA notification channel, separate from the foreground service's "companion_device_channel".
     private const val OTA_CHANNEL_ID = "ota_progress_channel"
 
     // ✅ OTA 通知专属 ID（高位 ID，避免与前台服务 ID=1 冲突）
+    // Dedicated high OTA notification ID to avoid conflicting with the foreground service's ID of 1.
     private const val OTA_NOTIFICATION_ID = 2688
 
     // MIUI 专项检测
+    // MIUI-specific detection.
     private val isMiuiDevice by lazy { detectMiui() }
 
-    const val STATE_1 = "镜像下载"
-    const val STATE_2 = "镜像同步"
-    const val STATE_3 = "系统升级"
+    val STATE_1: String get() = demoString(R.string.demo_download_image)
+    val STATE_2: String get() = demoString(R.string.demo_sync_image)
+    val STATE_3: String get() = demoString(R.string.demo_system_update)
 
-    const val STATE_1_ALL = "阶段(1/3): 镜像下载"
-    const val STATE_2_ALL = "阶段(2/3): 镜像同步"
-    const val STATE_3_ALL = "阶段(3/3): 系统升级"
+    val STATE_1_ALL: String get() = demoString(R.string.demo_stage_1_3_download_image)
+    val STATE_2_ALL: String get() = demoString(R.string.demo_stage_2_3_sync_image)
+    val STATE_3_ALL: String get() = demoString(R.string.demo_stage_3_3_system_update)
 
     var isShow = false
     private var isFirstNotification = AtomicBoolean(true)
@@ -90,6 +101,7 @@ object OtaManager {
         L.d(TAG, "=== 检查 OTA 通知设置 ===")
 
         // 检查全局通知权限
+        // Check the app-wide notification permission.
         if (!isNotificationEnabled()) {
             L.w(TAG, "❌ 全局通知权限已被禁用！请在系统设置中开启。")
             return
@@ -120,6 +132,7 @@ object OtaManager {
     }
 
     // 辅助方法：将 importance 转为可读字符串
+    // Helper: convert importance to a readable string.
     private fun getImportanceString(importance: Int): String {
         return when (importance) {
             NotificationManager.IMPORTANCE_NONE -> "NONE (已禁用)"
@@ -140,10 +153,10 @@ object OtaManager {
 
             val channel = NotificationChannel(
                 OTA_CHANNEL_ID,
-                "OTA 进度",
+                demoString(R.string.demo_ota_progress),
                 NotificationManager.IMPORTANCE_DEFAULT
             ).apply {
-                description = "系统升级进度通知"
+                description = demoString(R.string.demo_system_update_progress_notifications)
                 setShowBadge(false)
                 enableLights(false)
                 enableVibration(false)
@@ -154,10 +167,12 @@ object OtaManager {
     }
 
     // 在 OtaManager.kt 中添加工具方法
+    // Add a helper method in OtaManager.kt.
     private fun createContentIntent(): PendingIntent {
         val intent = Intent(MyApplication.instance, SystemOtaActivity::class.java).apply {
             this.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             // 可选：传递额外数据
+            // Optional: pass extra data.
             putExtra("from_notification", true)
         }
         return PendingIntent.getActivity(
@@ -213,7 +228,7 @@ object OtaManager {
         if (!isNotificationEnabled() || !isChannelEnabled() || !isShow) return
 
         val builder = NotificationCompat.Builder(MyApplication.instance, OTA_CHANNEL_ID)
-            .setContentTitle("升级成功，设备将重启")
+            .setContentTitle(demoString(R.string.demo_update_successful_device_will_restart))
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -225,16 +240,13 @@ object OtaManager {
         notificationManager.notify(OTA_NOTIFICATION_ID, builder.build())
         L.i(TAG, "显示 OTA 完成通知")
 
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            cancelNotification()
-//        }, 2000)
     }
 
     fun showFailure(error: String) {
         if (!isNotificationEnabled() || !isChannelEnabled() || !isShow) return
 
         val builder = NotificationCompat.Builder(MyApplication.instance, OTA_CHANNEL_ID)
-            .setContentTitle("系统升级失败")
+            .setContentTitle(demoString(R.string.demo_system_update_failed))
             .setContentText(error)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setAutoCancel(true)
@@ -247,15 +259,14 @@ object OtaManager {
         notificationManager.notify(OTA_NOTIFICATION_ID, builder.build())
         L.e(TAG, "显示 OTA 失败通知: $error")
 
-//        Handler(Looper.getMainLooper()).postDelayed({
-//            cancelNotification()
-//        }, 3000)
     }
 
     // ✅ MIUI 专项清除：确保通知真正消失
+    // MIUI-specific cleanup to ensure the notification disappears.
     fun cancelNotification() {
         if (isMiuiDevice) {
             // 步骤1: 发送空壳通知覆盖
+            // Step 1: replace the existing notification with an empty notification.
             val clearNotif = NotificationCompat.Builder(MyApplication.instance, OTA_CHANNEL_ID)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle("")
@@ -269,6 +280,7 @@ object OtaManager {
             notificationManager.notify(OTA_NOTIFICATION_ID, clearNotif)
 
             // 步骤2: 延迟取消
+            // Step 2: cancel it after a delay.
             Handler(Looper.getMainLooper()).postDelayed({
                 notificationManager.cancel(OTA_NOTIFICATION_ID)
                 L.i(TAG, "MIUI: OTA 通知已清除 (ID=$OTA_NOTIFICATION_ID)")
@@ -289,17 +301,23 @@ object OtaManager {
 
             val status = mGson.fromJson(message, SystemOtaStatus::class.java)
 
-            if (status.status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_START) {   // 眼镜升级中
+            // 眼镜升级中
+            // The glasses are updating.
+            if (status.status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_START) {
 
                 isState3 = true
                 progressState3 = status.process.toFloat()
 
                 showDownloadProgress(status.process, STATE_3_ALL)
-            } else if (status.status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_REBOOT) {  // 升级完成重启
+            } else if (status.status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_REBOOT) {
+                // 升级完成重启
+                // Restart after the update completes.
                 showCompletion()
                 if (isInOTAActivity) {
                     isOTACompleted = true
-                } else { // 不在升级页面，直接还原 SystemViewModel，避免再次进入状态不正确
+                } else {
+                    // 不在升级页面，直接还原 SystemViewModel，避免再次进入状态不正确
+                    // When outside the update screen, reset SystemViewModel directly to avoid an incorrect state on re-entry.
                     SystemViewModel.release()
                 }
             }

@@ -1,6 +1,9 @@
 package com.rokid.glass
 
+import com.rokid.glass.utils.demoString
+
 import android.annotation.SuppressLint
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -30,6 +33,7 @@ import java.io.File
 
 /**
  * sdk 拍照 录像 录制音频文件 发送视频流等
+ * SDK examples for taking photos, recording video/audio files, sending video streams, and related operations.
  */
 class SdkMediaActivity : BaseGlassActivity() {
 
@@ -54,7 +58,7 @@ class SdkMediaActivity : BaseGlassActivity() {
     @SuppressLint("SetTextI18n")
     private fun initView() {
         binding.btPhoto480P.setOnClickListener {
-            log("----开始拍照480P")
+            log(demoString(R.string.demo_taking_a_480p_photo))
             val fileName = "test_${System.currentTimeMillis()}.png"
             val publicPicturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val file = File(publicPicturesDir, fileName)
@@ -65,8 +69,9 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btPhoto720P.setOnClickListener {
-            log("----开始拍照720P")
+            log(demoString(R.string.demo_taking_a_720p_photo))
             // 720P拍的照片是横屏
+            // Photos taken at 720P are landscape.
             val fileName = "test_${System.currentTimeMillis()}.png"
             val publicPicturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val file = File(publicPicturesDir, fileName)
@@ -77,8 +82,9 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btPhoto1080P.setOnClickListener {
-            log("----开始拍照1080P")
+            log(demoString(R.string.demo_taking_a_1080p_photo))
             // 1080P拍的照片是竖屏
+            // Photos taken at 1080P are portrait.
             val fileName = "test_${System.currentTimeMillis()}.png"
             val publicPicturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val file = File(publicPicturesDir, fileName)
@@ -89,8 +95,9 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btPhoto1080PLand.setOnClickListener {
-            log("----开始拍照1080P横屏")
+            log(demoString(R.string.demo_taking_a_landscape_1080p_photo))
             // 1080P拍的照片是竖屏
+            // Photos taken at 1080P are portrait.
             val fileName = "test_${System.currentTimeMillis()}.png"
             val publicPicturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val file = File(publicPicturesDir, fileName)
@@ -101,8 +108,9 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btPhoto4K.setOnClickListener {
-            log("----开始拍照4K")
+            log(demoString(R.string.demo_taking_a_4k_photo))
             // 4K 拍照为横屏，分辨率：4032 × 3024
+            // 4K photos are landscape, with a resolution of 4032 x 3024.
             val fileName = "test_${System.currentTimeMillis()}.png"
             val publicPicturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
             val file = File(publicPicturesDir, fileName)
@@ -112,9 +120,11 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btStartRecord720P.setOnClickListener {
-            log("----开始视频刻录720P")
+            log(demoString(R.string.demo_starting_720p_video_recording))
             // 720P 录的视频是横屏,分辨率：1280*720
+            // Video recorded at 720P is landscape, with a resolution of 1280 x 720.
             // 取值为1则每间隔 1分钟自动生成新文件，后续音视频数据将写入新文件。
+            // A value of 1 creates a new file every minute; subsequent audio/video data is written to the new file.
             val min = 1
             val enableAudio = true
             val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/video"
@@ -134,7 +144,9 @@ class SdkMediaActivity : BaseGlassActivity() {
 
         binding.btStartRecord1080P.setOnClickListener {
             // 取值为1则每间隔 1分钟自动生成新文件，后续音视频数据将写入新文件。
+            // A value of 1 creates a new file every minute; subsequent audio/video data is written to the new file.
             // 1080P 录的视频是竖屏,分辨率：1080 * 1920
+            // Video recorded at 1080P is portrait, with a resolution of 1080 x 1920.
             val min = 1
             val enableAudio = true
             val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/video"
@@ -148,15 +160,18 @@ class SdkMediaActivity : BaseGlassActivity() {
                 fps = 20
             )
             // 1080P 目前拍的视频是竖屏
+            // Currently, video captured at 1080P is portrait.
             GlassSdk.getGlassMediaService()?.startRecord(videoCallback, recordConfig)
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
-            log("开始视频刻录1080P")
+            log(demoString(R.string.demo_starting_1080p_video_recording))
         }
 
         binding.btStartRecord1080PLand.setOnClickListener {
             // 取值为1则每间隔 1分钟自动生成新文件，后续音视频数据将写入新文件。
+            // A value of 1 creates a new file every minute; subsequent audio/video data is written to the new file.
             // 1080P 录的视频是竖屏,分辨率：1080 * 1920
+            // Video recorded at 1080P is portrait, with a resolution of 1080 x 1920.
             val min = 1
             val enableAudio = true
             val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/video"
@@ -170,30 +185,31 @@ class SdkMediaActivity : BaseGlassActivity() {
                 fps = 20
             )
             // 1080P 目前拍的视频是竖屏
+            // Currently, video captured at 1080P is portrait.
             GlassSdk.getGlassMediaService()?.startRecord(videoCallback, recordConfig)
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
-            log("开始视频刻录1080P_Land")
+            log(demoString(R.string.demo_starting_landscape_1080p_video_recording))
         }
 
         binding.btStopRecord.setOnClickListener {
-            log("----停止视频刻录")
+            log(demoString(R.string.demo_stopping_video_recording))
             GlassSdk.getGlassMediaService()?.stopRecord()
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
         }
 
         binding.btSendVideo.setOnClickListener {
-            log("----开始发送视频")
+            log(demoString(R.string.demo_starting_video_transmission))
             GlassSdk.getGlassMessageService()?.sendVideoStreamDataV2(object : IResultCallback.Default() {
                 override fun onSuccess(result: Boolean) {
                     super.onSuccess(result)
-                    log("sendVideoStreamData -- onSuccess: ")
+                    log(demoString(R.string.demo_sendvideostreamdata_onsuccess_status_10))
                 }
 
                 override fun onFailed(code: Int, errormsg: String?) {
                     super.onFailed(code, errormsg)
-                    log("sendVideoStreamData -- onFailed:  code = $code, errormsg = $errormsg")
+                    log(demoString(R.string.demo_sendvideostreamdata_onfailed_code_errormsg_status_11, code, errormsg))
                 }
             })
             unAllSelectState(binding.clMedia)
@@ -201,14 +217,15 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         binding.btStopSendVideo.setOnClickListener {
-            log("----停止发送视频")
+            log(demoString(R.string.demo_stopping_video_transmission))
             GlassSdk.getGlassMessageService()?.stopVideoStreamData()
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
         }
         binding.btnSetZoom.setOnClickListener {
-            binding.btnSetZoom.text = "zoom: $zoom"
+            binding.btnSetZoom.text = demoString(R.string.demo_zoom_status_12, zoom)
             // sdk的数字变焦方法，只有视频录像才会起作用，照片是不起作用的
+            // The SDK's digital zoom only affects video recording, not photos.
             GlassSdk.getGlassMediaService()?.zoomCamera(zoom)
             zoom++
             if (zoom > 3) {
@@ -216,10 +233,10 @@ class SdkMediaActivity : BaseGlassActivity() {
             }
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
-            log("----获取相机缩放：${GlassSdk.getGlassMediaService()?.zoomLevel}")
+            log(demoString(R.string.demo_camera_zoom, GlassSdk.getGlassMediaService()?.zoomLevel))
         }
         binding.btnRecordAudio.setOnClickListener {
-            log("----开始录音")
+            log(demoString(R.string.demo_starting_audio_recording))
             stopAudioWrite()
             val fileName = TimeUtils.timestampToDateTime(System.currentTimeMillis(), "yyyy-MM-dd-HH-mm-ss") + ".aac"
             val picDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
@@ -231,21 +248,21 @@ class SdkMediaActivity : BaseGlassActivity() {
             selectBtn(it as AppCompatButton)
         }
         binding.btnStopRecordAudio.setOnClickListener {
-            log("----停止录音")
+            log(demoString(R.string.demo_stopping_audio_recording))
             GlassSdk.getGlassMediaService()?.stopAudioRecord(mAudioCallback)
             stopAudioWrite()
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
         }
         binding.btnAiChat.setOnClickListener {
-            log("----开始AI问答")
+            log(demoString(R.string.demo_starting_ai_chat))
             GlassSdk.getGlassAiChatService()?.startAiChat(false)
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
-            GlassSdk.getGlassAiChatService()?.toAiChat("杭州明天下雨吗", mAIChaLister)
+            GlassSdk.getGlassAiChatService()?.toAiChat(demoString(R.string.demo_will_it_rain_in_hangzhou_tomorrow), mAIChaLister)
         }
         binding.btnStopAiChat.setOnClickListener {
-            log("----停止AI问答")
+            log(demoString(R.string.demo_stopping_ai_chat))
             GlassSdk.getGlassAiChatService()?.endAiChat()
             unAllSelectState(binding.clMedia)
             selectBtn(it as AppCompatButton)
@@ -272,7 +289,11 @@ class SdkMediaActivity : BaseGlassActivity() {
         textView.isSelected = true
         textView.isClickable = true
         textView.isFocusable = true
+        textView.isFocusableInTouchMode = true
         textView.requestFocus()
+        textView.post {
+            textView.requestRectangleOnScreen(Rect(0, 0, textView.width, textView.height), true)
+        }
     }
 
     override fun onGlassKeyEvent(keyEvent: Int): Boolean {
@@ -453,15 +474,21 @@ class SdkMediaActivity : BaseGlassActivity() {
             }
 
             GlassKeyEvent.KEYCODE_CLICK -> {
-                for (i in 0 until binding.clMedia.childCount) {
-                    if (binding.clMedia.getChildAt(i).isSelected) {
-                        binding.clMedia.getChildAt(i).performClick()
-                        break;
-                    }
-                }
+                findSelectedButton(binding.clMedia)?.performClick()
             }
         }
         return super.onGlassKeyEvent(keyEvent)
+    }
+
+    private fun findSelectedButton(viewGroup: ViewGroup): AppCompatButton? {
+        for (i in 0 until viewGroup.childCount) {
+            val child = viewGroup.getChildAt(i)
+            if (child is AppCompatButton && child.isSelected) return child
+            if (child is ViewGroup) {
+                findSelectedButton(child)?.let { return it }
+            }
+        }
+        return null
     }
 
     fun unAllSelectState(viewGroup: ViewGroup) {
@@ -488,7 +515,7 @@ class SdkMediaActivity : BaseGlassActivity() {
 
     private val mPhotoFileCallback = object : PhotoFileCallback.Stub() {
         override fun onTakePhoto(path: String) {
-            log("onTakePhoto-->path = $path")
+            log(demoString(R.string.demo_ontakephoto_path_status_13, path))
         }
 
         override fun getCallbackId(): String {
@@ -496,67 +523,73 @@ class SdkMediaActivity : BaseGlassActivity() {
         }
 
         override fun onTakePhotoV2(path: String, width: Int, height: Int) {
-            log("onTakePhoto--> width = $width,height = $height, path = $path")
+            log(demoString(R.string.demo_ontakephoto_width_height_path_status_14, width, height, path))
         }
     }
 
     private val mICameraStateLister = object : IMediaStateLister.Stub() {
         override fun onCameraResolutionChange(width: Int, height: Int) {
-            log("onCameraResolutionChange: width = $width, height = $height")
+            log(demoString(R.string.demo_oncameraresolutionchange_width_height_status_15, width, height))
         }
 
         override fun onCameraError(code: Int, errorMsg: String) {
-            log("onCameraError code=${code}, errorMsg = $errorMsg")
+            log(demoString(R.string.demo_oncameraerror_code_errormsg_status_16, code, errorMsg))
         }
     }
 
     private val mAIChaLister = object : AiChatListener.Stub() {
         override fun onContinuousModeUpdate(continuousMode: Boolean, timeout: Long, keepSessionActive: Boolean) {
-            log("onContinuousModeUpdate: continuousMode = $continuousMode, timeout = $timeout, keepSessionActive = $keepSessionActive")
+            log(demoString(R.string.demo_oncontinuousmodeupdate_continuousmode_timeout_keepsessionactive_status_17, continuousMode, timeout, keepSessionActive))
         }
 
         /**
          * ai回答的答案
+         * Answer returned by the AI.
          * @param answer 答案，流式的
+         * The streamed answer.
          * @param isFinish 答案的终止符号
+         * Whether the answer has finished.
          */
         override fun onAiChatAnswer(answer: String?, isFinish: Boolean, contentType: String?, sessionId: String?) {
-            log("onAiChatAnswer: answer = $answer, isFinish = $isFinish, contentType = $contentType, sessionId = $sessionId")
+            log(demoString(R.string.demo_onaichatanswer_answer_isfinish_contenttype_sessionid_status_18, answer, isFinish, contentType, sessionId))
         }
 
         /**
          * ai问题的错误回调
+         * Error callback for an AI question.
          * @param code 错误码
+         * The error code.
          * @param message 错误信息
+         * The error message.
          */
         override fun onError(code: Int, message: String) {
-            log("aiChat onError: code = $code, message = $message")
+            log(demoString(R.string.demo_aichat_onerror_code_message_status_19, code, message))
         }
 
         override fun onAiTakePhoto(filePath: String) {
-            log("onAiTakePhoto: filePath = $filePath")
+            log(demoString(R.string.demo_onaitakephoto_filepath_status_20, filePath))
         }
     }
 
     private val videoCallback = object : VideoCallback.Stub() {
         override fun onError() {
-            log("onError: ")
+            log(demoString(R.string.demo_onerror_status_21))
         }
 
         override fun onFinish() {
-            log("onFinish: ")
+            log(demoString(R.string.demo_onfinish_status_22))
         }
 
         override fun onNewFile(startTime: Long, endTime: Long, path: String, isLast: Boolean) {
-            log("onNewFile: $path")
+            log(demoString(R.string.demo_onnewfile_status_23, path))
         }
 
         override fun onErrorWithDetail(code: Int, errorMsg: String) {
-            log("onError: code = $code, errorMsg = $errorMsg")
+            log(demoString(R.string.demo_onerror_code_errormsg_status_24, code, errorMsg))
         }
 
         override fun onStart() {
-            log("onStart:")
+            log(demoString(R.string.demo_onstart_status_25))
         }
     }
 

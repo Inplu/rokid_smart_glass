@@ -1,5 +1,7 @@
 package com.rokid.glass
 
+import com.rokid.glass.utils.demoString
+import com.rokid.glesse.R
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -35,20 +37,12 @@ class GlassLprTrackActivity : BaseActivity() {
         setContentView(binding.root)
 
         // 添加车牌识别回调
+        // Add the license plate recognition callback.
         mAbsGlassTrackService?.setGlassOnlineRecListener(mTrackListener)
         // 离线车牌识别模式
+        // Offline license plate recognition mode.
         mAbsGlassTrackService?.startDetection(MODE_LPR)
 
-//        val min = 30
-//        val enableAudio = true
-//        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).absolutePath + "/video"
-//        val recordConfig = RecordConfig(
-//            path, min, enableAudio,
-//            width = PreviewResolution.ResolutionInfo_1080P_Land.width,
-//            height = PreviewResolution.ResolutionInfo_1080P_Land.height
-//        )
-//        // 开始视频录制
-//        GlassSdk.getGlassMediaService()?.startRecord(videoCallback, recordConfig)
     }
 
     private val videoCallback = object : VideoCallback.Stub() {
@@ -76,18 +70,22 @@ class GlassLprTrackActivity : BaseActivity() {
 
     /**
      *  车牌识别回调
+     * License plate recognition callback.
      */
     private val mTrackListener = object : IGlassDetectionListener.Stub() {
         /**
          * 检测模式发送改变的回调
+         * Callback for detection mode changes.
          * @param mode
          */
         override fun onModeChange(mode: Int) {
             // 还有在扫描的情况下更改状态MODE_NONE，onModeChange这个方法也没有执行
+            // Changing the state to MODE_NONE during scanning also failed to invoke onModeChange.
         }
 
         /**
          * 人脸检测的回调(可用与更新人脸追踪框)
+         * Face detection callback, which can be used to update face tracking boxes.
          * @param faceModels
          */
         override fun onFaceTrack(faceModels: List<FaceModel>) {
@@ -95,13 +93,14 @@ class GlassLprTrackActivity : BaseActivity() {
 
         /**
          * 车牌识别的回调
+         * License plate recognition callback.
          * @param lprModel
          */
         @SuppressLint("DefaultLocale")
         override fun onLPRTrack(lprModel: LPRModel) {
             lifecycleScope.launch(Dispatchers.Main) {
                 Log.e(TAG, "车牌号:${lprModel.plateNo}")
-                val msg = String.format("车牌颜色:%s 车牌号:%s 分数:%.2f", lprModel.color, lprModel.plateNo, lprModel.score)
+                val msg = String.format(demoString(R.string.demo_plate_color_plate_number_score), lprModel.color, lprModel.plateNo, lprModel.score)
                 log(msg)
                 if (GlobalData.btConnectState.value) {
                     GlassSdk.getGlassMessageService()?.sendTextMessageByClassicBT(msg)
@@ -111,6 +110,7 @@ class GlassLprTrackActivity : BaseActivity() {
 
         /**
          * 筛选最优的人脸图像 (可用于在线人脸识别接口的调用)
+         * Select the best face image, which can be used with the online face recognition API.
          */
         override fun onProcessedFaceModels(processedFaceModels: List<FaceModel>) {
         }
@@ -128,11 +128,11 @@ class GlassLprTrackActivity : BaseActivity() {
     override fun onDestroy() {
         super.onDestroy()
         // 停止车牌识别
+        // Stop license plate recognition.
         mAbsGlassTrackService?.stopDetection()
         // 移除车牌识别回调
+        // Remove the license plate recognition callback.
         mAbsGlassTrackService?.removeGlassOnlineRecListener(mTrackListener)
-        // 停止视频录制
-//        GlassSdk.getGlassMediaService()?.stopRecord()
     }
 
     override fun onResume() {

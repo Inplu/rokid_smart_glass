@@ -71,7 +71,6 @@ public class ImageTextureProgram {
 		}
 		
 		GLES20.glUseProgram(mProgramHandle);
-        //GlUtil.checkGlError("glUseProgram");
         
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[0]);

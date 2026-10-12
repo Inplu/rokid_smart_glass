@@ -38,7 +38,6 @@ object GlassSdkUtils {
     var mGlassCommonService: ICommonInfoServer? = null
     var mGlassDeviceService: IDeviceService? = null
 
-
     private var mClientMessageCallback = object : IClientCallback.Stub() {
         override fun onReady() {
             mBTService = GlassSdk.getClassicBluetoothService()
@@ -71,22 +70,18 @@ object GlassSdkUtils {
 
                 /**
                  * 更新伴生端 App 信息
+                 * Update the companion app information.
                  * @param info
                  */
                 override fun onCompanionAppInfo(info: CompanionAppInfo?) {
                     Log.d(TAG, "onPhoneAppInfo->" + info?.envType)
                 }
 
-//                override fun onPhoneAppInfo(info: PhoneAppInfo?) {
-//                    Log.d(TAG, "onPhoneAppInfo->" + info?.envType)
-//                }
-
                 override fun onConfig(p0: String?) {
                 }
             })
         }
     }
-
 
     private val mIClassicBTListeners = mutableSetOf<IClassicBTListener>()
     private val mIClassicBTListener = object : IClassicBTListener.Stub() {
@@ -123,6 +118,7 @@ object GlassSdkUtils {
 
         /**
          * wifip2p 是否可用(包含数据通道)
+         * Whether Wi-Fi P2P is available, including its data channel.
          */
         override fun onWifiP2pEnabled(enabled: Boolean) {
             GlobalData.setP2pConnectState(enabled)
@@ -131,6 +127,7 @@ object GlassSdkUtils {
 
         /**
          * 获取WifiP2p 信息
+         * Get Wi-Fi P2P information.
          */
         override fun onConnectionInfoAvailable(wifiP2pInfo: WifiP2pInfo?) {
             mIWifiP2PGoListeners.forEach { it.onConnectionInfoAvailable(wifiP2pInfo) }
@@ -138,6 +135,7 @@ object GlassSdkUtils {
 
         /**
          * WifiP2p 通道已断开
+         * The Wi-Fi P2P channel has disconnected.
          */
         override fun onChannelDisconnected() {
             mIWifiP2PGoListeners.forEach { it.onChannelDisconnected() }
@@ -146,6 +144,7 @@ object GlassSdkUtils {
 
         /**
          * 获取当前设备WifiP2pDevice信息
+         * Get WifiP2pDevice information for the current device.
          */
         override fun onSelfDeviceAvailable(device: WifiP2pDevice?) {
             mIWifiP2PGoListeners.forEach { it.onSelfDeviceAvailable(device) }
@@ -153,6 +152,7 @@ object GlassSdkUtils {
 
         /**
          * 发现的WifiP2p设备列表
+         * List of discovered Wi-Fi P2P devices.
          */
         override fun onPeersAvailable(devices: MutableList<WifiP2pDevice>?) {
             mIWifiP2PGoListeners.forEach { it.onPeersAvailable(devices) }
@@ -194,7 +194,6 @@ object GlassSdkUtils {
         mIMessageListeners.remove(listener)
     }
 
-
     private val mIBluetoothRingConnectListeners = mutableSetOf<IBluetoothRingConnectListener>()
     private val mIBluetoothRingConnectListener = object : IBluetoothRingConnectListener.Stub() {
         override fun onConnect(bean: BluetoothDeviceBean?, connect: Boolean) {
@@ -213,18 +212,19 @@ object GlassSdkUtils {
         mIBluetoothRingConnectListeners.remove(listener)
     }
 
-
     fun initSdk() {
         // 如果SDK已经初始化了，则直接返回
+        // Return immediately if the SDK is already initialized.
         if (GlassSdk.isReady()) {
             Log.d(TAG, "sdk已经初始化了")
             return
         }
         GlassSdk.bindSecurityService(Utils.getApp(), object : IServiceConnectionCallback {
             override fun onServiceConnected() {
-//                L.i(TAG, "----服务绑定成功：onServiceConnected")
-                //眼镜端的clientId与手机端注册的clientId要相同,
-                //这样手机端就知道把数据发给眼镜端那个应用程序了
+                // 眼镜端的clientId与手机端注册的clientId要相同,
+                // The glasses clientId must match the clientId registered on the phone,
+                // 这样手机端就知道把数据发给眼镜端那个应用程序了
+                // so the phone knows which app on the glasses should receive the data.
                 GlassSdk.registerClient("GlassSample", mClientMessageCallback)
             }
 
@@ -246,15 +246,17 @@ object GlassSdkUtils {
                 Scopes.mainScope.launch {
                     delay(4000)
                     Log.i(TAG, "onBindingDied:  重新绑定服务")
-                    initSdk() // 自动重新绑定
+                    // 自动重新绑定
+                    // Automatically bind again.
+                    initSdk()
                 }
             }
         })
     }
 
     fun destroySdk() {
-//        GlassSdk.unbindSecurityService()
-        //release 内部会 unbindSecurityService()
+        // release 内部会 unbindSecurityService()
+        // Calling release internally calls unbindSecurityService().
         GlassSdk.release()
         mIWifiP2PGoListeners.clear()
         mIClassicBTListeners.clear()

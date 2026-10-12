@@ -52,6 +52,7 @@ fun <T> MutableStateFlow<T>.call(data: T) {
 
 /**
  * 添加元素
+ * Add an element.
  */
 fun <T> MutableStateFlow<Set<T>>.increaseToSet(data: T) {
     value = value + data
@@ -59,6 +60,7 @@ fun <T> MutableStateFlow<Set<T>>.increaseToSet(data: T) {
 
 /**
  * 移除元素
+ * Remove an element.
  */
 fun <T> MutableStateFlow<Set<T>>.reduceFromSet(data: T) {
     value = value - data
@@ -66,6 +68,7 @@ fun <T> MutableStateFlow<Set<T>>.reduceFromSet(data: T) {
 
 /**
  * 清空
+ * Clear all elements.
  */
 fun <T> MutableStateFlow<Set<T>>.recreateSet() {
     value = setOf()
@@ -74,6 +77,7 @@ fun <T> MutableStateFlow<Set<T>>.recreateSet() {
 
 /**
  * 添加元素
+ * Add an element.
  */
 fun <T> MutableStateFlow<List<T>>.increaseToList(dataList: List<T>) {
     value = value + dataList
@@ -81,6 +85,7 @@ fun <T> MutableStateFlow<List<T>>.increaseToList(dataList: List<T>) {
 
 /**
  * 添加元素
+ * Add an element.
  */
 fun <T> MutableStateFlow<List<T>>.increaseToList(data: T) {
     value = value + data
@@ -88,6 +93,7 @@ fun <T> MutableStateFlow<List<T>>.increaseToList(data: T) {
 
 /**
  * 移除元素
+ * Remove an element.
  */
 fun <T> MutableStateFlow<List<T>>.reduceFromList(data: T) {
     value = value - data
@@ -95,6 +101,7 @@ fun <T> MutableStateFlow<List<T>>.reduceFromList(data: T) {
 
 /**
  * 移除元素
+ * Remove an element.
  */
 fun <T> MutableStateFlow<List<T>>.reduceFromList(index: Int) {
     value = value - value[index]
@@ -102,6 +109,7 @@ fun <T> MutableStateFlow<List<T>>.reduceFromList(index: Int) {
 
 /**
  * 长度
+ * Length.
  */
 fun <T> MutableStateFlow<List<T>>.listSize(): Int {
     return value.size
@@ -109,6 +117,7 @@ fun <T> MutableStateFlow<List<T>>.listSize(): Int {
 
 /**
  * 判空
+ * Check whether the collection is empty.
  */
 fun <T> MutableStateFlow<List<T>>.listIsEmpty(): Boolean {
     return value.isEmpty()
@@ -116,6 +125,7 @@ fun <T> MutableStateFlow<List<T>>.listIsEmpty(): Boolean {
 
 /**
  * 清空
+ * Clear all elements.
  */
 fun <T> MutableStateFlow<List<T>>.recreateList() {
     value = emptyList()

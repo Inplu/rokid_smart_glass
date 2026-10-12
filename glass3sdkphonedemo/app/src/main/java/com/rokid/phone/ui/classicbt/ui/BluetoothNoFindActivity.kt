@@ -62,9 +62,12 @@ class BluetoothNoFindActivity : BaseActivity<ActivityBluetoothNofindBinding>() {
             }
 
             // 监听播放按钮点击
+            // Listen for play button clicks.
             val playButton =  playerView.findViewById<View>(com.google.android.exoplayer2.R.id.exo_play)
             playButton?.setOnClickListener {
-                mTutorialPlayer?.seekTo(0)// 回到开头
+                // 回到开头
+                // Return to the beginning.
+                mTutorialPlayer?.seekTo(0)
                 mTutorialPlayer?.playWhenReady = true
             }
         }

@@ -1,5 +1,7 @@
 package com.rokid.glass.camera
 
+import com.rokid.glass.utils.demoString
+
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,27 +31,34 @@ import com.rokid.security.glass3.sdk.base.data.media.CameraShareConfig
 
 /**
  * NV21 导出模式 Fragment
+ * Fragment for NV21 export mode.
  * 显示纯相机 NV21 数据（不含屏幕叠加）
+ * Display raw camera NV21 data without screen overlays.
  * 支持用户自定义分辨率、FPS、Zoom、防抖等参数
+ * Allow custom resolution, FPS, zoom, stabilization, and other parameters.
  */
 class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     companion object {
         private const val TAG = "Nv21ExportFragment"
-        
+
         fun newInstance(): Nv21ExportFragment {
             return Nv21ExportFragment()
         }
-        
+
         // 支持的 FPS 选项
+        // Supported FPS options.
         private val FPS_OPTIONS = listOf(15, 20, 24, 30)
-        
+
         /**
          * 获取 Camera 支持的分辨率列表（对调宽高以适配竖屏显示）
-         * 
+         * Get camera-supported resolutions, swapping width and height for portrait display.
+         *
          * 通过 AIDL 接口从 system-server 动态获取 Camera API 支持的分辨率列表
+         * Dynamically obtain the resolutions supported by the Camera API from system-server through AIDL.
          * 过滤掉高于 2268x3024 的分辨率
-         * 
+         * Filter out resolutions above 2268 x 3024.
+         *
          * @return List<Triple<displayText, width, height>>
          */
         fun getSupportedResolutions(): List<Pair<String, Triple<Int, Int, Boolean>>> {
@@ -58,23 +67,27 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 val cameraSizes = CameraShareHelper().getSupportedPreviewSizes()
                 if (cameraSizes.isNotEmpty()) {
                     Log.d(TAG, "getSupportedResolutions: successfully got ${cameraSizes.size} sizes from AIDL")
-                    
+
                     // 过滤掉高于 2268x3024 的分辨率
+                    // Filter out resolutions above 2268 x 3024.
                     val filteredSizes = cameraSizes.filter { size ->
                         val maxDimension = maxOf(size.first, size.second)
                         val minDimension = minOf(size.first, size.second)
                         // 过滤条件：最大维度 <= 3024 且 最小维度 <= 2268
+                        // Filter condition: the larger dimension is at most 3024 and the smaller dimension is at most 2268.
                         maxDimension <= 3024 && minDimension <= 2268
                     }
-                    
+
                     Log.d(TAG, "getSupportedResolutions: filtered from ${cameraSizes.size} to ${filteredSizes.size} sizes (max 2268x3024)")
-                    
+
                     if (filteredSizes.isNotEmpty()) {
+                        // 按分辨率从高到低排序
+                        // Sort resolutions from highest to lowest.
                         val result = filteredSizes.map { size ->
-                            val displayText = "${size.first}x${size.second} (${if (size.third) "竖屏" else "横屏"})"
+                            val displayText = demoString(R.string.demo_x, size.first, size.second, if (size.third) demoString(R.string.demo_portrait) else demoString(R.string.demo_landscape))
                             Log.d(TAG, "getSupportedResolutions: ${displayText}")
                             displayText to size
-                        }.sortedByDescending { it.second.first * it.second.second } // 按分辨率从高到低排序
+                        }.sortedByDescending { it.second.first * it.second.second }
                         Log.d(TAG, "getSupportedResolutions: returning ${result.size} resolutions")
                         result
                     } else {
@@ -90,21 +103,25 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 getFallbackResolutions()
             }
         }
-        
+
         /**
          * Fallback 分辨率列表（当 Camera API 不可用时使用）
+         * Fallback resolution list for when the Camera API is unavailable.
          * 注意：这里的分辨率是视觉效果分辨率（已对调宽高）
+         * Note: these are visual display resolutions, with width and height already swapped.
          * - Camera 原始分辨率是横屏的（width > height），例如 1280x720
+         * - The camera's original resolution is landscape (width > height), for example 1280 x 720.
          * - 对调后变成竖屏视觉效果，例如 720x1280
+         * - Swapping the dimensions produces a portrait display, for example 720 x 1280.
          */
         private fun getFallbackResolutions(): List<Pair<String, Triple<Int, Int, Boolean>>> {
             return listOf(
-                "640x480 (横屏)" to Triple(640, 480, false),
-                "480x640 (竖屏)" to Triple(480, 640, true),
-                "1280x720 (横屏)" to Triple(1280, 720, false),
-                "720x1280 (竖屏)" to Triple(720, 1280, true),
-                "1920x1080 (横屏)" to Triple(1920, 1080, false),
-                "1080x1920 (竖屏)" to Triple(1080, 1920, true),
+                demoString(R.string.demo_640x480_landscape) to Triple(640, 480, false),
+                demoString(R.string.demo_480x640_portrait) to Triple(480, 640, true),
+                demoString(R.string.demo_1280x720_landscape) to Triple(1280, 720, false),
+                demoString(R.string.demo_720x1280_portrait) to Triple(720, 1280, true),
+                demoString(R.string.demo_1920x1080_landscape) to Triple(1920, 1080, false),
+                demoString(R.string.demo_1080x1920_portrait) to Triple(1080, 1920, true),
             )
         }
     }
@@ -122,7 +139,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     private lateinit var switchEis: Switch
     private lateinit var configControls: List<View>
     private var selectedConfigIndex = 0
-    
+
     private val nv21Helper = CameraShareHelper()
     private var configSwitchJob: Job? = null
     @Volatile private var callbackGeneration = 0
@@ -133,21 +150,39 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
     private var lastDroppedFrameCount = 0L
     private var currentWidth = 0
     private var currentHeight = 0
-    private var currentFps = 0 // 实际应用的 FPS
-    private var currentEisEnabled = false // 实际应用的 EIS 状态
-    private var currentZoomLevel = 1 // 实际应用的 Zoom
-    private var lastFrameTimestamp = 0L // 用于调试帧间隔
+    // 实际应用的 FPS
+    // The FPS actually applied.
+    private var currentFps = 0
+    // 实际应用的 EIS 状态
+    // The EIS state actually applied.
+    private var currentEisEnabled = false
+    // 实际应用的 Zoom
+    // The zoom actually applied.
+    private var currentZoomLevel = 1
+    // 用于调试帧间隔
+    // Used to debug frame intervals.
+    private var lastFrameTimestamp = 0L
     private var frameIntervalSum = 0L
     private var frameIntervalCount = 0
-    
+
     // 当前配置
-    private var currentResolutionIndex = 0 // 默认选择 1920x1080（会在初始化时查找）
-    private var currentFpsIndex = 0 // 默认 15fps
-    private var currentZoom = 1 // 默认 zoom = 1
-    private var currentEis = false // 默认关闭防抖
+    // Current configuration.
+    // 默认选择 1920x1080（会在初始化时查找）
+    // Select 1920 x 1080 by default; it will be located during initialization.
+    private var currentResolutionIndex = 0
+    // 默认 15fps
+    // Default: 15 fps.
+    private var currentFpsIndex = 0
+    // 默认 zoom = 1
+    // Default: zoom = 1.
+    private var currentZoom = 1
+    // 默认关闭防抖
+    // Disable stabilization by default.
+    private var currentEis = false
     private var currentConfigText: String = ""
-    
+
     // 动态获取的分辨率列表
+    // Dynamically obtained resolution list.
     private lateinit var resolutionOptions: List<Pair<String, Triple<Int, Int, Boolean>>>
 
     override fun onCreateView(
@@ -160,10 +195,11 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         // 动态获取 Camera 支持的分辨率列表（已过滤高于 2268x3024 的分辨率）
+        // Dynamically obtain the resolutions supported by Camera, excluding resolutions above 2268 x 3024.
         resolutionOptions = getSupportedResolutions()
-        
+
         val preferences = previewPreferences
         val savedWidth = preferences.getInt("width", 1920)
         val savedHeight = preferences.getInt("height", 1080)
@@ -197,7 +233,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             btnToggleConfig,
         )
         configControls.forEach { it.isFocusable = false }
-        
+
         setupConfigUI()
         btnShowConfig.isFocusable = false
         startNv21Export()
@@ -242,9 +278,11 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     /**
      * 设置配置 UI
+     * Set up the configuration UI.
      */
     private fun setupConfigUI() {
         // 分辨率 Spinner - 使用动态获取的分辨率列表
+        // Resolution Spinner: use the dynamically obtained resolution list.
         val resolutionAdapter = ArrayAdapter(
             requireContext(),
             R.layout.simple_spinner_item,
@@ -259,7 +297,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-        
+
         // FPS Spinner
         val fpsAdapter = ArrayAdapter(
             requireContext(),
@@ -275,7 +313,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
-        
+
         // Zoom SeekBar
         seekbarZoom.progress = currentZoom
         tvZoomValue.text = currentZoom.toString()
@@ -287,31 +325,35 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
-        
+
         // EIS Switch
         switchEis.isChecked = currentEis
         switchEis.setOnCheckedChangeListener { _, isChecked ->
             currentEis = isChecked
         }
-        
+
         // 显示配置按钮
+        // Show-configuration button.
         btnShowConfig.setOnClickListener {
             setConfigPanelVisible(true)
         }
-        
+
         // 隐藏配置按钮
+        // Hide-configuration button.
         btnToggleConfig.setOnClickListener {
             setConfigPanelVisible(false)
         }
-        
+
         // 应用配置按钮
+        // Apply-configuration button.
         btnApply.setOnClickListener {
             applyConfig()
         }
     }
-    
+
     /**
      * 应用用户配置
+     * Apply the user's configuration.
      */
     private fun applyConfig() {
         if (configSwitchJob?.isActive == true) return
@@ -320,9 +362,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         val height = resolutionOption.second
         val isPortrait = resolutionOption.third
         val fps = FPS_OPTIONS[currentFpsIndex]
-        
+
         Log.d(TAG, "Applying config: ${width}x${height}@${fps}fps, zoom=$currentZoom, EIS=$currentEis, isPortrait=$isPortrait")
-        
+
         val newConfig = CameraShareConfig(
             previewWidth = width,
             previewHeight = height,
@@ -363,33 +405,38 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                     .putInt("width", width).putInt("height", height).putInt("fps", fps)
                     .putInt("zoom", newConfig.zoomLevel).putBoolean("eis", newConfig.enableVideoStabilization)
                     .apply()
-                currentConfigText = "请求: ${width}x${height}@${fps}fps，EIS=${if (newConfig.enableVideoStabilization) "ON" else "OFF"}，zoom=${newConfig.zoomLevel}；已收到匹配尺寸帧"
+                currentConfigText = demoString(R.string.demo_requested_x_fps_eis_zoom_matching_frames_received, width, height, fps, if (newConfig.enableVideoStabilization) "ON" else "OFF", newConfig.zoomLevel)
                 updateDisplay()
                 Log.d(TAG, "Config switch confirmed by frame: ${width}x${height}")
             } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
-                currentConfigText = "切换未确认：10秒内未收到 ${width}x${height} 帧；实际 ${currentWidth}x${currentHeight}"
+                currentConfigText = demoString(R.string.demo_switch_unconfirmed_no_x_frames_within_10_seconds, width, height, currentWidth, currentHeight)
                 updateDisplay()
                 Log.w(TAG, currentConfigText)
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: Exception) {
                 Log.e(TAG, "Config switch failed", e)
-                tvInfo.text = "配置切换失败：${e.message}"
+                tvInfo.text = demoString(R.string.demo_configuration_switch_failed, e.message)
             } finally {
                 btnApply.isEnabled = true
             }
         }
-        
+
         // 更新显示
-        val orientationText = if (isPortrait) "竖屏" else "横屏"
-        currentConfigText = "切换中: ${width}x${height}@${fps}fps ($orientationText)，等待实际帧"
+        // Update the display.
+        val orientationText = if (isPortrait) demoString(R.string.demo_portrait) else demoString(R.string.demo_landscape)
+        currentConfigText = demoString(R.string.demo_switching_x_fps_waiting_for_frames, width, height, fps, orientationText)
         updateDisplay()
 
         // 隐藏配置面板
+        // Hide the configuration panel.
         setConfigPanelVisible(false)
     }
 
-    /** 配置面板显示时移除外层按钮，避免遮挡 Spinner 的下拉菜单。 */
+    /**
+     * 配置面板显示时移除外层按钮，避免遮挡 Spinner 的下拉菜单。
+     * Hide the outer button while the configuration panel is visible so it does not obscure the Spinner dropdown.
+     */
     private fun setConfigPanelVisible(visible: Boolean) {
         configPanel.visibility = if (visible) View.VISIBLE else View.GONE
         btnShowConfig.visibility = if (visible) View.GONE else View.VISIBLE
@@ -441,7 +488,10 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         }
     }
 
-    /** 单击直接轮换配置值，避免打开 Spinner 后眼镜腿方向键被弹窗消费。 */
+    /**
+     * 单击直接轮换配置值，避免打开 Spinner 后眼镜腿方向键被弹窗消费。
+     * Cycle configuration values directly on a click so opening the Spinner does not let its popup consume the temple direction keys.
+     */
     private fun activateSelectedConfig() {
         when (selectedConfigIndex) {
             0 -> spinnerResolution.setSelection(
@@ -462,7 +512,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
 
     /**
      * 创建 NV21 Callback
+     * Create the NV21 callback.
      * @param isPortrait 是否为竖屏模式
+     * Whether portrait mode is active.
      */
     private fun createNv21Callback(
         isPortrait: Boolean = false,
@@ -477,8 +529,8 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 currentWidth = width
                 currentHeight = height
                 if (currentConfigText.isEmpty()) {
-                    val orientationText = if (isPortrait) "竖屏" else "横屏"
-                    currentConfigText = "配置: ${width}x${height} ($orientationText), EIS=${if (currentEis) "ON" else "OFF"}, zoom=$currentZoom"
+                    val orientationText = if (isPortrait) demoString(R.string.demo_portrait) else demoString(R.string.demo_landscape)
+                    currentConfigText = demoString(R.string.demo_configuration_x_eis_zoom, width, height, orientationText, if (currentEis) "ON" else "OFF", currentZoom)
                 }
                 activity?.runOnUiThread {
                     updateDisplay()
@@ -493,6 +545,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                     firstFrame?.complete(Unit)
                 }
                 // 记录帧间隔，便于观察采集帧率。
+                // Record frame intervals to observe the capture frame rate.
                 val now = System.currentTimeMillis()
                 if (lastFrameTimestamp > 0) {
                     val interval = now - lastFrameTimestamp
@@ -508,6 +561,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 lastFrameTimestamp = now
 
                 // 回调帧率与预览渲染解耦；预览较慢时只保留最新帧，不阻塞后续回调。
+                // Decouple callback frame rate from preview rendering; keep only the latest frame when preview rendering is slower, without blocking later callbacks.
                 updateFps(width, height)
                 nv21SurfaceView.setPreviewData(nv21, width, height)
             }
@@ -521,7 +575,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
                 firstFrame?.completeExceptionally(IllegalStateException("$code: $msg"))
                 Log.e(TAG, "NV21 error: code=$code, msg=$msg")
                 activity?.runOnUiThread {
-                    tvInfo.text = "错误: $code, $msg"
+                    tvInfo.text = demoString(R.string.demo_error, code, msg)
                 }
             }
 
@@ -555,6 +609,7 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         }
 
         // 使用默认配置启动（选择第一个分辨率，即最高分辨率）
+        // Start with the default configuration, selecting the first and therefore highest resolution.
         val resolutionOption = resolutionOptions[currentResolutionIndex.coerceIn(0, resolutionOptions.size - 1)].second
         val initialConfig = CameraShareConfig(
             previewWidth = resolutionOption.first,
@@ -576,8 +631,8 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
             callback = createNv21Callback(isPortrait),
         )
 
-        val orientationText = if (isPortrait) "竖屏" else "横屏"
-        currentConfigText = "配置: ${initialConfig.previewWidth}x${initialConfig.previewHeight}@${initialConfig.previewTargetFps}fps ($orientationText), EIS=${if (currentEis) "ON" else "OFF"}, zoom=${initialConfig.zoomLevel}"
+        val orientationText = if (isPortrait) demoString(R.string.demo_portrait) else demoString(R.string.demo_landscape)
+        currentConfigText = demoString(R.string.demo_configuration_x_fps_eis_zoom, initialConfig.previewWidth, initialConfig.previewHeight, initialConfig.previewTargetFps, orientationText, if (currentEis) "ON" else "OFF", initialConfig.zoomLevel)
     }
 
     private fun updateFps(width: Int, height: Int) {
@@ -606,9 +661,9 @@ class Nv21ExportFragment : Fragment(), CameraShareGestureHandler {
         renderedFps: Float? = null,
         droppedFrames: Long = 0,
     ) {
-        val resolutionText = "已连接: ${currentWidth}x${currentHeight}"
+        val resolutionText = demoString(R.string.demo_connected_x, currentWidth, currentHeight)
         val fpsText = callbackFps?.let {
-            "SDK回调: %.1f fps，预览渲染: %.1f fps，丢弃旧预览帧: %d".format(
+            demoString(R.string.demo_sdk_callback_fps_preview_rendering_fps_discarded_preview).format(
                 it,
                 renderedFps ?: 0f,
                 droppedFrames,

@@ -33,9 +33,11 @@ class HeadPoseTracker(
         val magnetic = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
         if (magnetic != null) {
             // 有磁力计（指南针能力）
+            // A magnetometer is available, providing compass support.
             Log.d(TAG, "-----有磁力计")
         } else {
             // 没有磁力计
+            // No magnetometer is available.
             Log.d(TAG, "----没有磁力计")
         }
     }

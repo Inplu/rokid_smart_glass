@@ -14,6 +14,7 @@ import com.rokid.security.phone.sdk.base.utils.log.L;
 
 /**
  * EGL 相关配置
+ * EGL configuration.
  */
 public class EGLHelper {
 
@@ -28,6 +29,7 @@ public class EGLHelper {
 
     /**
      * 构造方法
+     * Constructor.
      *
      * @param eglContext
      */
@@ -38,6 +40,7 @@ public class EGLHelper {
 
     /**
      * 初始化EGL
+     * Initialize EGL.
      *
      * @param eglContext
      */
@@ -61,6 +64,7 @@ public class EGLHelper {
             throw new RuntimeException("unable to get EGL14 display");
         }
         // 初始化
+        // Initialize.
         final int[] version = new int[2];
         if (!EGL14.eglInitialize(mEglDisplay, version, 0, version, 1)) {
             mEglDisplay = null;
@@ -78,6 +82,7 @@ public class EGLHelper {
                 EGL14.EGL_RENDERABLE_TYPE,
                 EGL14.EGL_OPENGL_ES2_BIT,
                 // 录制android
+                // Android recording support.
                 EGL_RECORDABLE_ANDROID,
                 1,
                 EGL14.EGL_NONE
@@ -149,6 +154,7 @@ public class EGLHelper {
 
     /**
      * 交换buffer数据
+     * Swap buffer data.
      *
      * @return
      */
@@ -166,6 +172,7 @@ public class EGLHelper {
 
     /**
      * 释放资源
+     * Release resources.
      */
     public void release() {
 
@@ -186,6 +193,7 @@ public class EGLHelper {
 
     /**
      * 查错
+     * Check for errors.
      *
      * @param msg
      */

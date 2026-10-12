@@ -35,10 +35,15 @@ class EnableNotificationDialog(private val cancelListener: () -> Unit, private v
     fun View.setPressEffect() {
         this.setOnTouchListener { _, event ->
             when (event.action) {
-                MotionEvent.ACTION_DOWN -> this.alpha = 0.5f  // 按下时透明度变为50%
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> this.alpha = 1.0f  // 松开或取消时恢复透明度
+                // 按下时透明度变为50%
+                // Set the opacity to 50% while pressed.
+                MotionEvent.ACTION_DOWN -> this.alpha = 0.5f
+                // 松开或取消时恢复透明度
+                // Restore the opacity on release or cancellation.
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> this.alpha = 1.0f
             }
             // 返回 false 以确保其他事件（如点击事件）继续传播
+            // Return false so other events, such as clicks, continue to propagate.
             false
         }
     }

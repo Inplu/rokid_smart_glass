@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
  * Code for generating images useful for testing textures.
  */
 public class GeneratedTexture {
-    //private static final String TAG = GlUtil.TAG;
 
     public enum Image { COARSE, FINE };
 
@@ -56,7 +55,6 @@ public class GeneratedTexture {
     // Generate test image data.  This must come after the other values are initialized.
     private static final ByteBuffer sCoarseImageData = generateCoarseData();
     private static final ByteBuffer sFineImageData = generateFineData();
-
 
     /**
      * Creates a test texture in the current GL context.

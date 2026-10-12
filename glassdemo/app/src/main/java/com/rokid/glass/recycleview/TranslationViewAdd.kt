@@ -10,7 +10,6 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.rokid.glesse.R
 
-
 class TranslationViewAdd @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -38,7 +37,9 @@ class TranslationViewAdd @JvmOverloads constructor(
             invalidate()
         }
 
-    private val flowInterval = 50L // 每50ms显示一个字符
+    // 每50ms显示一个字符
+    // Display one character every 50 ms.
+    private val flowInterval = 50L
     private val flowRunnable = object : Runnable {
         override fun run() {
             var needInvalidate = false
@@ -63,6 +64,7 @@ class TranslationViewAdd @JvmOverloads constructor(
         baselineOffset = -paint.fontMetrics.top
 
         // 启动滚动输出
+        // Start incremental text output.
         post(flowRunnable)
     }
 
@@ -91,16 +93,6 @@ class TranslationViewAdd @JvmOverloads constructor(
         }
     }
 
-    // 接口保持不变
-//    fun appendToCurrentTranslation(textToAdd: String) {
-//        Log.d(TAG, "appendToCurrentTranslation textToAdd:$textToAdd")
-//        if (translations.isEmpty() || translations.last().isFinished) {
-//            startNewTranslation(textToAdd)
-//        } else {
-//            val currentItem = translations.last()
-//            currentItem.text += textToAdd
-//        }
-//    }
     fun appendToCurrentTranslation(textToAdd: String) {
         Log.d(TAG, "appendToCurrentTranslation textToAdd:$textToAdd")
         if (translations.isEmpty() || translations.last().isFinished) {
@@ -111,9 +103,11 @@ class TranslationViewAdd @JvmOverloads constructor(
         }
 
         // 如果 displayedLength 小于 text 长度，保证滚动输出继续
+        // If displayedLength is less than the text length, ensure incremental text output continues.
         translations.lastOrNull()?.let { item ->
             if (item.displayedLength < item.text.length) {
                 // 触发 flowRunnable 刷新显示
+                // Trigger flowRunnable to refresh the display.
                 post(flowRunnable)
             }
         }

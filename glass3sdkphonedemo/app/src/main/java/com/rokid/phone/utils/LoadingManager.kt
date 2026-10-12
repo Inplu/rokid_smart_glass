@@ -8,6 +8,7 @@ import kotlin.let
 
 /**
  * 全局加载动画管理类（Kotlin单例实现）
+ * Global loading animation manager implemented as a Kotlin singleton.
  */
 object LoadingManager {
 
@@ -16,17 +17,22 @@ object LoadingManager {
 
     /**
      * 在Application中初始化（可选）
+     * Initialize in Application (optional).
      */
     fun init(context: Context) {
         // 如果你有别的用处可以保留，否则可以删掉
+        // Keep this if it is needed elsewhere; otherwise, it can be removed.
     }
 
     /**
      * 显示加载动画 （无泄漏）
+     * Show the loading animation without leaks.
      */
     @Synchronized
     fun showLoading(activity: Activity, message: String? = null) {
-        hideLoading() // 保证先释放旧的 Dialog
+        // 保证先释放旧的 Dialog
+        // Ensure the previous Dialog is released first.
+        hideLoading()
 
         if (activity.isFinishing || activity.isDestroyed) {
             return
@@ -45,6 +51,7 @@ object LoadingManager {
 
     /**
      * 隐藏加载动画（无泄漏）
+     * Hide the loading animation without leaks.
      */
     @Synchronized
     fun hideLoading() {
@@ -55,6 +62,7 @@ object LoadingManager {
                     dialog.dismiss()
                 } else {
                     // Activity 已经被回收，不再调用 dismiss
+                    // The Activity has already been reclaimed; do not call dismiss again.
                 }
             } catch (_: Exception) {
             }

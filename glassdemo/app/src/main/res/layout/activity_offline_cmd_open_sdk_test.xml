@@ -9,7 +9,7 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OpenSDK OfflineCmd Test"
+        android:text="@string/demo_opensdk_offline_command_test"
         android:textColor="#00FF66"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Current: ZH_CN"
+        android:text="@string/demo_current_zh_cn"
         android:textColor="#00FF66"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,26 +45,32 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSwitchZh"
-                android:layout_width="80dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/round_select_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="切到中文"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_switch_to_chinese"
                 android:textColor="@color/green"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSwitchEn"
-                android:layout_width="100dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@drawable/round_unselect_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="Switch EN"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_switch_to_english"
                 android:textColor="@color/green_normal_40"
                 android:textSize="12sp" />
 
@@ -78,27 +84,33 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSetZhWords"
-                android:layout_width="100dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/round_unselect_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="设置中文词"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_set_chinese_words"
                 android:textColor="@color/green_normal_40"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnSetEnWords"
-                android:layout_width="120dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/round_unselect_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="Set EN Words"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_set_english_words"
                 android:textColor="@color/green_normal_40"
                 android:textSize="12sp" />
 
@@ -112,27 +124,33 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnClearCurrent"
-                android:layout_width="100dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/round_unselect_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="清空当前语言"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_clear_current_language"
                 android:textColor="@color/green_normal_40"
                 android:textSize="12sp" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnClearAll"
-                android:layout_width="100dp"
-                android:layout_height="36dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_marginEnd="12dp"
                 android:background="@drawable/round_unselect_bg"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="清空中英文"
+                android:minHeight="36dp"
+                android:ellipsize="none"
+                android:text="@string/demo_clear_chinese_and_english"
                 android:textColor="@color/green_normal_40"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -141,9 +159,10 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="10dp"
         android:focusable="false"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/llMain">
@@ -157,7 +176,7 @@
                 android:id="@+id/tvLogTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="触发日志"
+                android:text="@string/demo_trigger_log"
                 android:textColor="#00FF66"
                 android:textSize="14sp"
                 app:layout_constraintEnd_toEndOf="parent"

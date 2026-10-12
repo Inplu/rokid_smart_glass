@@ -17,7 +17,9 @@ import com.rokid.phone.base.viewmodel.interfaces.UiState
 import kotlinx.coroutines.launch
 
 abstract class MviDialogFragment<VB : ViewBinding, State : UiState, Intent : UiIntent, Event : UiEvent, VM : MviViewModel<State, Intent, Event>> :
-    DialogFragment() { // 关键点 1：继承 DialogFragment
+    // 关键点 1：继承 DialogFragment
+    // Key point 1: extend DialogFragment.
+    DialogFragment() {
 
     private val TAG = "MviDialogFragment"
     private lateinit var binding: VB
@@ -39,10 +41,13 @@ abstract class MviDialogFragment<VB : ViewBinding, State : UiState, Intent : UiI
     }
 
     // 可选：设置对话框宽高/样式（如果需要公共配置）
+    // Optional: set the dialog size or style if shared configuration is needed.
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         dialog?.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT, // 或自定义宽度
+            // 或自定义宽度
+            // Or use a custom width.
+            WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.WRAP_CONTENT
         )
     }
@@ -53,6 +58,7 @@ abstract class MviDialogFragment<VB : ViewBinding, State : UiState, Intent : UiI
 
     private fun observeViewModel() {
         // 观察状态变化（与 Fragment 相同）
+        // Observe state changes, as in Fragment.
         lifecycleScope.launch {
             viewModel.state
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
@@ -60,6 +66,7 @@ abstract class MviDialogFragment<VB : ViewBinding, State : UiState, Intent : UiI
         }
 
         // 观察一次性事件（与 Fragment 相同）
+        // Observe one-time events, as in Fragment.
         lifecycleScope.launch {
             viewModel.event
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)

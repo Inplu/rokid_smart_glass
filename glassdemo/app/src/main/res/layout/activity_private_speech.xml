@@ -10,18 +10,23 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="独立ASR/TTS"
+        android:text="@string/demo_standalone_asr_tts"
         android:textColor="#FFFFFF"
         android:textSize="17sp"
         android:textStyle="bold" />
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="这是独立部署在眼镜端的在线 ASR/TTS 应用，通过 Online-Speech 实现。用户也可通过 OpenSdkAudioSource 修改输入音源，并部署到其他 Android 系统。"
-        android:textColor="#BDBDBD"
-        android:textSize="11sp" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginBottom="4dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/demo_this_standalone_online_asr_tts_app_runs_on"
+            android:textColor="#BDBDBD"
+            android:textSize="11sp" />
+    </ScrollView>
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs_private_speech"
@@ -36,12 +41,13 @@
         android:id="@+id/pager_private_speech"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="3" />
 
     <TextView
         android:id="@+id/tv_private_speech_log"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="#101010"
         android:padding="6dp"
         android:scrollbars="vertical"

@@ -1,5 +1,8 @@
 package com.rokid.phone.ui.classicbt.ui
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -42,6 +45,7 @@ import kotlinx.coroutines.launch
 
 /**
  * 蓝牙扫描与跳转到蓝牙连接界面
+ * Bluetooth discovery and navigation to the Bluetooth connection screen.
  */
 class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, TestIntent, TestEvent, ClassicBtViewModel>() {
 
@@ -64,7 +68,7 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
             if (granted) {
                 ensureBluetoothEnabled()
             } else {
-                Toast.makeText(this, "请授权蓝牙连接权限", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, demoString(R.string.demo_grant_bluetooth_connection_permission), Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -77,14 +81,6 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
     private var lastConnectedDeviceName: String = ""
 
     override fun onInit(savedInstanceState: Bundle?) {
-        // 观察一次性事件
-//        lifecycleScope.launch {
-//            viewModel.event
-//                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-//                .collect { event ->
-//                    handleEvent(event)
-//                }
-//        }
 
         binding.ivBack.setOnClickListener {
             finish()
@@ -137,7 +133,7 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
             return
         }
         if (!SystemStateUtils.isBluetoothEnabled()) {
-            com.blankj.utilcode.util.ToastUtils.showShort("蓝牙未开启")
+            com.blankj.utilcode.util.ToastUtils.showShort(demoString(R.string.demo_bluetooth_is_off))
             enableBluetoothLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
             return
         }
@@ -145,7 +141,6 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
     }
 
     private fun startScanBt() {
-//        LoadingManager.showLoading(this, "蓝牙设备搜索中...")
         CoroutineScope(Dispatchers.Main).launch {
             showAnimation(binding.ivLoadSmall, true)
             viewModel.sendIntent(TestIntent.startScanBt)
@@ -200,14 +195,13 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
             }
 
             is TestEvent.UpdateConnectState -> {
-//                GlobalData.setBtConnectState(event.isConnect)
                 Log.d(TAG, "handleEvent::" + event.isConnect)
                 LoadingManager.hideLoading()
                 if (event.isConnect) {
                     startActivity(Intent(this, WifiP2PSettingActivity::class.java))
                     finish()
                 } else {
-                    Toast.makeText(this, "连接失败", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, demoString(R.string.demo_connection_failed), Toast.LENGTH_SHORT).show()
                 }
             }
 
@@ -218,6 +212,7 @@ class ClassicBtActivity : MviActivity<ActivityDiscoverDeviceBinding, TestState, 
 
     private fun goNoFindBluetooth() {
         //首次配对成功, 自动进入新手教学
+        // Enter the beginner tutorial automatically after the first successful pairing.
         Log.d(TAG, "goNoFindBluetooth-->")
         binding.tvListTip2.visibility = View.VISIBLE
         if (SPUtil.getInstance(this).getBoolean(

@@ -31,11 +31,11 @@ class BluetoothRingActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         wifiBinding = ActivityBluetoothRingActivityBinding.inflate(layoutInflater)
-//        PSecuritySDK.getTrackService().addTrackListener()
         setContentView(wifiBinding.root)
 
 
         //扫描设备
+        // Discover devices.
         wifiBinding.wfDiscoverPeersBtn.setOnClickListener {
             mBluetoothRingService?.startScan()
         }
@@ -96,10 +96,6 @@ class BluetoothRingActivity : ComponentActivity() {
     private fun handleAnimation(model: BluetoothDevice) {
 
         PSecuritySDK.getBluetoothRingService()?.connectToServer(model)
-//        val requestStr = SenderHandler.mGson.toJson(model)
-//
-//        PSecuritySDK.getMessageService()?.sendTextMessageByBle(requestStr)
-
 
     }
 }

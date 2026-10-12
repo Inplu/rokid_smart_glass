@@ -5,6 +5,7 @@
     android:background="@android:color/black">
 
     <!-- 录制信息面板 -->
+    <!-- Recording information panel. -->
     <LinearLayout
         android:id="@+id/record_panel"
         android:layout_width="match_parent"
@@ -20,7 +21,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mix 录制模式"
+            android:text="@string/demo_mixed_recording_mode"
             android:textColor="@android:color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
@@ -30,7 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="00:00"
+            android:text="@string/ui_time_zero"
             android:textColor="@android:color/holo_red_light"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -41,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:breakStrategy="simple"
-            android:text="准备录制..."
+            android:text="@string/demo_preparing_to_record"
             android:textColor="@android:color/white"
             android:textSize="12sp" />
 
@@ -51,11 +52,12 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:enabled="false"
-            android:text="停止录制" />
+            android:text="@string/demo_stop_recording" />
 
     </LinearLayout>
 
     <!-- 叠加时间显示 -->
+    <!-- Overlaid time display. -->
     <LinearLayout
         android:id="@+id/overlay_container"
         android:layout_width="wrap_content"

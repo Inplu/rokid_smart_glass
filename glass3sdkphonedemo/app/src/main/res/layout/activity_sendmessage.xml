@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
         android:gravity="center"
-        android:text="手机端界面发送消息"
+        android:text="@string/demo_send_messages_from_phone"
         android:textColor="@color/green"
         android:textSize="16sp" />
 
@@ -29,13 +29,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="P2P发送文本" />
+            android:text="@string/demo_send_p2p_text" />
 
         <Button
             android:id="@+id/wfSendFileBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="P2P发送文件" />
+            android:text="@string/demo_send_p2p_file" />
 
     </LinearLayout>
 
@@ -51,13 +51,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="蓝牙发送文本" />
+            android:text="@string/demo_send_bluetooth_text" />
 
         <Button
             android:id="@+id/btSendFileBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="蓝牙发送文件" />
+            android:text="@string/demo_send_bluetooth_file" />
 
     </LinearLayout>
 
@@ -73,13 +73,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:text="发送通知" />
+            android:text="@string/demo_send_notification" />
 
         <Button
             android:id="@+id/installApkBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="安装APK" />
+            android:text="@string/demo_install_apk" />
 
     </LinearLayout>
 

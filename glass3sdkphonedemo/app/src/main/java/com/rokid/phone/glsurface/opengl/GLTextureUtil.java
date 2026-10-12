@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 
 /**
  * 纹理工具类
+ * Texture utility class.
  */
 public class GLTextureUtil {
 
@@ -13,6 +14,7 @@ public class GLTextureUtil {
 
     /**
      * 创建OES纹理id
+     * Create an OES texture ID.
      *
      * @return
      */

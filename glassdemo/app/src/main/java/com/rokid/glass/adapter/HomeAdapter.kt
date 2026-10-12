@@ -2,8 +2,6 @@ package com.rokid.glass.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Typeface
 import android.util.Log
 import android.view.LayoutInflater
 
@@ -42,18 +40,23 @@ class HomeAdapter(private val mContext: Context) : RecyclerView.Adapter<HomeAdap
     }
 
     fun setFocusPosition(focusPosition: Int) {
+        lastFocusPosition = this.focusPosition
         this.focusPosition = focusPosition
-        iconInfoList[focusPosition].isChecked = true
+        iconInfoList.forEachIndexed { index, item ->
+            item.isChecked = index == focusPosition
+        }
     }
 
-    //翻到下一页
+    // 翻到下一页
+    // Go to the next page.
     private val _toNextPage = MutableLiveData<Unit>()
     val toNextPage: LiveData<Unit> = _toNextPage
     private fun toNextPage() {
         _toNextPage.postValue(Unit)
     }
 
-    //翻到上一页
+    // 翻到上一页
+    // Go to the previous page.
     private val _toPreviousPage = MutableLiveData<Unit>()
     val toPreviousPage: LiveData<Unit> = _toPreviousPage
     private fun toPreviousPage() {
@@ -109,7 +112,6 @@ class HomeAdapter(private val mContext: Context) : RecyclerView.Adapter<HomeAdap
         if (!iconInfoList.isEmpty()) {
             val menuItem = iconInfoList[position]
             val isChecked = menuItem.isChecked
-            holder.iconNameTv.setTypeface(Typeface.DEFAULT, if (isChecked) Typeface.BOLD else Typeface.NORMAL)
             holder.iconNameTv.text = menuItem.menuName
 
             holder.layoutItem.animate().cancel()
@@ -127,7 +129,7 @@ class HomeAdapter(private val mContext: Context) : RecyclerView.Adapter<HomeAdap
             } else {
                 holder.iconImage.setImageResource(menuItem.unCheckIconId)
                 holder.layoutItem.background = ContextCompat.getDrawable(mContext, menuItem.unCheckItemBgId)
-                holder.iconSelectBar.visibility = View.GONE
+                holder.iconSelectBar.visibility = View.INVISIBLE
             }
             holder.itemView.setOnClickListener { v: View? ->
                 Log.d(TAG, "setOnClickListener-" + " focusPosition:" + focusPosition + " hasFocus:" + (holder.itemView.hasFocus()))
@@ -135,9 +137,8 @@ class HomeAdapter(private val mContext: Context) : RecyclerView.Adapter<HomeAdap
                     itemOnClickListener!!.onClick(focusPosition, v)
                 }
             }
-            if (position == 0) {
+            if (position == focusPosition) {
                 holder.itemView.requestFocus()
-                iconInfoList[0].isChecked = true
             }
         }
     }
@@ -146,7 +147,7 @@ class HomeAdapter(private val mContext: Context) : RecyclerView.Adapter<HomeAdap
         return iconInfoList.size
     }
 
-    fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
+    fun Int.dpToPx(): Int = (this * mContext.resources.displayMetrics.density).toInt()
 
     inner class ViewHolder(itemView: View) : BaseViewHolder(itemView) {
         val layoutItem: View

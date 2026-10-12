@@ -47,6 +47,7 @@ object DeviceLinkerManager {
     var mWifiP2pDevice: WifiP2pDevice? = null
 
     //上一次连接的设备状态
+    // Connection state of the previously connected device.
     var mBluetoothDevice: BluetoothDeviceInfo? = null
     var mGetGlassSystemInfoMsgTask: Job? = null
     var mGson = Gson()
@@ -60,6 +61,7 @@ object DeviceLinkerManager {
     private var isAudioStreamRequested = false
 
     //正在连接的蓝牙设备信息，连接完成后会与mBluetoothDevice一致
+    // The Bluetooth device being connected; this matches mBluetoothDevice after connection succeeds.
     var mConnectingBluetoothDevice: BluetoothDeviceInfo? = null
 
     private val mIClassicBTClientListener = object : IClassicBTClientListener {
@@ -86,12 +88,15 @@ object DeviceLinkerManager {
             GlobalData.setBtConnectState(success)
             if (success && isSerialConnecting) {
                 // 只有在 connectDevices() 串行流程里，才会继续连接 Wi-Fi P2P
+                // Continue connecting Wi-Fi P2P only within the sequential connectDevices() flow.
                 mWifiP2pDevice?.let { device ->
                     if (!GlobalData.p2pConnectState.value) {
                         wifiConnect(device)
                     }
                 }
-                isSerialConnecting = false // 完成一次串行流程，清理标记
+                // 完成一次串行流程，清理标记
+                // Clear the flag after a sequential connection flow finishes.
+                isSerialConnecting = false
             }
         }
 
@@ -174,6 +179,7 @@ object DeviceLinkerManager {
 
     fun connectBt(bluetoothDevice: BluetoothDeviceInfo, action: (isConnect: Boolean) -> Unit) {
         // 检查设备是否为空
+        // Check whether the device is null.
         mBluetoothDevice = bluetoothDevice
         if (GlobalData.btConnectState.value) {
             return
@@ -214,6 +220,7 @@ object DeviceLinkerManager {
 
         Log.d(TAG, "wifiConnect: targetName=$targetDeviceName, cachedDevice=$wifiP2pDevice")
         // Wi-Fi P2P 连接
+        // Wi-Fi P2P connection.
         val wifiP2PClientService = PSecuritySDK.getWifiP2PClientService()
         if (wifiP2PClientService == null) {
             Log.e(TAG, "wifiConnect: WifiP2PClientService 尚未初始化")
@@ -326,10 +333,9 @@ object DeviceLinkerManager {
         override fun onClassicBTTextMessage(msg: String, clientId: String) {
             if (handleAudioStreamControl(msg)) return
             try {
-//                Log.d(TAG,"--------处理前msg=$msg,clientId=$clientId")
                 // 普通蓝牙文本不是系统业务消息，解析不到 CustomMessage 时直接忽略。
+                // Plain Bluetooth text is not a system business message; ignore it if it cannot be parsed as CustomMessage.
                 val customMessage = CustomMessage.fromClassicBtPayload(mGson, msg) ?: return
-//                Log.d(TAG, "---------处理后msg=${customMessage.message},type=${customMessage.type}")
                 if (customMessage.type == ProjectBusinessType.SYSTEM_INFO_RESPONSE) {
                     val systemInfo = mGson.fromJson(customMessage.message, RKSystemInfo::class.java)
                     if (systemInfo != null) {

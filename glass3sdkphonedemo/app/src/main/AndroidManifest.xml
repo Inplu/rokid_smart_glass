@@ -3,17 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 存储 -->
+    <!-- Storage. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-    <!--    <uses-permission android:name="android.permission.CALL_PHONE" />-->
 
     <!-- 针对 Android 13+（API 33+），声明精细媒体权限 -->
+    <!-- Declare granular media permissions for Android 13+ (API 33+). -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
     <!-- 兼容 Android 12 及以下（可选，若需支持旧版本） -->
+    <!-- Compatibility with Android 12 and earlier, if older versions must be supported. -->
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
@@ -22,7 +24,9 @@
         android:maxSdkVersion="32" />
 
     <!-- 蓝牙权限 =================开始    -->
+    <!-- Bluetooth permissions ================= start -->
     <!-- Android 12+ 所需权限 -->
+    <!-- Permissions required on Android 12+. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH_SCAN"
         android:usesPermissionFlags="neverForLocation"
@@ -30,10 +34,12 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <!-- Android < 12 所需权限 -->
+    <!-- Permissions required on Android versions below 12. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH"
         android:maxSdkVersion="30" />
     <!-- 允许应用程序发现和配对蓝牙设备 -->
+    <!-- Allow the application to discover and pair Bluetooth devices. -->
     <uses-permission
         android:name="android.permission.BLUETOOTH_ADMIN"
         android:maxSdkVersion="30" />
@@ -41,50 +47,81 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- 声明蓝牙功能（可选，过滤无蓝牙设备） -->
+    <!-- Declare Bluetooth support (optional; filters devices without Bluetooth). -->
     <uses-feature
         android:name="android.hardware.bluetooth"
         android:required="true" />
     <!-- 后台扫描需要的后台位置权限（如果需要后台扫描才加） -->
+    <!-- Background location permission, required only when background scanning is needed. -->
     <uses-permission
         android:name="android.permission.ACCESS_BACKGROUND_LOCATION"
         android:maxSdkVersion="33"
         tools:ignore="BackgroundLocationPolicy" />
     <!-- 蓝牙权限 =================结束    -->
+    <!-- Bluetooth permissions ================= end -->
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- 获取手机震动服务 -->
+    <!-- Access the phone's vibration service. -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- -wifiP2P 相关权限 =========================start -->
+    <!-- Wi-Fi P2P permissions ========================= start -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Android 6 ~ Android 12 (API 23 ~ 32) 需要声明定位权限（Wi-Fi P2P 扫描需要） -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <!-- Android 6 ~ Android 12 (API 23 ~ 32) 需要声明定位权限（Wi-Fi P2P 扫描需要） -->
+    <!-- Android 6 through Android 12 (API 23-32) requires location permission for Wi-Fi P2P scanning. -->
 
     <uses-feature android:name="android.software.companion_device_setup" />
 
-    <uses-permission android:name="android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND" /> <!-- 允许在后台使用数据 -->
-    <uses-permission android:name="android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND" /> <!-- 允许从后台启动前台服务 -->
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_RUN_IN_BACKGROUND" />
+    <!-- 允许在后台使用数据 -->
+    <!-- Allow data usage in the background. -->
+    <uses-permission android:name="android.permission.REQUEST_COMPANION_USE_DATA_IN_BACKGROUND" />
+    <!-- 允许从后台启动前台服务 -->
+    <!-- Allow foreground services to start from the background. -->
     <uses-permission android:name="android.permission.REQUEST_COMPANION_START_FOREGROUND_SERVICES_FROM_BACKGROUND" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE" />
     <uses-permission
         android:name="android.permission.NEARBY_WIFI_DEVICES"
         android:usesPermissionFlags="neverForLocation" />
     <!-- 屏幕录制权限（Android 10+需要） -->
+    <!-- Screen recording permission, required on Android 10+. -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
 
     <!-- PSTORE SDK接⼝权限 -->
+    <!-- PSTORE SDK API permissions. -->
     <uses-permission android:name="cybertech.permission.READ_PSTORE" />
-    <uses-permission android:name="cybertech.permission.READ_PSTORE_USERINFO" /> <!-- 读取同步时间的权限 -->
-    <uses-permission android:name="cybertech.permission.READ_PSTORE_SERVER_SYNC_TIME" /> <!-- 读取链路信息的权限 -->
-    <uses-permission android:name="cybertech.permission.READ_PSTORE_LINKINFO" /> <!-- 读取位置信息的权限 -->
-    <uses-permission android:name="cybertech.permission.READ_PSTORE_LOCATIONINFO" /> <!-- 提交操作⽇志的权限 -->
-    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_OPERATIONLOG" /> <!-- 提交状态数据的权限 -->
-    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_APP_STATE_MONITOR" /> <!-- 组件授权 -->
-    <uses-permission android:name="cybertech.permission.READ_PSTORE_COMPONENT_AUTHORIZATION" /> <!-- 消息推送 -->
-    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_PUSH" /> <!-- 数据共享 -->
-    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_SHARE_DATA" /> <!-- 应⽤市场应⽤/组件检测 -->
+    <uses-permission android:name="cybertech.permission.READ_PSTORE_USERINFO" />
+    <!-- 读取同步时间的权限 -->
+    <!-- Permission to read synchronized time. -->
+    <uses-permission android:name="cybertech.permission.READ_PSTORE_SERVER_SYNC_TIME" />
+    <!-- 读取链路信息的权限 -->
+    <!-- Permission to read link information. -->
+    <uses-permission android:name="cybertech.permission.READ_PSTORE_LINKINFO" />
+    <!-- 读取位置信息的权限 -->
+    <!-- Permission to read location information. -->
+    <uses-permission android:name="cybertech.permission.READ_PSTORE_LOCATIONINFO" />
+    <!-- 提交操作⽇志的权限 -->
+    <!-- Permission to submit operation logs. -->
+    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_OPERATIONLOG" />
+    <!-- 提交状态数据的权限 -->
+    <!-- Permission to submit status data. -->
+    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_APP_STATE_MONITOR" />
+    <!-- 组件授权 -->
+    <!-- Component authorization. -->
+    <uses-permission android:name="cybertech.permission.READ_PSTORE_COMPONENT_AUTHORIZATION" />
+    <!-- 消息推送 -->
+    <!-- Push messaging. -->
+    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_PUSH" />
+    <!-- 数据共享 -->
+    <!-- Data sharing. -->
+    <uses-permission android:name="cybertech.permission.WRITE_PSTORE_SHARE_DATA" />
+    <!-- 应⽤市场应⽤/组件检测 -->
+    <!-- App store application and component detection. -->
     <uses-permission android:name="cybertech.permission.READ_MARKET_APPS_CHECK" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
@@ -126,8 +163,11 @@
 
     <uses-feature
         android:name="android.hardware.wifi.direct"
-        android:required="false" /> <!-- wifiP2P 相关权限  ===========================end。 -->
+        android:required="false" />
+    <!-- wifiP2P 相关权限  ===========================end。 -->
+    <!-- Wi-Fi P2P permissions =========================== end. -->
     <!-- 蓝牙相关权限 -->
+    <!-- Bluetooth-related permissions. -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

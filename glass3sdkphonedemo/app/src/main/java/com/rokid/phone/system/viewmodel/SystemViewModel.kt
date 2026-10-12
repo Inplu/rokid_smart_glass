@@ -1,5 +1,8 @@
 package com.rokid.phone.system.viewmodel
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import com.blankj.utilcode.util.ToastUtils
 import com.google.gson.Gson
 import com.rokid.phone.MyApplication
@@ -76,6 +79,7 @@ class SystemViewModel constructor(
         override fun onClassicBTTextMessage(msg: String, clientId: String) {
             try {
                 // 普通蓝牙文本不是系统业务消息，解析不到 CustomMessage 时直接忽略。
+                // Plain Bluetooth text is not a system business message; ignore it if it cannot be parsed as CustomMessage.
                 val customMessage = CustomMessage.fromClassicBtPayload(mGson, msg) ?: return
                 if (customMessage.type == ProjectBusinessType.SYSTEM_INFO_RESPONSE) {
                     val systemInfo =
@@ -151,23 +155,6 @@ class SystemViewModel constructor(
         }
     }
 
-
-//    private fun downUpdate(filePath :String,fileMd5:String){
-//        this.filePath = filePath
-//        if (File(filePath).exists()){
-//
-//            var md5 = FileUtil.getFileMD5(File(filePath))
-//
-//            L.d(TAG,"downUpdate md5:"+md5+" fileMd5:"+fileMd5)
-//            if (md5 == fileMd5){
-//                setState { SystemState(updateStatus=UpdateStatus.UPDATE_ING,process =100*0.8f)}
-//                sendGlassUpdateFile(filePath)
-//                return
-//            }
-//        }
-//        repository.downUpdate(filePath,mUpdateListener)
-//    }
-
     private fun downUpdate(path: String, fileMd5: String) {
         this.filePath = path
         val file = File(path)
@@ -185,11 +172,11 @@ class SystemViewModel constructor(
 
                 if (md5 == fileMd5) {
                     // 文件完整且校验通过
+                    // The file is complete and verification passed.
                     L.d(TAG, "文件完整，直接上传，md5 == fileMd5")
                     setState {
                         SystemState(
                             updateStatus = UpdateStatus.UPDATE_ING_DOWNLOAD,
-//                            process = 100 * 0.8f
                             process = 100f
                         )
                     }
@@ -197,12 +184,15 @@ class SystemViewModel constructor(
                     return
                 } else {
                     // 文件存在但MD5不匹配或是文件不完整
+                    // The file exists, but its MD5 does not match or it is incomplete.
                     val downloadedSize = file.length()
                     L.d(TAG, "文件不完整，大小: $downloadedSize 字节")
 
                     // 检查是否可能是断点续传（文件大小>0且MD5匹配）
+                    // Check whether the download may be resumed: the file size is greater than zero and the MD5 matches.
                     if (oldMd5 == fileMd5 && downloadedSize > 0) {
                         // 尝试获取服务器文件信息来验证是否支持续传
+                        // Try to obtain server file information to verify resumable download support.
                         L.d(TAG, "md5 一致，且检测到不完整文件，尝试续传: $downloadedSize 字节")
                         repository.downUpdateWithResume(path, mResumeListener, downloadedSize)
                         return
@@ -214,6 +204,7 @@ class SystemViewModel constructor(
                         }
 
                         // 保存最新  md5
+                        // Save the latest MD5.
                         saveNewOtaFileMd5(fileMd5)
 
                         if (file.delete()) {
@@ -229,9 +220,11 @@ class SystemViewModel constructor(
                 }
             } else {
                 // 文件不存在，重新下载
+                // The file does not exist; download it again.
                 L.d(TAG, "文件不存在，开始新下载")
 
                 // 保存最新  md5
+                // Save the latest MD5.
                 saveNewOtaFileMd5(fileMd5)
 
                 repository.downUpdateWithResume(path, mResumeListener, 0L)
@@ -239,6 +232,7 @@ class SystemViewModel constructor(
         } catch (e: Exception) {
             L.e(TAG, "downUpdate 异常: ${e.message}", e)
             // 异常处理：显示错误状态
+            // Exception handling: display an error state.
 
             setState {
                 SystemState(
@@ -248,7 +242,8 @@ class SystemViewModel constructor(
             }
 
             // 可以选择重试或提示用户
-            ToastUtils.showLong("下载准备失败: ${e.message}")
+            // Optionally retry or prompt the user.
+            ToastUtils.showLong(demoString(R.string.demo_failed_to_prepare_download, e.message))
         }
     }
 
@@ -259,6 +254,7 @@ class SystemViewModel constructor(
 
     private fun saveNewOtaFileMd5(md5: String) {
         // 保存文件 MD5，供下一次下载判断是否可以断点续传。
+        // Save the file's MD5 to determine whether a later download can be resumed.
         SPUtil.getInstance(MyApplication.instance).putString(
             "${SystemGlobalConstant.deviceId}_${SpKeyConstant.OTA_FILE_MD5}",
             md5
@@ -266,6 +262,7 @@ class SystemViewModel constructor(
     }
 
     // 统一的监听器
+    // Shared listener.
     private var mResumeListener = object : DownloadListener {
         override fun onResult(status: Int) {
             L.d(TAG, "onResult $status")
@@ -277,7 +274,7 @@ class SystemViewModel constructor(
                     )
                 }
 
-                OtaManager.showFailure("下载失败")
+                OtaManager.showFailure(demoString(R.string.demo_download_failed))
             } else if (status == DownloadStatus.DOWNLOAD_STATUS_DOWNLOADED) {
                 sendGlassUpdateFile(filePath)
             }
@@ -292,7 +289,6 @@ class SystemViewModel constructor(
             setState {
                 SystemState(
                     updateStatus = UpdateStatus.UPDATE_ING_DOWNLOAD,
-//                    process = progress * 0.8f
                     process = progress.toFloat()
                 )
             }
@@ -311,10 +307,13 @@ class SystemViewModel constructor(
             L.d(TAG, "sendGlassUpdateFile serverFileMd5: $serverFileMd5, glassFilePath: $glassFilePath")
 
             // 续传前再次校验本地记录与服务端文件 MD5 是否一致。
+            // Before resuming, verify again that the locally recorded MD5 matches the server file's MD5.
             val file = File(glassFilePath)
             if (file.exists()) {
                 val md5 = FileUtil.getFileMD5(file)
-                if (md5 == serverFileMd5) { // 校验通过
+                // 校验通过
+                // Verification passed.
+                if (md5 == serverFileMd5) {
                     L.d(TAG, "sendGlassUpdateFile md5 校验通过，开始发送镜像。。。")
 
                     repository.sendGlassUpdateFile(glassFilePath, fileReceiveListener)
@@ -324,7 +323,7 @@ class SystemViewModel constructor(
                                 "md5: $md5, serverFileMd5: $serverFileMd5, 删除文件重新下载。。。"
                     )
 
-                    ToastUtils.showLong("MD5校验不通过，重新下载！")
+                    ToastUtils.showLong(demoString(R.string.demo_md5_verification_failed_download_again))
                     repeatDownload(glassFilePath)
                 }
             } else {
@@ -343,6 +342,7 @@ class SystemViewModel constructor(
         File(path).delete()
 
         // 保存最新  md5
+        // Save the latest MD5.
         saveNewOtaFileMd5(serverFileMd5)
 
         repository.downUpdateWithResume(path, mResumeListener, 0L)
@@ -357,26 +357,6 @@ class SystemViewModel constructor(
     private fun getGlassSystemInfoMsg() {
         repository.getGlassSystemInfoMsg()
     }
-
-
-//
-//    private  var mUpdateListener = object : DownloadListener{
-//
-//        override fun onResult(status: Int) {
-//            L.d(TAG, "onResult $status")
-//            if (status == DownloadStatus.DOWNLOAD_STATUS_DOWNLOAD_FAILED){
-//                setState { SystemState(updateStatus=UpdateStatus.UPDATE_FAILED,process =process) }
-//            }else if (status == DownloadStatus.DOWNLOAD_STATUS_DOWNLOADED){
-//                sendGlassUpdateFile(filePath)
-//            }
-//        }
-//
-//        override fun onProgress(progress: Int) {
-//            L.d(TAG, "onProgress $progress")
-//            setState { SystemState(updateStatus=UpdateStatus.UPDATE_ING,process =progress*0.8f)}
-//        }
-//    }
-
 
     private var mCheckUpdateListener = object : SystemRepository.CheckUpdateListener {
 
@@ -396,7 +376,6 @@ class SystemViewModel constructor(
     private val fileReceiveListener = object : FileReceiveListener {
         override fun onStart() {
             L.d(TAG, "fileReceiveListener onStart ")
-//            setState { SystemState(updateStatus = UpdateStatus.UPDATE_ING, process = 80F) }
             setState { SystemState(updateStatus = UpdateStatus.UPDATE_ING_SEND, process = 0F) }
 
             OtaManager.showDownloadProgress(0, OtaManager.STATE_2_ALL)
@@ -406,8 +385,6 @@ class SystemViewModel constructor(
             L.d(TAG, "fileReceiveListener onProgressChanged $progress")
             setState {
                 SystemState(
-//                    updateStatus = UpdateStatus.UPDATE_ING,
-//                    process = progress * 0.2f + 80F
                     updateStatus = UpdateStatus.UPDATE_ING_SEND,
                     process = progress
                 )
@@ -418,7 +395,6 @@ class SystemViewModel constructor(
 
         override fun onComplete(filePath: String) {
             L.d(TAG, "fileReceiveListener onComplete")
-//            setState { SystemState(updateStatus = UpdateStatus.UPDATE_ING, process = 100F) }
             setState { SystemState(updateStatus = UpdateStatus.UPDATE_ING_SEND, process = 100F) }
             sendGlassUpdateMsg(filePath)
 
@@ -429,7 +405,7 @@ class SystemViewModel constructor(
             L.d(TAG, "fileReceiveListener onFail")
             setState { SystemState(updateStatus = UpdateStatus.UPDATE_FAILED, process = 0F) }
 
-            OtaManager.showFailure("文件传输失败")
+            OtaManager.showFailure(demoString(R.string.demo_file_transfer_failed))
         }
 
         override fun onCancel() {

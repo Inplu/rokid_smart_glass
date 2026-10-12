@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- 底层背景色 -->
+    <!-- Background color of the bottom layer. -->
     <item>
         <shape android:shape="rectangle">
-            <solid android:color="#80000000" /> <!-- 黑色背景 -->
+            <solid android:color="#80000000" />
+            <!-- 黑色背景 -->
+            <!-- Black background. -->
         </shape>
     </item>
 
     <!-- 上层透明图片 -->
+    <!-- Transparent image on the upper layer. -->
     <item
         android:drawable="@mipmap/icon_bg_photo"
         android:gravity="fill" />

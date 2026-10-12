@@ -13,7 +13,7 @@
         android:layout_marginVertical="700dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="扫描蓝牙"
+        android:text="@string/demo_scan_bluetooth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -23,7 +23,7 @@
         android:layout_marginVertical="600dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="连接蓝牙"
+        android:text="@string/demo_connect_bluetooth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -33,7 +33,7 @@
         android:layout_marginVertical="500dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="断开蓝牙"
+        android:text="@string/demo_disconnect_bluetooth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -43,7 +43,7 @@
         android:layout_marginVertical="400dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="停止扫描蓝牙"
+        android:text="@string/demo_stop_bluetooth_scan"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -54,7 +54,7 @@
         android:layout_marginVertical="300dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="获取蓝牙状态"
+        android:text="@string/demo_get_bluetooth_status"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -64,7 +64,7 @@
         android:layout_marginVertical="200dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="发送文本"
+        android:text="@string/demo_send_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
     <Button
@@ -74,7 +74,7 @@
         android:layout_marginVertical="100dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="发送Audio"
+        android:text="@string/demo_send_audio"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -1,5 +1,7 @@
 package com.rokid.glass.camera
 
+import com.rokid.glass.utils.demoString
+
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,14 +25,19 @@ import java.util.Locale
 
 /**
  * Mix 录制模式 Fragment
+ * Fragment for Mix recording mode.
  * 相机+屏幕叠加录制 MP4
+ * Record camera footage overlaid with screen content as MP4.
  */
 class MixRecordFragment : Fragment(), CameraShareGestureHandler {
 
     companion object {
         private const val TAG = "MixRecordFragment"
 
-        /** AR Mix 导出常用预览参数（与 [Nv21ExportFragment] 默认 1080P 竖屏区分，Mix 走 GPU 叠加管线）。 */
+        /**
+         * AR Mix 导出常用预览参数（与 [Nv21ExportFragment] 默认 1080P 竖屏区分，Mix 走 GPU 叠加管线）。
+         * Common AR Mix export preview parameters; unlike the default portrait 1080P in [Nv21ExportFragment], Mix uses the GPU overlay pipeline.
+         */
         private val DEFAULT_MIX_CONFIG = CameraShareConfig(
             previewWidth = 720,
             previewHeight = 1280,
@@ -49,7 +56,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
     private lateinit var tvRecordInfo: TextView
     private lateinit var tvOverlayTime: TextView
     private lateinit var btnStopRecord: Button
-    
+
     private var nv21Helper: CameraShareHelper? = null
     private var nv21Recorder: Nv21VideoRecorder? = null
     private var recordStartTime = 0L
@@ -86,7 +93,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         recordPanel = view.findViewById(R.id.record_panel)
         tvRecordTime = view.findViewById(R.id.tv_record_time)
         tvRecordInfo = view.findViewById(R.id.tv_record_info)
@@ -95,12 +102,12 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
         btnStopRecord.setOnClickListener {
             stopMixMode()
             btnStopRecord.isEnabled = false
-            btnStopRecord.text = "已停止"
+            btnStopRecord.text = demoString(R.string.demo_stopped)
         }
-        
+
         tvOverlayTime.text = timeFormat.format(Date())
         mainHandler.post(overlayTimeUpdater)
-        
+
         startMixMode()
     }
 
@@ -118,7 +125,9 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
 
     /**
      * 与 [Nv21ExportFragment.releaseNv21Resources] 对齐：Activity 退后台或 Fragment 销毁时释放 NV21/Mix 会话，
+     * Match [Nv21ExportFragment.releaseNv21Resources]: release the NV21/Mix session when the Activity goes to the background or the Fragment is destroyed,
      * 避免相机与编码器在后台仍占用。
+     * so the camera and encoder are not kept occupied in the background.
      */
     private fun releaseMixResources(reason: String) {
         mainHandler.removeCallbacks(recordTimeUpdater)
@@ -150,7 +159,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
                     val path = nv21Recorder!!.start()
                     recordStartTime = System.currentTimeMillis()
                     activity?.runOnUiThread {
-                        tvRecordInfo.text = "录制中: ${width}x${height}\n文件: $path"
+                        tvRecordInfo.text = demoString(R.string.demo_recording_x_nfile, width, height, path)
                         btnStopRecord.isEnabled = true
                         btnStopRecord.requestFocus()
                         mainHandler.post(recordTimeUpdater)
@@ -169,7 +178,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
                 override fun onError(code: Int, msg: String) {
                     Log.e(TAG, "Mix error: code=$code, msg=$msg")
                     activity?.runOnUiThread {
-                        tvRecordInfo.text = "错误: $code, $msg"
+                        tvRecordInfo.text = demoString(R.string.demo_error, code, msg)
                         btnStopRecord.isEnabled = false
                     }
                 }
@@ -183,7 +192,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
             Log.d(TAG, "Recording saved: $path")
             activity?.runOnUiThread {
                 if (isAdded) {
-                    tvRecordInfo.text = "已保存: $path"
+                    tvRecordInfo.text = demoString(R.string.demo_saved, path)
                 }
             }
         }
@@ -215,7 +224,7 @@ class MixRecordFragment : Fragment(), CameraShareGestureHandler {
         if (elapsed >= 1000) {
             val fps = frameCount * 1000f / elapsed
             activity?.runOnUiThread {
-                tvRecordInfo.text = "录制中: ${width}x${height}\n帧率: %.1f fps".format(fps)
+                tvRecordInfo.text = demoString(R.string.demo_recording_x_nframe_rate_fps, width, height, fps)
             }
             frameCount = 0
             lastFpsTime = now

@@ -171,9 +171,11 @@
     </array>
 
     <!--  警小舟公安launcher页   -->
+    <!-- Jing Xiaozhou public security launcher page. -->
     <color name="app_workhome_worker_name_color">#CCFFFFFF</color>
 
     <!--    首页 homeActivity 字体颜色-->
+    <!-- Font color for the homeActivity home page. -->
     <color name="app_main_icon_font_uncheck_color">#CCFFFFFF</color>
     <color name="app_main_icon_font_checked_color">#FFFFFFFF</color>
 

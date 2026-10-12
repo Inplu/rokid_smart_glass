@@ -1,6 +1,9 @@
 package com.rokid.phone.video
 
-/** MediaCodec 输出格式对应的实际可见画面尺寸。 */
+/**
+ * MediaCodec 输出格式对应的实际可见画面尺寸。
+ * Actual visible frame dimensions from the MediaCodec output format.
+ */
 data class DecodedVideoGeometry(
     val codedWidth: Int,
     val codedHeight: Int,

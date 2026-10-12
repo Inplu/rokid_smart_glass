@@ -1,5 +1,7 @@
 package com.rokid.phone.ui.classicbt.adapter
 
+import com.rokid.phone.utils.demoString
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -42,7 +44,7 @@ class BleDeviceAdapter(private var list: List<ScanResult>) :
         holder.tvDeviceAddress.text = device.address
         val conDevice = connectedDevices.find { it.address ==  device.address}
         val isConneted = conDevice != null
-        holder.tvDeviceDetails.text = if(isConneted) "已连接" else ""
+        holder.tvDeviceDetails.text = if(isConneted) demoString(R.string.demo_connected) else ""
         holder.itemView.setOnClickListener {
             onItemClickListener?.onItemClick( position,device)
         }

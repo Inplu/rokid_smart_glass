@@ -1,5 +1,7 @@
 package com.rokid.phone.ui
 
+import com.rokid.phone.utils.demoString
+
 import android.net.wifi.p2p.WifiP2pDevice
 import android.os.Bundle
 import android.util.Log
@@ -25,7 +27,9 @@ import kotlinx.coroutines.launch
 
 /**
  * 蓝牙和p2p连接界面
+ * Bluetooth and P2P connection screen.
  * 连接成功后跳转到连接成功界面
+ * Navigate to the connection success screen after connecting successfully.
  */
 class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>() {
     private val TAG = "WifiP2PSettingActivity"
@@ -52,47 +56,30 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
         var frameTime = 14
 
         val frameList = listOf(
-            R.mipmap.fx_matching_000 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_003 to frameTime,
-//            R.mipmap.fx_matching_006 to frameTime,
+            // 第一帧，持续100ms
+            // The first frame lasts 100 ms.
+            R.mipmap.fx_matching_000 to frameTime,
             R.mipmap.fx_matching_009 to frameTime,
-//            R.mipmap.fx_matching_012 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_015 to frameTime,
             R.mipmap.fx_matching_018 to frameTime,
-//            R.mipmap.fx_matching_021 to frameTime,
-//            R.mipmap.fx_matching_024 to frameTime,  // 第一帧，持续100ms
             R.mipmap.fx_matching_027 to frameTime,
-//            R.mipmap.fx_matching_030 to frameTime,
-//            R.mipmap.fx_matching_033 to frameTime,
-            R.mipmap.fx_matching_036 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_039 to frameTime,
-//            R.mipmap.fx_matching_042 to frameTime,
+            // 第一帧，持续100ms
+            // The first frame lasts 100 ms.
+            R.mipmap.fx_matching_036 to frameTime,
             R.mipmap.fx_matching_045 to frameTime,
-//            R.mipmap.fx_matching_048 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_051 to frameTime,
             R.mipmap.fx_matching_054 to frameTime,
-//            R.mipmap.fx_matching_057 to frameTime,
-//            R.mipmap.fx_matching_060 to frameTime,  // 第一帧，持续100ms
             R.mipmap.fx_matching_063 to frameTime,
-//            R.mipmap.fx_matching_066 to frameTime,
-//            R.mipmap.fx_matching_069 to frameTime,
-            R.mipmap.fx_matching_072 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_075 to frameTime,
-//            R.mipmap.fx_matching_078 to frameTime,
+            // 第一帧，持续100ms
+            // The first frame lasts 100 ms.
+            R.mipmap.fx_matching_072 to frameTime,
             R.mipmap.fx_matching_081 to frameTime,
-//            R.mipmap.fx_matching_084 to frameTime,
-//            R.mipmap.fx_matching_087 to frameTime,
-            R.mipmap.fx_matching_090 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_093 to frameTime,
-//            R.mipmap.fx_matching_096 to frameTime,
+            // 第一帧，持续100ms
+            // The first frame lasts 100 ms.
+            R.mipmap.fx_matching_090 to frameTime,
             R.mipmap.fx_matching_099 to frameTime,
-//            R.mipmap.fx_matching_102 to frameTime,
-//            R.mipmap.fx_matching_105 to frameTime,
-            R.mipmap.fx_matching_108 to frameTime,  // 第一帧，持续100ms
-//            R.mipmap.fx_matching_111 to frameTime,
-//            R.mipmap.fx_matching_114 to frameTime,
+            // 第一帧，持续100ms
+            // The first frame lasts 100 ms.
+            R.mipmap.fx_matching_108 to frameTime,
             R.mipmap.fx_matching_117 to frameTime,
-//            R.mipmap.fx_matching_120 to frameTime
         )
     }
 
@@ -101,6 +88,7 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
         lifecycleScope.launch {
             mFrameAnimationUtil = FrameAnimationUtil(binding.ivDiscoverGif)
             // 动态创建帧列表（资源ID + 持续时间）
+            // Build the frame list dynamically from resource IDs and durations.
             mFrameAnimationUtil?.initFromFrames(frameList, lifecycleScope)
             mWifiP2PClientService?.addWifiP2PClientListener(mIWifiP2PClientListener)
             CoroutineScope(Dispatchers.Main).launch {
@@ -135,17 +123,19 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
         showStatus()
         if (mDevice == null) {
             if (!SystemStateUtils.isWifiEnabled(this)) {
-                com.blankj.utilcode.util.ToastUtils.showShort("wifi未开启")
+                com.blankj.utilcode.util.ToastUtils.showShort(demoString(R.string.demo_wi_fi_is_off))
                 return
             }
             if (!initialize) {
                 isFindDevice = false
                 mWifiP2PClientService?.disconnect()
                 // 初始化P2p 通道
+                // Initialize the P2P channel.
                 mWifiP2PClientService?.initialize {
                     initialize = it.isSuccess
                     if(it.isSuccess){
                         // 开始发现设备
+                        // Start device discovery.
                         mWifiP2PClientService?.startDiscoverPeers()
                     }
                 }
@@ -176,7 +166,7 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
     override fun onResume() {
         super.onResume()
         if (!SystemStateUtils.isWifiEnabled(this)) {
-            com.blankj.utilcode.util.ToastUtils.showShort("wifi未开启")
+            com.blankj.utilcode.util.ToastUtils.showShort(demoString(R.string.demo_wi_fi_is_off))
         }
     }
 
@@ -185,6 +175,7 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
 
     private val mIWifiP2PClientListener = object : IWifiP2PClientListener {
         // wifip2p 是否可用(包含数据通道)
+        // Whether Wi-Fi P2P is available, including the data channel.
         override fun onWifiP2pEnabled(enabled: Boolean) {
             Log.i(TAG, "onWifiP2pEnabled ${enabled}")
             lifecycleScope.launch {
@@ -195,13 +186,13 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
         }
 
         // 获取当前WifiP2pDevice 设备信息
+        // Get the current WifiP2pDevice information.
         override fun onSelfDeviceAvailable(device: WifiP2pDevice) {
-//            binding.tvDeviceName.text = device.deviceName
         }
 
         // 发现设备列表
+        // Discovered device list.
         override fun onPeersAvailable(devices: List<WifiP2pDevice>) {
-//            LoadingManager.hideLoading()
             val newDevices = devices.filter { it.deviceName.contains("Glass3_") }
             if (newDevices.isEmpty()) {
                 return
@@ -222,46 +213,43 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
         Log.i(TAG, "showStatus: $curStatus")
         when (curStatus) {
             PARI_PRE_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "发现设备"
-                binding.tvSubtitleDiscoverDevice.text = "设备蓝牙名称可从眼镜主页获取"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_discover_devices)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_find_the_bluetooth_name_on_the_glasses_home)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvPairComplete.visibility = View.GONE
-                binding.btnPairDevice.text = "配对"
+                binding.btnPairDevice.text = demoString(R.string.demo_pair)
                 binding.ivShow.setImageResource(R.mipmap.icon_rokid_big)
                 binding.ivDiscoverGif.visibility = View.GONE
             }
 
             PARI_ING_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "配对中..."
-                binding.tvSubtitleDiscoverDevice.text = "请耐心等待"
-                binding.btnPairDevice.text = "配对中..."
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_pairing)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_please_wait)
+                binding.btnPairDevice.text = demoString(R.string.demo_pairing)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvPairComplete.visibility = View.GONE
-//                Glide.with(this).load(R.mipmap.icon_pair).into(binding.ivShow)
                 binding.ivDiscoverGif.visibility = View.VISIBLE
                 mFrameAnimationUtil?.start()
             }
 
             PARI_SUCCESS_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "配对成功"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_paired_successfully)
                 binding.tvSubtitleDiscoverDevice.visibility = View.INVISIBLE
-//                binding.ivShow.setImageResource(R.mipmap.icon_pair_complete)
                 binding.tvPairComplete.visibility = View.VISIBLE
                 binding.ivDiscoverGif.visibility = View.GONE
                 completePair()
             }
 
             PARI_FAILED_STATUS -> {
-                binding.tvTitleDiscoverDevice.text = "配对失败"
-                binding.tvSubtitleDiscoverDevice.text = "设备蓝牙名称可从眼镜主页获取"
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_pairing_failed)
+                binding.tvSubtitleDiscoverDevice.text = demoString(R.string.demo_find_the_bluetooth_name_on_the_glasses_home)
                 binding.tvTitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvSubtitleDiscoverDevice.visibility = View.VISIBLE
                 binding.tvPairComplete.visibility = View.GONE
-//                binding.ivShow.setImageResource(R.mipmap.icon_rokid_big)
                 binding.ivDiscoverGif.visibility = View.GONE
-                binding.btnPairDevice.text = "重试"
+                binding.btnPairDevice.text = demoString(R.string.demo_retry)
             }
         }
 
@@ -277,9 +265,11 @@ class WifiP2PSettingActivity : BaseActivity<ActivityDiscoverP2pDevice2Binding>()
 
             repeat(count_) { second ->
                 val remainingTime = count_ - second
-                binding.tvTitleDiscoverDevice.text = "配对成功"
-                binding.btnPairDevice.text = "进入首页($remainingTime)"
-                delay(1000) // 延迟1秒
+                binding.tvTitleDiscoverDevice.text = demoString(R.string.demo_paired_successfully)
+                binding.btnPairDevice.text = demoString(R.string.demo_go_to_home, remainingTime)
+                // 延迟1秒
+                // Delay for one second.
+                delay(1000)
             }
             finish()
 

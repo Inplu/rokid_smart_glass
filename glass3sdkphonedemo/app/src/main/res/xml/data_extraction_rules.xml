@@ -6,11 +6,6 @@
 <data-extraction-rules>
     <cloud-backup>
         <!-- Demo 不声明额外的云端备份规则。 -->
+        <!-- The Demo declares no additional cloud backup rules. -->
     </cloud-backup>
-    <!--
-    <device-transfer>
-        <include .../>
-        <exclude .../>
-    </device-transfer>
-    -->
 </data-extraction-rules>

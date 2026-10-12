@@ -16,14 +16,14 @@ class SendMessageSpeechButtonsContractTest {
         assertTrue(onlineTts >= 0)
         assertTrue(onlineTts < offlineTts)
         assertTrue(offlineTts < onlineAsr)
-        assertTrue(layout.contains("android:text=\"在线TTS\""))
-        assertTrue(layout.contains("android:text=\"离线TTS\""))
-        assertTrue(layout.contains("android:text=\"在线ASR\""))
+        assertTrue(layout.contains("@string/demo_online_tts_2"))
+        assertTrue(layout.contains("@string/demo_offline_tts"))
+        assertTrue(layout.contains("@string/demo_online_asr_2"))
         listOf("btnOnlineTts", "btnOfflineTts", "btnOnlineAsr").forEach { buttonId ->
             val button = layout.substringAfter("android:id=\"@+id/$buttonId\"")
                 .substringBefore("/>")
             assertTrue(button.contains("android:gravity=\"center\""))
-            assertTrue(button.contains("android:paddingHorizontal=\"8dp\""))
+            assertTrue(button.contains("android:singleLine=\"false\""))
             assertTrue(button.contains("android:paddingVertical=\"4dp\""))
             assertTrue(button.contains("android:textSize=\"12sp\""))
         }
@@ -58,15 +58,14 @@ class SendMessageSpeechButtonsContractTest {
             "src/main/java/com/rokid/glass/SendMessageActivity.kt"
         ).readText()
 
-        assertTrue(source.contains("这是在线TTS语音播报"))
-        assertTrue(source.contains("这是离线TTS语音播报"))
+        assertTrue(source.contains("R.string.demo_this_is_an_online_text_to_speech_demo"))
+        assertTrue(source.contains("R.string.demo_this_is_an_offline_text_to_speech_demo"))
         assertTrue(source.contains("SpeechCompleteListener.Stub()"))
-        assertTrue(source.contains("在线 TTS 播放完成"))
-        assertTrue(source.contains("当前无可用网络"))
-        assertTrue(source.contains("此超时不能判定鉴权或声音路由故障"))
-        assertTrue(source.contains("鉴权或权限失败"))
-        assertTrue(source.contains("未收到完成回调"))
-        assertTrue(source.contains("离线 TTS 请求已发送"))
+        assertTrue(source.contains("R.string.demo_online_tts_playback_complete_remaining"))
+        assertTrue(source.contains("R.string.demo_no_network_available_in_direct_mode_connect_glasses"))
+        assertTrue(source.contains("R.string.demo_no_online_tts_completion_callback_cancellation_requested_continuing"))
+        assertTrue(source.contains("R.string.demo_online_tts_authentication_or_permission_failed_check_lingmou"))
+        assertTrue(source.contains("R.string.demo_offline_tts_request_sent"))
         assertTrue(source.contains("removeSpeechCompleteListener"))
         assertFalse(source.contains("OnlineTtsStabilityRun"))
         assertFalse(source.contains("ONLINE_TTS_REPEAT_COUNT"))
@@ -79,8 +78,8 @@ class SendMessageSpeechButtonsContractTest {
         ).readText()
 
         assertTrue(source.contains("service.doSpeechTts(ONLINE_TTS_DEMO_TEXT)"))
-        assertTrue(source.contains("在线 TTS 服务连接成功"))
-        assertTrue(source.contains("在线 TTS 请求已发送"))
+        assertTrue(source.contains("R.string.demo_online_tts_service_connected"))
+        assertTrue(source.contains("R.string.demo_online_tts_request_sent"))
         assertFalse(source.contains("onlineTtsWaitingForConnection"))
         assertFalse(source.contains("正在连接在线 TTS 服务，请稍候..."))
 
@@ -92,7 +91,7 @@ class SendMessageSpeechButtonsContractTest {
             "src/main/java/com/rokid/glass/SendMessageActivity.kt"
         ).readText()
 
-        assertTrue(source.contains("checkSpeechNetwork(\"在线 ASR\")"))
+        assertTrue(source.contains("checkSpeechNetwork(demoString(R.string.demo_online_asr))"))
         assertTrue(source.contains("OnlineAsrStatusMessages.serviceUnavailable"))
         assertFalse(source.contains("log(OnlineAsrStatusMessages.connectionFailed)"))
         assertTrue(source.contains("OnlineAsrStatusMessages.connectionTimeout"))
@@ -103,7 +102,7 @@ class SendMessageSpeechButtonsContractTest {
         assertTrue(
             source.substringAfter("private fun startAsr()")
                 .substringBefore("private fun playOnlineTts()")
-                .contains("checkSpeechNetwork(\"在线 ASR\")")
+                .contains("checkSpeechNetwork(demoString(R.string.demo_online_asr))")
         )
     }
 }

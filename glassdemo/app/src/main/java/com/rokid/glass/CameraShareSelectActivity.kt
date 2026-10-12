@@ -1,6 +1,7 @@
 package com.rokid.glass
 
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.KeyEvent
@@ -12,6 +13,7 @@ import com.rokid.glesse.R
 
 /**
  * Camera Share Demo 选择页面
+ * Selection page for the Camera Share Demo.
  */
 class CameraShareSelectActivity : BaseGlassActivity() {
 
@@ -97,6 +99,12 @@ class CameraShareSelectActivity : BaseGlassActivity() {
 
     private fun updateModeSelection() {
         modeButtons.forEachIndexed { index, button -> button.isSelected = index == selectedModeIndex }
+        val selectedButton = modeButtons[selectedModeIndex]
+        selectedButton.post {
+            selectedButton.requestRectangleOnScreen(
+                Rect(0, 0, selectedButton.width, selectedButton.height), true
+            )
+        }
     }
 
     private fun openMode(mode: String) {

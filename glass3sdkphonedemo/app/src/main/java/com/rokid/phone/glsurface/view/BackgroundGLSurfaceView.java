@@ -33,10 +33,12 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
     private int muvTextureLoc;
 
     //顶点坐标 Buffer
+    // Vertex coordinate buffer.
     private FloatBuffer mVertexBuffer;
     private int mVertexBufferId;
 
     //纹理坐标 Buffer
+    // Texture coordinate buffer.
     private FloatBuffer mTextureBuffer;
     private int mTextureBufferId;
 
@@ -51,10 +53,18 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
     private int mAppliedFrameHeight;
 
     private float vertexData[] = {
-            -1f, -1f,// 左下角
-            1f, -1f, // 右下角
-            -1f, 1f, // 左上角
-            1f, 1f,  // 右上角
+            // 左下角
+            // Bottom-left corner.
+            -1f, -1f,
+            // 右下角
+            // Bottom-right corner.
+            1f, -1f,
+            // 左上角
+            // Top-left corner.
+            -1f, 1f,
+            // 右上角
+            // Top-right corner.
+            1f, 1f,
     };
 
     private float textureData[] = {
@@ -86,7 +96,6 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
 
     private void initRenderer(Context context) {
         this.mContext = context;
-//        this.setDebugFlags(DEBUG_CHECK_GL_ERROR | DEBUG_LOG_GL_CALLS);
         mRenderer = new PreviewRenderer();
         this.setEGLContextClientVersion(2);
         this.setRenderer(mRenderer);
@@ -95,6 +104,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
 
     /**
      * 初始化EGL环境
+     * Initialize the EGL environment.
      */
     private void initGLEnv() {
         mProgram = GLShaderUtil.createProgram(vertexSource, fragmentSourceNV21);
@@ -103,12 +113,10 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
         af_Position = GLES20.glGetAttribLocation(mProgram, "af_Position");
         myTextureLoc = GLES20.glGetUniformLocation(mProgram,  "yTexture");
         muvTextureLoc = GLES20.glGetUniformLocation(mProgram,  "uvTexture");
-//        Logger.d( "BackgroundGLSurfaceView: initEGL : mProgram="+mProgram
-//                +", av_Position="+av_Position+", af_Position="+af_Position
-//                +", myTextureLoc="+myTextureLoc+", muvTextureLoc="+muvTextureLoc); // 这里有可能为空
     }
 
     // 预览数据进行渲染
+    // Render the preview data.
     public synchronized void setPreviewData(byte[] data, int width, int height) {
         if (mRenderer != null && data != null && data.length > 0) {
             mRenderer.setPreviewData(data, width, height);
@@ -120,7 +128,6 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
         if (mRenderer != null){
             mRenderer.releaseBuf();
             this.requestRender();
-//            mRenderer = null;
         }
     }
 
@@ -152,23 +159,25 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
                 lastTime = currentTime;
             }
             long delta = currentTime - lastTime;
-            if (delta >= 1000) { // 每秒统计一次
+            // 每秒统计一次
+            // Calculate statistics once per second.
+            if (delta >= 1000) {
                 fps = frameCount * 1000.0f / delta;
                 frameCount = 0;
                 lastTime = currentTime;
 
                 // 这里可以打日志，或者回调出去
-                // Log.d("GLSurfaceView", "FPS=" + fps);
+                // Log the result here or deliver it through a callback.
                 if (fpsListener != null) {
                     fpsListener.onFpsUpdate(fps);
                 }
             }
-            //Logger.d( "BackgroundGLSurfaceView: onDrawFrame() mProgram="+mProgram+", width="+width+", height="+height+", mTextureID[0]="+mTextureID[0]+", mTextureID[1]="+mTextureID[1]);
             GLES20.glUseProgram(mProgram);
 
             updateFitCenterVertexBufferIfNeeded();
 
             // 绑定顶点和纹理坐标
+            // Bind vertex and texture coordinates.
             GLES20.glEnableVertexAttribArray(av_Position);
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mVertexBufferId);
             GLES20.glVertexAttribPointer(av_Position, CoordsPerVertexCount, GLES20.GL_FLOAT, false, 0, 0);
@@ -180,6 +189,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
             // 绑定Y和UV纹理
+            // Bind the Y and UV textures.
             GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureID[0]);
             GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_LUMINANCE, width, height, 0, GLES20.GL_LUMINANCE, GLES20.GL_UNSIGNED_BYTE, yFloatBuffer);
@@ -191,6 +201,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             GLES20.glUniform1i(muvTextureLoc, 1);
 
             // 绘制 GLES20.GL_TRIANGLE_STRIP:复用坐标
+            // Draw with GLES20.GL_TRIANGLE_STRIP to reuse coordinates.
             GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VertexCount);
 
             GLES20.glDisableVertexAttribArray(av_Position);
@@ -202,7 +213,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceChanged(GL10 gl, int w, int h) {
             //当surface的尺寸发生改变时，该方法被调用，。往往在这里设置ViewPort。或者Camara等。
-//            Logger.d( "BackgroundGLSurfaceView: onSurfaceChanged() w="+w+", h="+h);
+            // Called when the surface size changes; typically configure the viewport or camera here.
             gl.glViewport(0, 0, w, h);
             mSurfaceWidth = w;
             mSurfaceHeight = h;
@@ -211,13 +222,15 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
             // 该方法在渲染开始前调用，OpenGL ES的绘制上下文被重建时也会调用。
+            // Called before rendering starts and whenever the OpenGL ES rendering context is recreated.
             //当Activity暂停时，绘制上下文会丢失，当Activity恢复时，绘制上下文会重建。
-//            Logger.d( "BackgroundGLSurfaceView: onSurfaceCreated()");
+            // The rendering context is lost when the Activity pauses and recreated when it resumes.
             initGLEnv();
         }
 
         /**
          * 设置preview数据
+         * Set the preview data.
          * @param data
          * @param width
          * @param height
@@ -251,7 +264,6 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             this.height = height;
             mFrameWidth = width;
             mFrameHeight = height;
-            //Logger.d( "BackgroundGLSurfaceView: data.length="+data.length+", width="+width+", height="+height);
             yFloatBuffer.clear();
             yFloatBuffer.put(data, 0, ySize);
             yFloatBuffer.flip();
@@ -286,6 +298,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
         mVertexBuffer.position(0);
         mVertexBufferId = vbo[0];
         // ARRAY_BUFFER 将使用 Float*Array 而 ELEMENT_ARRAY_BUFFER 必须使用 Uint*Array
+        // ARRAY_BUFFER uses Float*Array, while ELEMENT_ARRAY_BUFFER must use Uint*Array.
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mVertexBufferId);
         GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertexData.length * 4, mVertexBuffer, GLES20.GL_DYNAMIC_DRAW);
 
@@ -303,6 +316,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
 
     /**
      * 完整显示帧并保持真实宽高比。比例不一致时显示黑边，不裁剪、不拉伸。
+     * Display the entire frame at its original aspect ratio. Add black bars when ratios differ, without cropping or stretching.
      */
     private void updateFitCenterVertexBufferIfNeeded() {
         if (mVertexBuffer == null || mVertexBufferId == 0 ||
@@ -351,6 +365,7 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             "}";
 
     // 修改 fragmentSourceNV21 字段，移除亮度偏移
+    // Modify fragmentSourceNV21 to remove the brightness offset.
     private final String fragmentSourceNV21 = "precision highp float;" +
             "uniform sampler2D yTexture;" +
             "uniform sampler2D uvTexture;" +
@@ -358,7 +373,9 @@ public class BackgroundGLSurfaceView extends GLSurfaceView {
             "void main()" +
             "{" +
             "   float r, g, b, y, u, v;\n" +
-            "   y = texture2D(yTexture, v_texPo).r;\n" +  // 移除 -0.2 偏移
+            // 移除 -0.2 偏移
+            // Remove the -0.2 offset.
+            "   y = texture2D(yTexture, v_texPo).r;\n" +
             "   u = texture2D(uvTexture, v_texPo).a - 0.5;\n" +
             "   v = texture2D(uvTexture, v_texPo).r - 0.5;\n" +
             "   r = y + 1.57481*v;\n" +

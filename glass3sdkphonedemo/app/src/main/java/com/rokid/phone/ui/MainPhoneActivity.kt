@@ -1,5 +1,7 @@
 package com.rokid.phone.ui
 
+import com.rokid.phone.utils.demoString
+
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -57,7 +59,10 @@ import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.PermissionRequest
 import kotlin.math.roundToInt
 
-/** 手机端 Demo 首页，负责 SDK 初始化与设备连接入口。 */
+/**
+ * 手机端 Demo 首页，负责 SDK 初始化与设备连接入口。
+ * Phone Demo home screen, responsible for SDK initialization and device connection entry points.
+ */
 class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermissions.PermissionCallbacks {
 
     private lateinit var activity: Activity
@@ -73,9 +78,10 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
     private val enableBtLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             // 蓝牙已开启，可执行扫描、连接等操作
+            // Bluetooth is enabled; discovery and connection operations can proceed.
             getPermission()
         } else {
-            Toast.makeText(this, "请开启蓝牙以使用功能", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, demoString(R.string.demo_turn_on_bluetooth_to_use_this_feature), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -84,6 +90,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
     /**
      * 获取手机端SDK引擎服务
+     * Get the phone SDK engine service.
      */
     private val mPhoneEngineService by lazy {
         PSecuritySDK.getMobileEngineService()
@@ -93,18 +100,22 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
         val list = arrayListOf<String>()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             // 发现附近的 Wi-Fi 设备权限
+            // Permission to discover nearby Wi-Fi devices.
             list.add(Manifest.permission.NEARBY_WIFI_DEVICES)
         } else {
             // 获取用户大概地理位置
+            // Get the user's approximate location.
             list.add(Manifest.permission.ACCESS_FINE_LOCATION)
             list.add(Manifest.permission.ACCESS_COARSE_LOCATION)
         }
         // Android 12 及以上版本需要动态申请蓝牙扫描和连接权限。
+        // Android 12 and later require runtime Bluetooth scan and connect permissions.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             list.add(Manifest.permission.BLUETOOTH_SCAN)
             list.add(Manifest.permission.BLUETOOTH_CONNECT)
         } else {
             // Android 12 以下版本使用旧版蓝牙权限；扫描结果还受定位权限约束。
+            // Earlier Android versions use legacy Bluetooth permissions; location permission also affects scan results.
             list.add(Manifest.permission.BLUETOOTH)
             list.add(Manifest.permission.BLUETOOTH_ADMIN)
         }
@@ -115,21 +126,29 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
     private fun initSDK() {
         lifecycleScope.launch {
             // 客户端 ID 用于区分通信双方；自定义 ID 必须与眼镜端配置保持一致。
+            // The client ID distinguishes the communicating parties; a custom ID must match the configuration on the glasses.
             val clientIds = arrayListOf("SecurityPhone", "GlassSample")
 
             // AK/SK 由销售或商务提供；没有在线语音凭证时可暂时保留为空。
+            // Sales or business contacts provide AK/SK; leave them empty temporarily if online voice credentials are unavailable.
             val userAuthInfo = UserAuthInfo(
-                appId = "", // 填写 AK
-                secret = "" // 填写 SK
+                // 填写 AK
+                // Enter AK.
+                appId = "",
+                // 填写 SK
+                // Enter SK.
+                secret = ""
             )
 
             // 示例仅启用语音识别和语音合成，因此跳过翻译服务初始化。
+            // This sample only enables speech recognition and synthesis, so translation service initialization is skipped.
             val banServiceList: List<NetServiceType> = arrayListOf(NetServiceType.TranslateService)
 
             // 如需禁用全部网络服务，可将禁用列表改为 NetServiceType.ALL。
-//             val banServiceList: List<NetServiceType> = arrayListOf(NetServiceType.ALL)
+            // To disable all network services, use NetServiceType.ALL in the disabled-service list.
 
             // PUBLIC 表示使用公开服务环境。
+            // PUBLIC selects the public service environment.
             val param = EngineParam(
                 clientIds = clientIds,
                 userAuthInfo = userAuthInfo,
@@ -140,8 +159,10 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
                 if (it.isSuccess) {
                     Log.d(TAG, "手机端初始化SDK成功")
                     // SDK初始化成功回调
+                    // SDK initialization success callback.
                     GlobalData.setSdkInitState(it.isSuccess)
                     // 设置系统信息监听
+                    // Set the system information listener.
                     DeviceLinkerManager.addSystemInfoListener(systemInfoCallback)
                     DeviceLinkerManager.addMessageListener()
                     DeviceLinkerManager.initObserver()
@@ -193,7 +214,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
     override fun onResume() {
         super.onResume()
         if (!SystemStateUtils.isBluetoothEnabled()) {
-            ToastUtils.showShort("蓝牙未开启")
+            ToastUtils.showShort(demoString(R.string.demo_bluetooth_is_off))
         }
         isResume = true
         connectStatus(GlobalData.btConnectState.value, GlobalData.p2pConnectState.value)
@@ -211,12 +232,14 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
             return
         }
         // 初始化蓝牙适配器
+        // Initialize the Bluetooth adapter.
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
         if (bluetoothAdapter == null) {
-            Toast.makeText(this, "设备不支持蓝牙", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, demoString(R.string.demo_this_device_does_not_support_bluetooth), Toast.LENGTH_SHORT).show()
             return
         }
         // 开启蓝牙（若未开启）
+        // Enable Bluetooth if it is off.
         if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             enableBtLauncher.launch(enableBtIntent)
@@ -250,7 +273,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
         if (isIgnoring) {
             return
         }
-        dialogBattery = BottomPromptDialog.show(activity, "请授权", "为了保证P2P连接稳定，需要避免电池优化") {
+        dialogBattery = BottomPromptDialog.show(activity, demoString(R.string.demo_permission_required), demoString(R.string.demo_disable_battery_optimization_to_keep_the_p2p_connection)) {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             intent.data = Uri.parse("package:${packageName}")
             startActivity(intent)
@@ -266,6 +289,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
     /**
      * 自动连接上次连接的蓝牙设备
+     * Automatically connect to the previously connected Bluetooth device.
      */
     private fun autoConnectBt(isDelay: Boolean = false) {
         autoConnectBtJob?.cancel()
@@ -300,14 +324,14 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.btAppInstall.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
         }
 
         binding.btMessageReceive.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             startActivity(Intent(this@MainPhoneActivity, MessageReceiveActivity::class.java))
@@ -315,7 +339,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.btMessageSend.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             startActivity(Intent(this@MainPhoneActivity, SendMessageActivity::class.java))
@@ -345,7 +369,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.btAlbum.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             startActivity(Intent(this@MainPhoneActivity, GalleryActivity::class.java))
@@ -353,7 +377,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.btP2PConnect.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             if (!GlobalData.p2pConnectState.value) {
@@ -365,7 +389,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.btVideoReceive.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             DeviceLinkerManager.getGlassPowerInfoMsg()
@@ -374,11 +398,11 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
         binding.clOta.setOnClickListener {
             if (!GlobalData.btConnectState.value) {
-                Toast.makeText(this, "请先完成蓝牙设备连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_the_bluetooth_device_first_2), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             if (!GlobalData.p2pConnectState.value) {
-                Toast.makeText(this, "请先完成P2P连接", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, demoString(R.string.demo_connect_p2p_first), Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
             startActivity(Intent(this, SystemOtaActivity::class.java))
@@ -460,6 +484,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
             connectStatus(it, GlobalData.p2pConnectState.value)
             if (it) {
                 //检查眼镜端协议版本
+                // Check the glasses protocol version.
                 lifecycleScope.launch {
                     binding.tvDeviceName.text = DeviceLinkerManager.getDeviceName()
                 }
@@ -472,13 +497,16 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
             binding.tvDeviceName.text = DeviceLinkerManager.getDeviceName()
             if (it && GlobalData.btConnectState.value) {
                 // true 设置P2P保持长连接,false关闭P2P长连接
+                // Set true to keep the P2P connection alive, or false to disable this behavior.
                 lifecycleScope.launch {
                     delay(800)
                     PSecuritySDK.getWifiP2PClientService()?.getIP2PConnectControl()?.getKeepP2PConnectState({ it ->
                         // 没有设置P2P长连接
+                        // P2P keep-alive has not been configured.
                         if (!it) {
                             Log.d(TAG, "--->长连接未开启")
                             // true 设置P2P保持长连接,false关闭P2P长连接
+                            // Set true to keep the P2P connection alive, or false to disable this behavior.
                             PSecuritySDK.getWifiP2PClientService()?.getIP2PConnectControl()
                                 ?.setKeepP2PConnect(true, { isSuccess ->
                                     if (isSuccess) {
@@ -494,6 +522,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
                     })
 
                     // 设置是否自动将 H264 解码为 NV21（默认开启）
+                    // Set whether to decode H.264 to NV21 automatically; enabled by default.
                     PSecuritySDK.getWifiP2PClientService()?.setAutoDecodeH264ToNv21(true)
                 }
 
@@ -501,6 +530,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
         }
 
         //取消重连的逻辑
+        // Cancel the reconnection logic.
         GlobalEvent.connectionRejectedEvent.collect(lifecycleScope) {
             autoConnectBtJob?.cancel()
         }
@@ -561,9 +591,9 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
             }
             EasyPermissions.requestPermissions(
                 PermissionRequest.Builder(this, 999, *deniedList.toTypedArray())
-                    .setRationale("应用需要以下权限才能正常工作")
-                    .setPositiveButtonText("确定")
-                    .setNegativeButtonText("取消")
+                    .setRationale(demoString(R.string.demo_the_app_needs_the_following_permissions_to_work))
+                    .setPositiveButtonText(demoString(R.string.demo_ok))
+                    .setNegativeButtonText(demoString(R.string.prompter_cancel))
                     .setTheme(android.R.style.Theme_DeviceDefault_Light_Dialog)
                     .build()
             )
@@ -574,9 +604,11 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
     }
 
     // -------------------------- 必须重写：转发系统权限结果 --------------------------
+    // -------------------------- Required override: forward system permission results --------------------------
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         // 关键：将系统回调结果转发给 EasyPermissions，框架会自动解析并触发上面的回调方法
+        // Forward system callback results to EasyPermissions, which parses them and invokes the callbacks above.
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this)
     }
 
@@ -605,7 +637,8 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
     override fun onPermissionsDenied(requestCode: Int, perms: MutableList<String>) {
         // 权限拒绝（perms 是被拒绝的权限列表）
-        Toast.makeText(this, "权限被拒绝：" + perms.toString(), Toast.LENGTH_SHORT).show()
+        // Permissions were denied; perms lists the denied permissions.
+        Toast.makeText(this, demoString(R.string.demo_permissions_denied) + perms.toString(), Toast.LENGTH_SHORT).show()
         checkPermissionList()
     }
 
@@ -621,7 +654,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
             } else {
                 binding.ivDl.setImageResource(R.mipmap.icon_dianchi_100)
             }
-            binding.tvDl.text = "眼镜：" + SystemGlobalConstant.powerValue.toString() + "%"
+            binding.tvDl.text = demoString(R.string.demo_glasses) + SystemGlobalConstant.powerValue.toString() + "%"
         }
     }
 
@@ -645,13 +678,13 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
                 binding.ivConnect.visibility = View.VISIBLE
                 binding.llConnectInfo.visibility = View.GONE
             } else if (p2_success) {
-                binding.btConnect.text = "蓝牙已连接"
-                binding.btP2PConnect.text = "P2P已连接"
+                binding.btConnect.text = demoString(R.string.demo_bluetooth_connected)
+                binding.btP2PConnect.text = demoString(R.string.demo_p2p_connected)
                 binding.ivConnect.visibility = View.GONE
                 binding.llConnectInfo.visibility = View.VISIBLE
             } else {
-                binding.btConnect.text = "蓝牙已连接"
-                binding.btP2PConnect.text = "P2P未连接"
+                binding.btConnect.text = demoString(R.string.demo_bluetooth_connected)
+                binding.btP2PConnect.text = demoString(R.string.demo_p2p_disconnected)
                 binding.ivConnect.visibility = View.GONE
                 binding.llConnectInfo.visibility = View.VISIBLE
             }
@@ -668,6 +701,7 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
                     deviceManager.startObservingDevicePresence(device.address)
                 } else {
                     // 低版本（API < 31）使用替代方案（如蓝牙广播监听）
+                    // Use an alternative on older versions (API < 31), such as a Bluetooth broadcast receiver.
                     Log.d(TAG, "设备版本低于 Android 12，使用低版本监听方案")
                 }
             }
@@ -695,9 +729,11 @@ class MainPhoneActivity : BaseActivity<LayoutMainPhoneBinding>(), EasyPermission
 
     private fun startDiscover(address: String) {
         // 使用主线程启动设备发现，避免线程问题
+        // Start device discovery on the main thread to avoid threading issues.
         lifecycleScope.launch {
             try {
                 // 使用全局launcher启动设备发现
+                // Use the global launcher to start device discovery.
                 uuidDeviceDiscoveryManager?.startDeviceDiscoveryWithGlobalLauncher(address, true, mDeviceDiscoveryCallback)
             } catch (e: Exception) {
                 isDeviceDiscovered = false

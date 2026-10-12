@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.onStart
 
 /**
  * 通过Class跳转界面
+ * Navigate to a screen using its class.
  */
 fun Activity.startActivityForResult(cls: Class<*>, requestCode: Int) {
     startActivityForResult(cls, requestCode, null)
@@ -31,6 +32,7 @@ fun Activity.startActivityForResult(cls: Class<*>, requestCode: Int) {
 
 /**
  * 含有Bundle通过Class跳转界面
+ * Navigate to a screen using its class and a Bundle.
  */
 fun Activity.startActivityForResult(cls: Class<*>, requestCode: Int, bundle: Bundle?) {
     val intent = Intent()
@@ -53,7 +55,9 @@ fun View.setOnClickListener1(onClickListener: (View) -> Unit) {
 
 /**
  * 含有Bundle通过Class跳转界面
+ * Navigate to a screen using its class and a Bundle.
  * @param cls 跳转界面
+ * The target screen class.
  */
 @JvmOverloads
 fun Activity.startActivity(cls: Class<*>, bundle: Bundle? = null) {
@@ -67,6 +71,7 @@ fun Activity.startActivity(cls: Class<*>, bundle: Bundle? = null) {
 
 /**
  * 获取字体所对应的像素
+ * Get the pixel size corresponding to the font size.
  */
 fun getSp(sp: Float): Float {
     val resources = Resources.getSystem()
@@ -75,13 +80,16 @@ fun getSp(sp: Float): Float {
 
 /**
  * 上一次点击的默认时间0
+ * The default timestamp of the previous click is 0.
  */
 var mLastClickTime: Long = 0
 private const val MIN_CLICK_DELAY_TIME: Long = 600
 
 /**
  * 是否快速点击  true 是  false 否
+ * Whether this is a rapid repeat click: true for yes, false for no.
  * @param minClickDelayTime 单位毫秒
+ * Minimum click interval in milliseconds.
  */
 fun isFastClick(minClickDelayTime: Long = MIN_CLICK_DELAY_TIME): Boolean {
     val currentTime = System.currentTimeMillis()
@@ -95,17 +103,21 @@ fun isFastClick(minClickDelayTime: Long = MIN_CLICK_DELAY_TIME): Boolean {
 
 /**
  * 上一次点击的默认时间0
+ * The default timestamp of the previous click is 0.
  */
 private var mLastClickTime2: Long = 0
 
 /**
  * 上一次点击的默认时间0
+ * The default timestamp of the previous click is 0.
  */
 private var mLastClickTime3: Long = 0
 
 /**
  * 是否快速点击  true 是  false 否
+ * Whether this is a rapid repeat click: true for yes, false for no.
  * @param minClickDelayTime 单位毫秒
+ * Minimum click interval in milliseconds.
  */
 fun isFastClick2(minClickDelayTime: Long = 300): Boolean {
     val currentTime = System.currentTimeMillis()
@@ -119,7 +131,9 @@ fun isFastClick2(minClickDelayTime: Long = 300): Boolean {
 
 /**
  * 是否快速点击  true 是  false 否
+ * Whether this is a rapid repeat click: true for yes, false for no.
  * @param minClickDelayTime 单位毫秒
+ * Minimum click interval in milliseconds.
  */
 fun isFastClick3(minClickDelayTime: Long = 500): Boolean {
     val currentTime = System.currentTimeMillis()
@@ -133,7 +147,9 @@ fun isFastClick3(minClickDelayTime: Long = 500): Boolean {
 
 /**
  * 是否快速点击  true 是  false 否
+ * Whether this is a rapid repeat click: true for yes, false for no.
  * @param minClickDelayTime 单位毫秒
+ * Minimum click interval in milliseconds.
  */
 fun isFastConnectToBle(minClickDelayTime: Long = 3000): Boolean {
     val currentTime = System.currentTimeMillis()
@@ -168,8 +184,10 @@ fun Float.px2dip(): Float {
 
 /**
  * 获取application中指定的meta-data
+ * Get the specified metadata from the application.
  *
  * @return 如果没有获取成功(没有对应值 ， 或者异常)，则返回值为空
+ * Returns null if the value is missing or cannot be retrieved because of an exception.
  */
 fun getAppMetaData(ctx: Context?, key: String?): String? {
     if (ctx == null || TextUtils.isEmpty(key)) {
@@ -178,11 +196,13 @@ fun getAppMetaData(ctx: Context?, key: String?): String? {
     try {
         val packageManager = ctx.packageManager ?: return null
         // 元数据声明在 application 节点，因此从 ApplicationInfo 中读取。
+        // Read the metadata from ApplicationInfo because it is declared on the application element.
         val applicationInfo =
             packageManager.getApplicationInfo(ctx.packageName, PackageManager.GET_META_DATA)
                 ?: return null
         if (applicationInfo.metaData != null) {
-            //key要与manifest中的配置文件标识一致
+            // key要与manifest中的配置文件标识一致
+            // The key must match the metadata identifier configured in the manifest.
             return applicationInfo.metaData.getString(key)
         }
     } catch (e: PackageManager.NameNotFoundException) {
@@ -193,6 +213,7 @@ fun getAppMetaData(ctx: Context?, key: String?): String? {
 
 /**
  * 倒计时的协程
+ * Coroutine for a countdown.
  */
 fun countDownCoroutines(
     total: Int,

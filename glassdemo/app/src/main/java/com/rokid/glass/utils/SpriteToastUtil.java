@@ -13,10 +13,11 @@ import android.widget.Toast;
 import com.rokid.glass.MyApplication;
 import com.rokid.glesse.R;
 
-
-/** 在眼镜端展示带图标的自定义提示。 */
+/**
+ * 在眼镜端展示带图标的自定义提示。
+ * Show a custom toast with an icon on the glasses.
+ */
 public class SpriteToastUtil {
-
 
     public static void showSpriteToastOld(Context context, String toastContent, int image, int time, boolean playSoundEffect) {
         try {
@@ -37,7 +38,6 @@ public class SpriteToastUtil {
             nowToast.setView(layout);
             nowToast.show();
             if (playSoundEffect) {
-                // MainApplication.getFocusAudioManager().playSoundEffect(FocusAudioManager.FX_RKD_TOAST);
             }
             if (time <= 3000) {
                 MyApplication.Companion.getGMainHandler().postDelayed(new Runnable() {
@@ -84,7 +84,6 @@ public class SpriteToastUtil {
 
             windowManager.addView(layout, params);
             if (playSoundEffect) {
-                // BasicApplication.getBasicInstance().playFxSound(FxSoundPlayer.FX_RKD_TOAST);
             }
             MyApplication.Companion.getGMainHandler().postDelayed(() -> {
                 try {

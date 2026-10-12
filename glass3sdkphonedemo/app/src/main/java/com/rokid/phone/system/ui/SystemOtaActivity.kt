@@ -1,5 +1,8 @@
 package com.rokid.phone.system.ui
 
+import com.rokid.phone.utils.demoString
+import com.rokid.phone.R
+
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
@@ -44,8 +47,6 @@ import java.lang.ref.WeakReference
 class SystemOtaActivity :
     MviActivity<ActivitySystemBinding, SystemState, SystemIntent, SystemEvent, SystemViewModel>() {
 
-//    override val viewModel = SystemViewModel(SystemRepository())
-
     private var updateStatus = UpdateStatus.UPDATE_UN
     private var isNeedUpdate = false
     private var fileMd5 = ""
@@ -63,9 +64,10 @@ class SystemOtaActivity :
     private var isFirst = true
     private var mDialog: AlertDialog? = null
 
-    private val btSystemFirstText = "检测新版本"
+    private val btSystemFirstText = demoString(R.string.demo_check_for_updates)
 
     // 使用单例 ViewModel，使 OTA 状态不受页面重建影响。
+    // Use a singleton ViewModel so OTA state survives screen recreation.
     override val viewModel: SystemViewModel by lazy {
         SystemViewModel.getInstance()
     }
@@ -82,15 +84,11 @@ class SystemOtaActivity :
         initListener()
 
         // 多层基类可能重复触发初始化，通过标记确保 OTA 管理器只启动一次。
+        // Multiple base classes may trigger initialization repeatedly; use a flag to start the OTA manager only once.
         if (isFirst) {
             isFirst = false
             OtaManager.start()
         }
-
-//        if (OtaManager.isState3) {
-//            setState3(OtaManager.progressState3.toInt())
-//            updateStatus = OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_START
-//        }
 
         L.i(TAG, "SystemOtaActivity onInit p2p: ${GlobalData.p2pConnectState.value}" +
                 " 是否是第三阶段: ${OtaManager.isState3}, progress: ${OtaManager.progressState3}")
@@ -102,22 +100,22 @@ class SystemOtaActivity :
                     + SystemGlobalConstant.powerValue + " updateStatus:" + updateStatus)
 
             if (!(SystemGlobalConstant.isCharge) && SystemGlobalConstant.powerValue != 100) {
-                Toast.makeText(this, "请保持眼镜在充电状态", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, demoString(R.string.demo_keep_the_glasses_charging), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (updateStatus == UpdateStatus.UPDATE_ING_DOWNLOAD || updateStatus == UpdateStatus.UPDATE_ING_SEND) {
-                Toast.makeText(this, "正在更新请稍后", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, demoString(R.string.demo_updating_please_wait), Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
             if (!NetworkUtil.isNetworkAvailable(this)) {
-                ToastUtils.showShort("网络无连接！")
+                ToastUtils.showShort(demoString(R.string.demo_no_network_connection))
                 return@setOnClickListener
             }
 
             if (!GlobalData.btConnectState.value) {
-                ToastUtils.showShort("蓝牙未连接！")
+                ToastUtils.showShort(demoString(R.string.demo_bluetooth_disconnected))
                 return@setOnClickListener
             }
 
@@ -127,10 +125,7 @@ class SystemOtaActivity :
             }
 
             // 热点状态在不同厂商设备上的检测结果不一致，因此仅通过界面提示用户确认网络状态。
-//            if (HotspotDetector.isHotspotEnabled(this)) {
-//                showApTips()
-//                return@setOnClickListener
-//            }
+            // Hotspot detection varies across device manufacturers, so only prompt the user in the UI to verify the network state.
 
             if (System.currentTimeMillis() - clickTime < 500) {
                 L.i(TAG, "initListener 忽略快速重复点击。。。")
@@ -140,13 +135,6 @@ class SystemOtaActivity :
             clickTime = System.currentTimeMillis()
 
             if (isNeedUpdate) {
-//                updateStatus = UpdateStatus.UPDATE_ING
-//                binding.btSystem.visibility = View.GONE
-//                LoadingManager.showLoading(this, "更新准备...")
-//
-//                L.d(TAG, "开始更新准备中。。。")
-//
-//                viewModel.sendIntent(SystemIntent.startUpdate(filePath, fileMd5))
 
                 L.i(TAG, "initListener 开始更新准备中...")
 
@@ -154,12 +142,11 @@ class SystemOtaActivity :
             } else {
                 L.i(TAG, "initListener 版本检测中...")
 
-                LoadingManager.showLoading(this, "版本检测中...")
+                LoadingManager.showLoading(this, demoString(R.string.demo_checking_for_updates))
 
                 val info = RKSystemInfo()
                 info.osType = SystemGlobalConstant.osType
                 info.version = SystemGlobalConstant.version
-//                info.version = "1.01.002-20250619-151102"
                 info.deviceId = SystemGlobalConstant.deviceId
                 info.deviceTypeId = SystemGlobalConstant.deviceTypeId
 
@@ -185,13 +172,12 @@ class SystemOtaActivity :
         L.d(TAG, "onBackPressed updateStatus: $updateStatus")
 
         if (updateStatus == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_START || OtaManager.isState3) {
-            exitTipsMsg = "眼镜系统正在升级中，可关闭页面等待升级完成"
+            exitTipsMsg = demoString(R.string.demo_the_glasses_are_updating_you_can_close_this)
             showFinishTips()
 
             return
         } else if (updateStatus == UpdateStatus.UPDATE_ING_DOWNLOAD || updateStatus == UpdateStatus.UPDATE_ING_SEND) {
-            exitTipsMsg = "眼镜系统正在升级中，确认中断吗？"
-//            showFinishTips()
+            exitTipsMsg = demoString(R.string.demo_the_glasses_are_updating_interrupt_the_update)
 
             showTipsForExit()
 
@@ -220,13 +206,13 @@ class SystemOtaActivity :
 
             if (it) {
                 L.d(TAG, "prepareConnectP2P 111 准备更新...")
-                LoadingManager.showLoading(this, "准备更新...")
+                LoadingManager.showLoading(this, demoString(R.string.demo_preparing_update))
 
                 startDownload()
                 getP2PKeepConnect()
             } else {
                 L.d(TAG, "prepareConnectP2P 222 通道连接中...")
-                LoadingManager.showLoading(this, "通道连接中...")
+                LoadingManager.showLoading(this, demoString(R.string.demo_connecting))
 
                 PSecuritySDK.getWifiP2PClientService()?.sendConnectP2pRequest { isConnect ->
                     L.d(TAG, "prepareConnectP2P P2P自动连接结果 isConnect: $isConnect, isStartDownload: $isStartDownload")
@@ -235,7 +221,7 @@ class SystemOtaActivity :
                         runOnUiThread {
                             if (isConnect) {
                                 L.d(TAG, "prepareConnectP2P 222 准备更新...")
-                                LoadingManager.showLoading(this, "准备更新...")
+                                LoadingManager.showLoading(this, demoString(R.string.demo_preparing_update))
 
                                 startDownload()
                                 getP2PKeepConnect()
@@ -278,6 +264,7 @@ class SystemOtaActivity :
 
                 if (!isKeepConnect) {
                     // 使用新的弱引用
+                    // Use the new weak reference.
                     val innerWeakActivity = WeakReference(activity)
                     PSecuritySDK.getWifiP2PClientService()?.getIP2PConnectControl()?.setKeepP2PConnect(true) { isSuccess ->
                         val innerActivity = innerWeakActivity.get()
@@ -310,9 +297,9 @@ class SystemOtaActivity :
 
     private fun p2pConnectFailTips() {
         AlertDialog.Builder(this)
-            .setTitle("连接失败")
-            .setMessage("P2P自动连接失败，请手动尝试")
-            .setPositiveButton("确定") { dialog, which ->
+            .setTitle(demoString(R.string.demo_connection_failed))
+            .setMessage(demoString(R.string.demo_automatic_p2p_connection_failed_try_manually))
+            .setPositiveButton(demoString(R.string.demo_ok)) { dialog, which ->
                 if (!GlobalData.p2pConnectState.value) {
                     if (ProtocolVersionUtils.isGlassVersion1()) {
                         startActivity(Intent(this, BtWifiConnectActivity::class.java))
@@ -323,7 +310,7 @@ class SystemOtaActivity :
 
                 dialog.dismiss()
             }
-            .setNegativeButton("取消") { dialog, which ->
+            .setNegativeButton(demoString(R.string.prompter_cancel)) { dialog, which ->
                 dialog.dismiss()
             }
             .setCancelable(false)
@@ -348,9 +335,8 @@ class SystemOtaActivity :
                 isNeedUpdate = event.need
                 if (event.need) {
                     binding.clUpdateContent.visibility = View.VISIBLE
-                    binding.btSystem.text = "立即更新"
-                    binding.tvNewSystemVersion.text = "版本号 " + event.version
-//                    binding.clProcess.visibility = View.VISIBLE
+                    binding.btSystem.text = demoString(R.string.demo_update_now)
+                    binding.tvNewSystemVersion.text = demoString(R.string.demo_version) + event.version
                     binding.clUpdateContent.visibility = View.VISIBLE
                     binding.tvUpdateContent.text = event.content
                 } else {
@@ -373,27 +359,28 @@ class SystemOtaActivity :
 
                 if (status == OTA_UPDATE_STATUS.OTA_FILE_MOVE) {
                     binding.progressBar.visibility = View.GONE
-                    binding.tvProcessTips.text = "OTA文件正在迁移至升级路径"
+                    binding.tvProcessTips.text = demoString(R.string.demo_moving_ota_file_to_the_update_location)
                     isDownOrSend = false
                 } else if (status == OTA_UPDATE_STATUS.OTA_FILE_MOVE_SUCCESS) {
                     binding.progressBar.visibility = View.GONE
-                    binding.tvProcessTips.text = "OTA文件迁移至升级路径成功"
+                    binding.tvProcessTips.text = demoString(R.string.demo_ota_file_moved_to_the_update_location)
                     isDownOrSend = false
                 } else if (status == OTA_UPDATE_STATUS.OTA_FILE_MOVE_FAILED) {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "OTA文件迁移至升级路径失败", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, demoString(R.string.demo_failed_to_move_ota_file_to_the_update), Toast.LENGTH_SHORT).show()
                     isDownOrSend = false
                 } else if (status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_START) {
                     // 恢复页面时隐藏操作按钮，确保升级进度视图可见。
+                    // When restoring the screen, hide action buttons and keep the update progress view visible.
                     binding.btSystem.visibility = View.GONE
                     binding.clProcess.visibility = View.VISIBLE
                     binding.progressBar.visibility = View.VISIBLE
-//                    binding.tvProcessTips.text = "正在进行升级，阶段"+mSystemOtaStatus.state+" 更新中"+mSystemOtaStatus.process+"%"
-                    binding.tvStatus.text = "阶段(3/3):"
+                    binding.tvStatus.text = demoString(R.string.demo_stage_3_3)
                     binding.tvProcessTips.text = "${OtaManager.STATE_3} " + mSystemOtaStatus.process + " %"
                     binding.progressBar.progress = mSystemOtaStatus.process.toFloat()
 
                     // 只展示当前阶段的进度，避免多个进度视图交替出现。
+                    // Show only the current stage's progress to avoid alternating between multiple progress views.
                     if (isDownOrSend) {
                         isDownOrSend = false
                         viewModel.sendIntent(SystemIntent.cancelDownload())
@@ -403,7 +390,7 @@ class SystemOtaActivity :
                     }
                 } else if (status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_REBOOT) {
                     binding.progressBar.visibility = View.GONE
-                    binding.tvProcessTips.text = "升级完成正在重启中"
+                    binding.tvProcessTips.text = demoString(R.string.demo_update_complete_restarting)
                     GlobalEvent.autoConnectionEvent.call(workScope)
 
                     exitTipsMsg = ""
@@ -415,14 +402,14 @@ class SystemOtaActivity :
                 } else if (status == OTA_UPDATE_STATUS.OTA_CORE_SYSTEM_UPDATE_FAILED) {
                     binding.progressBar.visibility = View.GONE
                     exitTipsMsg = ""
-                    Toast.makeText(this, "升级失败", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, demoString(R.string.demo_update_failed), Toast.LENGTH_SHORT).show()
 
                     isDownOrSend = false
                     OtaManager.resetState3()
                 } else if (status == OTA_UPDATE_STATUS.OTA_CHECK_FAILED) {
                     binding.progressBar.visibility = View.GONE
                     exitTipsMsg = ""
-                    Toast.makeText(this, "升级检测失败，请重试", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, demoString(R.string.demo_failed_to_check_for_updates_try_again), Toast.LENGTH_SHORT).show()
 
                     isDownOrSend = false
                     OtaManager.resetState3()
@@ -449,25 +436,27 @@ class SystemOtaActivity :
 
         isDownOrSend = (state.updateStatus == UpdateStatus.UPDATE_ING_DOWNLOAD || state.updateStatus == UpdateStatus.UPDATE_ING_SEND)
 
-        if (state.updateStatus == UpdateStatus.UPDATE_ING_DOWNLOAD) { // 下载
+        // 下载
+        // Download.
+        if (state.updateStatus == UpdateStatus.UPDATE_ING_DOWNLOAD) {
             LoadingManager.hideLoading()
             binding.btSystem.visibility = View.GONE
             binding.clProcess.visibility = View.VISIBLE
             binding.progressBar.progress = state.process
             binding.progressBar.visibility = View.VISIBLE
-            binding.tvStatus.text = "阶段(1/3):"
+            binding.tvStatus.text = demoString(R.string.demo_stage_1_3)
             binding.tvProcessTips.text =
-//                "镜像下载 " + String.format(Locale.US, "%.1f", state.process) + " %"
                 "${OtaManager.STATE_1} " + state.process.toInt() + " %"
-        } else if (state.updateStatus == UpdateStatus.UPDATE_ING_SEND) { // 发送镜像到眼镜
+        } else if (state.updateStatus == UpdateStatus.UPDATE_ING_SEND) {
+            // 发送镜像到眼镜
+            // Send the image to the glasses.
             LoadingManager.hideLoading()
             binding.btSystem.visibility = View.GONE
             binding.clProcess.visibility = View.VISIBLE
             binding.progressBar.progress = state.process
             binding.progressBar.visibility = View.VISIBLE
-            binding.tvStatus.text = "阶段(2/3):"
+            binding.tvStatus.text = demoString(R.string.demo_stage_2_3)
             binding.tvProcessTips.text =
-//                "镜像同步 " + String.format(Locale.US, "%.1f", state.process) + " %"
                 "${OtaManager.STATE_2} " + state.process.toInt() + " %"
         } else if (state.updateStatus == UpdateStatus.UPDATE_FAILED) {
             L.i(TAG, "render 更新失败 btSystem.text: ${binding.btSystem.text}")
@@ -477,11 +466,11 @@ class SystemOtaActivity :
                 return
             }
 
-            binding.btSystem.text = "重试"
+            binding.btSystem.text = demoString(R.string.demo_retry)
             binding.btSystem.visibility = View.VISIBLE
             binding.clProcess.visibility = View.GONE
             isStartDownload = false
-            Toast.makeText(this, "更新失败", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, demoString(R.string.demo_update_failed_2), Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -490,7 +479,7 @@ class SystemOtaActivity :
         binding.btSystem.visibility = View.GONE
         binding.clProcess.visibility = View.VISIBLE
         binding.progressBar.visibility = View.VISIBLE
-        binding.tvStatus.text = "阶段(3/3):"
+        binding.tvStatus.text = demoString(R.string.demo_stage_3_3)
         binding.tvProcessTips.text =
             "${OtaManager.STATE_3} " + progress + " %"
         binding.progressBar.progress = OtaManager.progressState3
@@ -510,7 +499,7 @@ class SystemOtaActivity :
 
         if (OtaManager.isOTACompleted) {
             binding.progressBar.visibility = View.GONE
-            binding.tvProcessTips.text = "升级完成正在重启中"
+            binding.tvProcessTips.text = demoString(R.string.demo_update_complete_restarting)
             GlobalEvent.autoConnectionEvent.call(workScope)
 
             exitTipsMsg = ""
@@ -574,9 +563,9 @@ class SystemOtaActivity :
         mDialog?.dismiss()
         mDialog = null
         mDialog = AlertDialog.Builder(this)
-            .setTitle("升级完成")
-            .setMessage("眼镜系统正在重启中...")
-            .setPositiveButton("确定") { dialog, which ->
+            .setTitle(demoString(R.string.demo_update_complete))
+            .setMessage(demoString(R.string.demo_the_glasses_are_restarting))
+            .setPositiveButton(demoString(R.string.demo_ok)) { dialog, which ->
                 finish()
                 SystemViewModel.release()
                 startActivity(Intent(this, MainPhoneActivity::class.java))
@@ -590,13 +579,13 @@ class SystemOtaActivity :
 
         if (exitTipsMsg.isNotEmpty()) {
             AlertDialog.Builder(this)
-                .setTitle("提示")
+                .setTitle(demoString(R.string.demo_notice))
                 .setMessage(exitTipsMsg)
-                .setPositiveButton("确认") { dialog, which ->
+                .setPositiveButton(demoString(R.string.UserGuide_touchpad_Click_system_description)) { dialog, which ->
                     OtaManager.isShow = true
                     finish()
                 }
-                .setNegativeButton("取消") { dialog, which ->
+                .setNegativeButton(demoString(R.string.prompter_cancel)) { dialog, which ->
                     dialog.dismiss()
                 }
                 .setCancelable(false)
@@ -606,16 +595,16 @@ class SystemOtaActivity :
 
     private fun showTipsForExit() {
         AlertDialog.Builder(this)
-            .setTitle("提示")
-            .setMessage("眼镜系统正在升级中")
-            .setPositiveButton("后台运行") { dialog, which ->
+            .setTitle(demoString(R.string.demo_notice))
+            .setMessage(demoString(R.string.demo_the_glasses_are_updating))
+            .setPositiveButton(demoString(R.string.demo_run_in_background)) { dialog, which ->
                 L.i(TAG, "退入后台继续升级。。。")
 
-                ToastUtils.showLong("后台升级中...")
+                ToastUtils.showLong(demoString(R.string.demo_updating_in_background))
                 OtaManager.isShow = true
                 finish()
             }
-            .setNegativeButton("中止升级") { dialog, which ->
+            .setNegativeButton(demoString(R.string.demo_cancel_update)) { dialog, which ->
                 stopUpdate()
                 finish()
             }
@@ -625,31 +614,20 @@ class SystemOtaActivity :
 
     private fun showBTConnectTips() {
         AlertDialog.Builder(this)
-            .setTitle("提示")
-            .setMessage("蓝牙断开，请重新连接后再进行升级！")
-            .setPositiveButton("确定") { dialog, which ->
+            .setTitle(demoString(R.string.demo_notice))
+            .setMessage(demoString(R.string.demo_bluetooth_disconnected_reconnect_before_updating))
+            .setPositiveButton(demoString(R.string.demo_ok)) { dialog, which ->
                 L.i(TAG, "蓝牙断开，中断升级。。。")
 
                 stopUpdate()
                 finish()
                 startActivity(Intent(this, MainPhoneActivity::class.java))
             }
-//            .setNegativeButton("取消") {dialog, which ->
-//                dialog.dismiss()
-//            }
             .setCancelable(false)
             .show()
     }
 
     private fun showApTips() {
-//        AlertDialog.Builder(this)
-//            .setTitle("通道冲突")
-//            .setMessage("请关闭手机热点后再次重试!")
-//            .setPositiveButton("确定") { dialog, which ->
-//                dialog.dismiss()
-//            }
-//            .setCancelable(true)
-//            .show()
     }
 
 }

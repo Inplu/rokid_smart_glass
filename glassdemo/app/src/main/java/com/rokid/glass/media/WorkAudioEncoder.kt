@@ -8,7 +8,9 @@ import android.util.Log
 
 /**
  * 使用 MediaCodec + MediaMuxer 将 PCM 编码为 AAC (M4A/MP4 容器)
+ * Use MediaCodec and MediaMuxer to encode PCM as AAC in an M4A/MP4 container.
  * 即使文件后缀是 .mp3，内部实际是 AAC 编码
+ * The contents are AAC-encoded even when the filename extension is .mp3.
  */
 class WorkAudioEncoder {
     private val TAG = "AiWorkAudioEncoder"
@@ -21,6 +23,7 @@ class WorkAudioEncoder {
     private var presentationTimeUs = 0L
 
     // 假设输入是 16kHz 单声道 16bit PCM (Rokid Glass 常用格式)
+    // Assume 16 kHz mono 16-bit PCM input, a common format for Rokid Glass.
     private val SAMPLE_RATE = 16000
     private val CHANNEL_COUNT = 1
     private val BIT_RATE = 64000

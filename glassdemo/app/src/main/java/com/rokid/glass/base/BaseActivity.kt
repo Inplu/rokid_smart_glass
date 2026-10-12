@@ -47,24 +47,22 @@ open class BaseActivity : AppCompatActivity() {
         when (event.action) {
             KeyEvent.ACTION_DOWN -> {
                 when (event.keyCode) {
-//                    KeyEvent.KEYCODE_DPAD_DOWN -> {
-//                        Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:方向键向下事件")
-//                        ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_DPAD_DOWN)
-//                        return@OnUnhandledKeyEventListenerCompat true
-//                    }
                     // 触摸板向前滑动
+                    // Swipe forward on the touchpad.
                     KeyEvent.KEYCODE_DPAD_RIGHT -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板向前滑动")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_FRONT)
                         return@OnUnhandledKeyEventListenerCompat true
                     }
                     // 触摸板向后滑动
+                    // Swipe backward on the touchpad.
                     KeyEvent.KEYCODE_DPAD_LEFT -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板向后滑动")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_BEHIND)
                         return@OnUnhandledKeyEventListenerCompat true
                     }
                     // 触摸板返回键
+                    // Touchpad Back key.
                     KeyEvent.KEYCODE_BACK -> {
                         Log.d(TAG, "---OnUnhandledKeyEventListenerCompat:按下事件,触摸板返回键")
                         ret = GlassKeyEvent(GlassKeyEvent.KEYCODE_BACK)
@@ -86,6 +84,7 @@ open class BaseActivity : AppCompatActivity() {
         val timeDiff = curTime - lastHomeClickTime
         Log.d(TAG, "指环中间事件->时间差值:${timeDiff}毫秒")
         // 取消之前未执行的单击协程
+        // Cancel any previous pending single-click coroutine.
         clickJob?.cancel()
         clickJob = null
         if (timeDiff < DoubleTime) {
@@ -93,9 +92,11 @@ open class BaseActivity : AppCompatActivity() {
             GlassKeyEvent(GlassKeyEvent.KEYCODE_DOUBLE_CLICK)
         } else {
             // 启动协程延迟发送单击事件
+            // Start a coroutine to dispatch the single-click event after a delay.
             clickJob = scope.launch {
                 delay(DoubleTime)
                 // 检查协程是否仍处于活跃状态
+                // Check whether the coroutine is still active.
                 if (isActive) {
                     Log.d(TAG, "指环中间事件->判定为单击：间隔${timeDiff}ms")
                     GlassKeyEvent(GlassKeyEvent.KEYCODE_CLICK)
@@ -117,7 +118,6 @@ open class BaseActivity : AppCompatActivity() {
 
             MotionEvent.ACTION_MOVE -> {
                 Log.d(TAG, "dispatchTouchEvent ACTION_MOVE")
-//                return true
             }
 
             MotionEvent.ACTION_UP -> {
@@ -173,19 +173,26 @@ open class BaseActivity : AppCompatActivity() {
     private var lastKeyCode = -1
 
     // 防重复时间间隔（100ms）
+    // Duplicate-event suppression interval: 100 ms.
     private val DEBOUNCE_INTERVAL: Long = 100
 
     fun GlassKeyEvent(keyEvent: Int): Boolean {
         Log.d(TAG, "onGlassKeyEvent:$keyEvent")
         // 获取当前时间戳
+        // Get the current timestamp.
         val currentTime = System.currentTimeMillis()
         // 检查是否在100ms内按下相同的键
+        // Check whether the same key was pressed within 100 ms.
         if (keyEvent == lastKeyCode && (currentTime - lastKeyTime) < DEBOUNCE_INTERVAL) {
             // 100ms内重复按相同键，视为重复事件，直接返回
+            // Treat a repeated press of the same key within 100 ms as a duplicate and return immediately.
             Log.d(TAG, "忽略重复按键: $keyEvent")
-            return true // 消费事件，不再传递
+            // 消费事件，不再传递
+            // Consume the event without forwarding it.
+            return true
         }
         // 不是重复事件，更新记录的时间和键值
+        // For a non-duplicate event, update the recorded timestamp and keycode.
         lastKeyTime = currentTime
         lastKeyCode = keyEvent
         onGlassKeyEvent(keyEvent)
@@ -201,6 +208,7 @@ open class BaseActivity : AppCompatActivity() {
 
     /**
      * 屏幕常亮
+     * Keep the screen on.
      */
     override fun onResume() {
         super.onResume()
@@ -209,11 +217,11 @@ open class BaseActivity : AppCompatActivity() {
 
     /**
      * 取消屏幕常亮
+     * Stop keeping the screen on.
      */
     override fun onPause() {
         super.onPause()
         window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
-
 
 }

@@ -13,7 +13,7 @@
         android:layout_marginVertical="700dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="扫描指环"
+        android:text="@string/demo_scan_rings"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -24,7 +24,7 @@
         android:layout_marginVertical="500dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
-        android:text="连接"
+        android:text="@string/demo_connect"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

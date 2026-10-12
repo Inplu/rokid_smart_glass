@@ -15,7 +15,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginBottom="28dp"
         android:gravity="center"
-        android:text="车牌识别"
+        android:text="@string/item_plate_recog"
         android:textColor="@color/green"
         app:layout_constraintBottom_toTopOf="@+id/ll_container"
         app:layout_constraintLeft_toLeftOf="parent" />

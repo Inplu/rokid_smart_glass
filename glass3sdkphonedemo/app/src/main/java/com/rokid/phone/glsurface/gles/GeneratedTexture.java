@@ -24,7 +24,6 @@ import java.nio.ByteBuffer;
  * Code for generating images useful for testing textures.
  */
 public class GeneratedTexture {
-    //private static final String TAG = GlUtil.TAG;
 
     public enum Image { COARSE, FINE };
 

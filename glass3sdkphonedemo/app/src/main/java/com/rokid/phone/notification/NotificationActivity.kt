@@ -79,12 +79,6 @@ class NotificationActivity : FragmentActivity() {
             }
         }
 
-//        binding.sideIndexView.setOnIndexTouchListener { letter ->
-//            val position = applicationAdapter.getPositionForSection(letter.first())
-//            if (position >= 0) {
-//                binding.recyclerView.scrollToPosition(position)
-//            }
-//        }
     }
 
 
@@ -96,14 +90,6 @@ class NotificationActivity : FragmentActivity() {
                 this
             )
         )
-//        if (!isNotificationPermissionGranted(this)) {
-//            SPUtil.getInstance(this).putBoolean(PREF_KEY_ENABLE_NOTIFICATION_MESSAGE, false)
-//            binding.switchEnableNotification.isChecked = false
-//            binding.switchEnableNotification.isEnabled = false
-//            binding.rlEnableNotification.alpha = 0.5f
-//            updateUI(false)
-//            Toast.makeText(this, getString(R.string.notification_error_toast), Toast.LENGTH_SHORT).show()
-//        }
         if (!isNotificationListenerEnabled(this)) {
             SPUtil.getInstance(this).putBoolean(PREF_KEY_ENABLE_NOTIFICATION_MESSAGE, false)
             binding.switchEnableNotification.isChecked = false
@@ -131,6 +117,7 @@ class NotificationActivity : FragmentActivity() {
         Log.d(TAG, "[Notification] switchEnableAllNotification isCheck=$isCheck")
         SPUtil.getInstance(this).putBoolean(PREF_KEY_ENABLE_ALL_NOTIFICATION, isCheck)
         // 所有都全部开启或者全部关闭
+        // Enable or disable all items together.
         if (::applicationAdapter.isInitialized) {
             applicationAdapter.setEnableAllNotification(isCheck)
             saveAppSetting()
@@ -147,6 +134,7 @@ class NotificationActivity : FragmentActivity() {
             val pm = baseContext.packageManager
 
             // 先禁用 Service
+            // Disable the Service first.
             pm.setComponentEnabledSetting(
                 componentName,
                 PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
@@ -154,6 +142,7 @@ class NotificationActivity : FragmentActivity() {
             )
 
             // 重新启用 Service
+            // Enable the Service again.
             pm.setComponentEnabledSetting(
                 componentName,
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -220,7 +209,6 @@ class NotificationActivity : FragmentActivity() {
         binding.recyclerView.visibility = View.GONE
         binding.tvNotificationFilterTips.visibility = View.GONE
 
-//        binding.rlLockscreenNotify.visibility = View.VISIBLE
         binding.switchLockscreenNotify.isChecked =
             SPUtil.getInstance(baseContext).getBoolean(PREF_KEY_ONLY_LOCKSCREEN_NOTIFY, false)
 
@@ -246,7 +234,10 @@ class NotificationActivity : FragmentActivity() {
             }
 
             // 排序 + 分组
-            val grouped = apps.groupBy { it.firstLetter }.toSortedMap() // A-Z排序
+            // Sort and group.
+            // A-Z排序
+            // Sort from A to Z.
+            val grouped = apps.groupBy { it.firstLetter }.toSortedMap()
             val items = mutableListOf<AppListItem>()
             grouped.forEach { (letter, group) ->
                 items.add(AppListItem.Header(letter.toString()))
@@ -261,18 +252,6 @@ class NotificationActivity : FragmentActivity() {
                 binding.tvNotificationFilterTips.visibility = View.VISIBLE
                 binding.rlEnableAllNotification.visibility = View.VISIBLE
                 Log.d(TAG, "[Notification] getInstalledApps apps.size = ${apps.size}, save appsList=${appsList}")
-//                val applist = apps.filter { app ->
-//                    pm.getLaunchIntentForPackage(app.packageName) != null
-//                }.map { app ->
-//                    AppInfo(
-//                        name = pm.getApplicationLabel(app).toString(),
-//                        packageName = app.packageName,
-//                        icon = pm.getApplicationIcon(app),
-//                        isCheck = if (appsList.isEmpty()) false else appsList.contains(app.packageName)
-//                    )
-//                }.sortedByDescending { appInfo -> // Sorting to prioritize apps in appsList
-//                    appInfo.isCheck
-//                }
 
                 applicationAdapter = ApplicationAdapter(items) {
                     val isAllEnable = SPUtil.getInstance(baseContext).getBoolean(PREF_KEY_ENABLE_ALL_NOTIFICATION, false)
@@ -288,8 +267,6 @@ class NotificationActivity : FragmentActivity() {
                 binding.recyclerView.adapter = applicationAdapter
                 binding.recyclerView.layoutManager = LinearLayoutManager(baseContext)
 
-                // 设置侧边栏点击跳转
-//                initSideBar(applicationAdapter.getIndexMap())
             }
         }
     }

@@ -16,10 +16,13 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/rl_layout"
         android:layout_width="match_parent"
-        android:layout_height="37dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:orientation="vertical"
+        android:paddingVertical="10dp"
         android:layout_marginLeft="23dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="23dp"
@@ -30,22 +33,19 @@
         app:layout_constraintTop_toBottomOf="@+id/layout_title">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:text="眼镜系统"
+            android:text="@string/demo_glasses_system"
             android:textColor="#272727"
             android:textSize="16sp" />
 
         <TextView
             android:id="@+id/tv_version"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
             android:textColor="#9C9D9C"
             android:textSize="16sp" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ll_empty"
@@ -68,7 +68,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="眼镜系统已是最新"
+            android:text="@string/demo_glasses_system_is_up_to_date"
             android:textColor="#666666" />
     </LinearLayout>
 
@@ -92,33 +92,42 @@
 
         <TextView
             android:id="@+id/tv_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
             android:layout_marginTop="2dp"
-            android:text="最新系统"
+            android:text="@string/demo_latest_system"
             android:textSize="15sp"
-            app:layout_constraintLeft_toRightOf="@+id/iv_logo"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toEndOf="@+id/iv_logo"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <TextView
             android:id="@+id/tv_new_system_version"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="3dp"
+            android:text="@string/demo_yodaos_sprite_1_2_1"
+            app:layout_constraintStart_toEndOf="@+id/iv_logo"
+            app:layout_constraintTop_toBottomOf="@id/tv_name"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/update_header_bottom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="12dp"
-            android:layout_marginTop="3dp"
-            android:text="YodaOS-Sprite 1.2.1"
-            app:layout_constraintLeft_toRightOf="@+id/iv_logo"
-            app:layout_constraintTop_toBottomOf="@id/tv_name" />
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="iv_logo,tv_new_system_version" />
 
         <TextView
             android:id="@+id/tv_update_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="这里是更新内容"
+            android:text="@string/demo_update_details"
             android:textColor="@color/black_normal_70"
-            app:layout_constraintTop_toBottomOf="@+id/iv_logo" />
+            app:layout_constraintTop_toBottomOf="@id/update_header_bottom" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Button
@@ -129,7 +138,7 @@
         android:layout_marginRight="13dp"
         android:layout_marginBottom="15dp"
         android:background="@drawable/rounded_corner_black_bg"
-        android:text="检测新版本"
+        android:text="@string/demo_check_for_updates"
         android:textColor="@color/white"
         android:textSize="16sp"
         app:backgroundTint="#FF000000"
@@ -142,7 +151,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:paddingHorizontal="15dp"
-        android:text="关闭热点且保证眼镜WIFI连接和充电状态"
+        android:text="@string/demo_turn_off_the_hotspot_keep_the_glasses_connected"
         android:textColor="#999999"
         android:lineSpacingExtra="1.5dp"
         app:layout_constraintBottom_toTopOf="@+id/bt_system"
@@ -159,7 +168,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cl_process"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="wrap_content"
+        android:minHeight="96dp"
         android:background="@drawable/rounded_corner_bg"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -167,18 +177,20 @@
         app:layout_constraintRight_toRightOf="parent">
 
         <LinearLayout
+            android:id="@+id/progress_text_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tv_status"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:gravity="center"
                 android:textColor="#0C120D"
                 android:textStyle="bold"
                 android:textSize="15sp"
@@ -186,11 +198,12 @@
 
             <TextView
                 android:id="@+id/tv_process_tips"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:gravity="center"
                 android:textColor="#0C120D"
-                android:layout_marginStart="6dp"
+                android:layout_marginHorizontal="16dp"
                 tools:text="镜像上传 26 %"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -202,10 +215,11 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/progress_text_container" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -2,7 +2,9 @@ package com.rokid.phone.video
 
 /**
  * 根据控制链路、数据链路和渲染状态选择最小恢复动作。
+ * Choose the smallest recovery action based on the control channel, data channel, and rendering state.
  * 远端相机只在蓝牙和 P2P 均正常、并且确实收不到视频包时才允许重启。
+ * Only restart the remote camera when Bluetooth and P2P are healthy and no video packets are arriving.
  */
 class VideoStreamRecoveryPolicy(private val stallTimeoutMs: Long) {
     enum class Action {

@@ -9,7 +9,7 @@ class SpeechMenuIconContractTest {
     @Test
     fun onlineSpeechMenuUsesDedicatedIconForBothStates() {
         val source = File("src/main/java/com/rokid/glass/HomeActivity.kt").readText()
-        val speechBlock = source.substringAfter("\"独立ASR/TTS\"")
+        val speechBlock = source.substringAfter("R.string.demo_standalone_asr_tts")
             .substringBefore("false\n                )")
 
         assertEquals(2, Regex("R\\.mipmap\\.app_online_speech").findAll(speechBlock).count())

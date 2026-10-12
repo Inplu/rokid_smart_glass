@@ -38,6 +38,7 @@ class BlueDeviceAdapter(private var list: List<BluetoothDeviceInfo>) :
     @SuppressLint("MissingPermission")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         // 获取已连接设备列表（保持原有逻辑不变）
+        // Get the connected device list while retaining the existing logic.
         val bluetoothManager = Utils.getApp().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val profileIds = listOf(
             BluetoothProfile.HEADSET,
@@ -67,12 +68,14 @@ class BlueDeviceAdapter(private var list: List<BluetoothDeviceInfo>) :
 
         holder.cbDevice.isChecked = list[position].isSelected
         // 处理Item点击事件
+        // Handle item clicks.
         holder.itemView.setOnClickListener {
 
             onItemClickListener?.onItemClick(position,list[position])
         }
 
         // 处理CheckBox点击事件
+        // Handle CheckBox clicks.
         holder.cbDevice.setOnClickListener {
             selectItem(position)
         }
@@ -94,6 +97,7 @@ class BlueDeviceAdapter(private var list: List<BluetoothDeviceInfo>) :
 
 
             // 回调选中事件
+            // Invoke the selection callback.
             onItemClickListener?.onSelect(list[position])
         }
     }

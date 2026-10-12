@@ -56,7 +56,6 @@ public final class EglCore {
     private EGLConfig mEGLConfig = null;
     private int mGlVersion = -1;
 
-
     /**
      * Prepares EGL display and context.
      * <p>
@@ -93,7 +92,6 @@ public final class EglCore {
 
         // Try to get a GLES3 context, if requested.
         if ((flags & FLAG_TRY_GLES3) != 0) {
-            //L.d(TAG, "Trying GLES 3");
             EGLConfig config = getConfig(flags, 3);
             if (config != null) {
                 int[] attrib3_list = {
@@ -104,7 +102,6 @@ public final class EglCore {
                         attrib3_list, 0);
 
                 if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {
-                    //L.d(TAG, "Got GLES 3 config");
                     mEGLConfig = config;
                     mEGLContext = context;
                     mGlVersion = 3;
@@ -112,7 +109,6 @@ public final class EglCore {
             }
         }
         if (mEGLContext == EGL14.EGL_NO_CONTEXT) {  // GLES 2 only, or GLES 3 attempt failed
-            //L.d(TAG, "Trying GLES 2");
             EGLConfig config = getConfig(flags, 2);
             if (config == null) {
                 throw new RuntimeException("Unable to find a suitable EGLConfig");
@@ -157,7 +153,6 @@ public final class EglCore {
                 EGL14.EGL_BLUE_SIZE, 8,
                 EGL14.EGL_ALPHA_SIZE, 8,
                 EGL14.EGL_DEPTH_SIZE, 24,
-                //EGL14.EGL_STENCIL_SIZE, 8,
                 EGL14.EGL_RENDERABLE_TYPE, renderableType,
                 EGL14.EGL_NONE, 0,      // placeholder for recordable [@-3]
                 EGL14.EGL_NONE

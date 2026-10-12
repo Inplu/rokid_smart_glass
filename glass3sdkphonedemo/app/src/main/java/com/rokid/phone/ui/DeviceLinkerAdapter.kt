@@ -1,5 +1,7 @@
 package com.rokid.phone.ui
 
+import com.rokid.phone.utils.demoString
+
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import com.rokid.phone.R
 
 
 // 列表项基类
+// Base class for list items.
 sealed class ListItem {
       data class GroupHeader(val title: String) : ListItem()
     data class DeviceItem(val name: String, var isConnected: Boolean, var isConnecting: Boolean = false) : ListItem()
@@ -28,7 +31,9 @@ class DeviceLinkerAdapter(private var itemList: MutableList<ListItem> = mutableL
         private const val TYPE_DEVICE_ITEM = 1
     }
 
-    private var selectedPosition = -1 // 记录当前选中位置
+    // 记录当前选中位置
+    // Track the currently selected position.
+    private var selectedPosition = -1
     var onItemClickListener: OnItemClickListener? = null
 
     override fun getItemViewType(position: Int): Int {
@@ -69,11 +74,11 @@ class DeviceLinkerAdapter(private var itemList: MutableList<ListItem> = mutableL
                     deviceHolder.progressBar.visibility = View.GONE
                     deviceHolder.tvDeviceStatus.visibility = View.VISIBLE
                     if (item.isConnected) {
-                        deviceHolder.tvDeviceStatus.text = "已连接"
+                        deviceHolder.tvDeviceStatus.text = demoString(R.string.demo_connected)
                         deviceHolder.tvDeviceStatus.setTextColor(deviceHolder.itemView.context.getColor( R.color.green))
                         deviceHolder.tvDeviceName.setTextColor(deviceHolder.itemView.context.getColor( R.color.green))
                     } else {
-                        deviceHolder.tvDeviceStatus.text = "未连接"
+                        deviceHolder.tvDeviceStatus.text = demoString(R.string.demo_disconnected_3)
                         deviceHolder.tvDeviceStatus.setTextColor(deviceHolder.itemView.context.getColor(android.R.color.darker_gray))
                         deviceHolder.tvDeviceName.setTextColor(deviceHolder.itemView.context.getColor(android.R.color.black))
                     }
@@ -91,6 +96,7 @@ class DeviceLinkerAdapter(private var itemList: MutableList<ListItem> = mutableL
 
     /**
      * 选中指定位置的Item并取消之前的选中项
+     * Select the item at the specified position and deselect the previously selected item.
      */
 
 
@@ -99,11 +105,13 @@ class DeviceLinkerAdapter(private var itemList: MutableList<ListItem> = mutableL
     }
 
 
-    
+
     fun setNewData(list: List<ListItem>) {
         itemList.clear()
         itemList.addAll(list)
-        selectedPosition = -1 // 重置选中状态
+        // 重置选中状态
+        // Reset the selection state.
+        selectedPosition = -1
         notifyDataSetChanged()
     }
 
@@ -121,7 +129,7 @@ class DeviceLinkerAdapter(private var itemList: MutableList<ListItem> = mutableL
             }
         }
     }
-    
+
     class DeviceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvDeviceName: TextView = itemView.findViewById(R.id.tvDeviceName)
         val tvDeviceStatus: TextView = itemView.findViewById(R.id.tvDeviceDetails)

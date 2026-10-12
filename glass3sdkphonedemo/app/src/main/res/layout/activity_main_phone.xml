@@ -5,9 +5,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainPhoneActivity">
 
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -16,6 +21,7 @@
             android:padding="16dp">
 
             <!-- 顶部标题栏 -->
+            <!-- Top title bar. -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -28,7 +34,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="设备"
+                    android:text="@string/demo_device"
                     android:textSize="24sp"
                     android:textColor="#333333"
                     android:textStyle="bold" />
@@ -50,6 +56,7 @@
             </LinearLayout>
 
             <!-- 连接提示 -->
+            <!-- Connection hint. -->
             <LinearLayout
                 android:visibility="visible"
                 android:layout_width="match_parent"
@@ -71,7 +78,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="未连接，如何连接眼镜"
+                    android:text="@string/demo_disconnected_how_to_connect_glasses"
                     android:textSize="14sp"
                     android:textColor="#1976D2" />
 
@@ -84,6 +91,7 @@
             </LinearLayout>
 
             <!-- Rokid Glass3 设备卡片 -->
+            <!-- Rokid Glass3 device card. -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -92,6 +100,7 @@
                 android:gravity="center">
 
                 <!-- 眼镜图标 -->
+                <!-- Glasses icon. -->
                 <ImageView
                     android:layout_width="200dp"
                     android:layout_height="120dp"
@@ -114,7 +123,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     android:layout_marginTop="90dp"
-                    android:text="Rokid Glass3"
+                    android:text="@string/demo_rokid_glass3"
                     android:textStyle="bold"
                     android:textSize="16sp"
                     android:textColor="#757575"
@@ -201,7 +210,7 @@
 
                     <TextView
                         android:id="@+id/tv_dl"
-                        android:text="10%"
+                        android:text="@string/demo_10"
                         android:gravity="center"
                         android:textSize="14sp"
                         android:textColor="#333333"
@@ -219,19 +228,24 @@
 
 
             <!-- 功能模块网格 -->
+            <!-- Feature grid. -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <!-- 垂直辅助线（定义左右分栏基准） -->
+                <!-- Vertical guideline defining the boundary between the left and right columns. -->
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline_vertical"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    app:layout_constraintGuide_percent="0.5" /> <!-- 使用百分比确保真正居中 -->
+                    app:layout_constraintGuide_percent="0.5" />
+                <!-- 使用百分比确保真正居中 -->
+                <!-- Use a percentage to ensure it is centered. -->
 
                 <!-- 水平辅助线（分隔控制行与功能行） -->
+                <!-- Horizontal guideline separating the control row from the feature rows. -->
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline_horizontal"
                     android:layout_width="wrap_content"
@@ -240,6 +254,7 @@
                     app:layout_constraintGuide_begin="90dp" />
 
                 <!-- 水平辅助线（分隔第一行功能卡片） -->
+                <!-- Horizontal guideline separating the first row of feature cards. -->
                 <androidx.constraintlayout.widget.Guideline
                     android:id="@+id/guideline_horizontal_second"
                     android:layout_width="wrap_content"
@@ -248,10 +263,11 @@
                     app:layout_constraintGuide_begin="198dp" />
 
                 <!-- 音量控制 -->
+                <!-- Volume control. -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/volume_control"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="104dp"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -270,25 +286,28 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:layout_width="80dp"
-                        android:layout_height="23dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="系统复用"
+                        android:text="@string/demo_system_features"
                         android:textColor="#666666"
                         android:textSize="12sp"
                         app:layout_constraintBottom_toBottomOf="@+id/volumeicon"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toEndOf="@+id/volumeicon"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"
                         app:layout_constraintTop_toTopOf="@+id/volumeicon" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 亮度控制 -->
+                <!-- Brightness control. -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/brightness_control"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="104dp"
                     android:background="@drawable/rounded_corner_bg"
                     android:layout_marginTop="16dp"
                     android:layout_marginStart="6dp"
@@ -307,14 +326,16 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:layout_width="27dp"
-                        android:layout_height="23dp"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:text="声音发送"
+                        android:text="@string/demo_send_audio_2"
                         android:textColor="#666666"
                         android:textSize="12sp"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toEndOf="@+id/lighticon"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"
                         app:layout_constraintBottom_toBottomOf="@+id/lighticon"
                         app:layout_constraintTop_toTopOf="@+id/lighticon" />
 
@@ -322,10 +343,12 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 翻译 (第二行左侧) -->
+                <!-- Translation (second row, left). -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_translate"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -350,36 +373,51 @@
 
                     <TextView
                         android:id="@+id/tv_title_translate"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="翻译"
+                        android:text="@string/demo_translate"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_translate"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_translate_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_translate,iv_translate" />
 
                     <TextView
                         android:id="@+id/tv_desc_translate"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:gravity="center"
-                        android:text="沟通无忧支持多语翻译"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_communicate_with_multilingual_translation"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_translate_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 通知 (第二行右侧) -->
+                <!-- Notifications (second row, right). -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_notification"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginStart="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -404,35 +442,51 @@
 
                     <TextView
                         android:id="@+id/tv_title_notification"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="通知"
+                        android:text="@string/demo_notifications"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_notification"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_notification_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_notification,iv_notification" />
 
                     <TextView
                         android:id="@+id/tv_desc_notification"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="管理眼镜端接受通知"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_manage_notifications_on_glasses"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_notification_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 新手教学 (第三行左侧) -->
+                <!-- Getting started tutorial (third row, left). -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_message_receive"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -457,35 +511,51 @@
 
                     <TextView
                         android:id="@+id/tv_title_tutorial"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="消息接收"
+                        android:text="@string/demo_receive_messages"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_tutorial"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_tutorial_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_tutorial,iv_tutorial" />
 
                     <TextView
                         android:id="@+id/tv_desc_tutorial"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="接收眼镜消息"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_receive_messages_from_glasses"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_tutorial_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- 操作指南 (第三行右侧) -->
+                <!-- User guide (third row, right). -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_message_send"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginStart="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -510,28 +580,42 @@
 
                     <TextView
                         android:id="@+id/tv_title_guide"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="消息发送"
+                        android:text="@string/demo_send_messages"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_guide"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_guide_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_guide,iv_guide" />
 
                     <TextView
                         android:id="@+id/tv_desc_guide"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="发送消息给眼镜"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_send_messages_to_glasses"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_guide_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -539,7 +623,8 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_album"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -564,33 +649,48 @@
 
                     <TextView
                         android:id="@+id/tv_title_album"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="相册"
+                        android:text="@string/demo_gallery"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_album"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_album_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_album,iv_album" />
 
                     <TextView
                         android:id="@+id/tv_desc_album"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="记录视频和照片"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_record_videos_and_photos"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_album_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/btn_video_stream"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginStart="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -615,37 +715,53 @@
 
                     <TextView
                         android:id="@+id/tv_title_ai_assistant"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="消息通知"
+                        android:text="@string/notification_title"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_ai_assistant"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_ai_assistant_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_ai_assistant,iv_ai_assistant" />
 
                     <TextView
                         android:id="@+id/tv_desc_ai_assistant"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="实时视觉智能"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_live_visual_intelligence"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_ai_assistant_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 
                 <!-- 应用安装 (第四行右侧) -->
+                <!-- Application installation (fourth row, right). -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/bt_app_install"
                     android:layout_width="0dp"
-                    android:layout_height="85dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="104dp"
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="6dp"
                     android:background="@drawable/rounded_corner_bg"
@@ -670,39 +786,55 @@
 
                     <TextView
                         android:id="@+id/tv_title_app_install"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="发送连接数据"
+                        android:text="@string/demo_send_connection_data"
                         android:textColor="#333333"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_marginTop="14dp"
-                        android:layout_marginLeft="11dp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginStart="11dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/iv_app_install"
+                        android:layout_marginEnd="8dp"/>
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/tv_title_app_install_bottom"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="tv_title_app_install,iv_app_install" />
 
                     <TextView
                         android:id="@+id/tv_desc_app_install"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:layout_marginLeft="11dp"
-                        android:text="快速安装眼镜端应用"
+                        android:layout_marginBottom="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="11dp"
+                        android:gravity="start"
+                        android:text="@string/demo_quickly_install_apps_on_glasses"
                         android:textColor="#232323"
                         android:textSize="10sp"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_title_app_install_bottom"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:layout_marginEnd="12dp"/>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <!-- AI助手 (第五行左侧) -->
+                <!-- AI assistant (fifth row, left). -->
 
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-
+    </ScrollView>
 
     <!-- 底部TabBar -->
+    <!-- Bottom tab bar. -->
     <LinearLayout
         android:visibility="visible"
         android:layout_width="match_parent"
@@ -712,6 +844,7 @@
         android:elevation="8dp">
 
         <!-- 分割线 -->
+        <!-- Divider. -->
         <View
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
@@ -725,6 +858,7 @@
             android:paddingBottom="6dp">
 
             <!-- 助手 Tab -->
+            <!-- Assistant tab. -->
             <LinearLayout
                 android:id="@+id/tab_assistant"
                 android:layout_width="0dp"
@@ -745,13 +879,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="助手"
+                    android:text="@string/demo_assistant"
                     android:textSize="10sp"
                     android:textColor="#8E8E93" />
 
             </LinearLayout>
 
             <!-- 设备 Tab (当前选中) -->
+            <!-- Device tab (currently selected). -->
             <LinearLayout
                 android:id="@+id/tab_device"
                 android:layout_width="0dp"
@@ -773,13 +908,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="设备"
+                    android:text="@string/demo_device"
                     android:textSize="10sp"
                     android:textColor="#007AFF" />
 
             </LinearLayout>
 
             <!-- 媒体 Tab -->
+            <!-- Media tab. -->
             <LinearLayout
                 android:id="@+id/tab_media"
                 android:layout_width="0dp"
@@ -800,13 +936,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="媒体"
+                    android:text="@string/demo_media"
                     android:textSize="10sp"
                     android:textColor="#8E8E93" />
 
             </LinearLayout>
 
             <!-- 我的 Tab -->
+            <!-- Profile tab. -->
             <LinearLayout
                 android:id="@+id/tab_profile"
                 android:layout_width="0dp"
@@ -828,7 +965,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="我的"
+                    android:text="@string/demo_me"
                     android:textSize="10sp"
                     android:textColor="#8E8E93" />
 
