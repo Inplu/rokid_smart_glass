@@ -1,5 +1,7 @@
 # Glass3 SDK Demo
 
+This repository contains the Rokid Glass 3 smart-glass system for assisting teachers, based on the official Glass 3 SDK demos.
+
 [中文 README](README.zh-CN.md)
 
 An example project for Rokid Glass3, covering the glasses SDK, phone and glasses coordination, industry applications, and audio/video streaming.
